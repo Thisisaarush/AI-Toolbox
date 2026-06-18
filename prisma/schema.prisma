@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String   @id @default(cuid())
+  clerkId         String   @unique
+  email           String?
+  name            String?
+  imageUrl        String?
+  stripeCustomerId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  dreams         Dream[]
+  commitMessages CommitMessage[]
+  prompts        Prompt[]
+  vibeChecks     VibeCheck[]
+}
+
+model Dream {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String
+  analysis    String?
+  imageUrl    String?
+  mood        String?
+  tags        String[]
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model CommitMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  diff      String
+  message   String
+  type      String?
+  scope     String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Prompt {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  content     String
+  model       String   @default("gpt-4o")
+  version     Int      @default(1)
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model VibeCheck {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playlistUrl String?
+  description String?
+  posterUrl   String?
+  vibeTags    String[]
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
