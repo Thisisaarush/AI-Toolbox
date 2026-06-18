@@ -8,16 +8,26 @@ import "./globals.css"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  adjustFontFallback: true,
 })
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  adjustFontFallback: true,
 })
 
 export const metadata: Metadata = {
   title: "Toolbox — Dev Tools & Creative Apps",
-  description: "A collection of dev tools and creative AI apps. One login, access to all.",
+  description: "A growing collection of AI-powered dev tools and creative apps. One account, access to all.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  openGraph: {
+    title: "Toolbox — Dev Tools & Creative Apps",
+    description: "A growing collection of AI-powered dev tools and creative apps.",
+    type: "website",
+  },
 }
 
 export default function RootLayout({
@@ -30,11 +40,15 @@ export default function RootLayout({
       <html
         lang="en"
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+        suppressHydrationWarning
       >
+        <head>
+          <link rel="preconnect" href="https://clerk.toolbox.app" />
+        </head>
         <body className="min-h-full flex flex-col">
           <TooltipProvider>
             {children}
-            <Toaster />
+            <Toaster position="bottom-right" richColors />
           </TooltipProvider>
         </body>
       </html>

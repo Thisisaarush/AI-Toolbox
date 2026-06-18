@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Code2, Moon, Music, Puzzle, GitCommit, Image, BookOpen, Radio } from "lucide-react"
+import { Code2, Moon, Music, Puzzle, GitCommit, Terminal, Image, BookOpen, Radio } from "lucide-react"
 import { Header } from "@/components/shared/header"
 
 const tools = [
@@ -49,6 +49,15 @@ const tools = [
     badge: "Dev Tool",
     color: "text-orange-500",
     bgColor: "bg-orange-50 dark:bg-orange-950",
+  },
+  {
+    name: "Curl-to-Type",
+    description: "Paste a cURL command and get TypeScript fetch code instantly.",
+    icon: Terminal,
+    href: "/tools/curl-to-type",
+    badge: "Dev Tool",
+    color: "text-cyan-500",
+    bgColor: "bg-cyan-50 dark:bg-cyan-950",
   },
   {
     name: "Cursive",
