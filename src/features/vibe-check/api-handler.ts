@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 
     if (!posterUrl) {
       return NextResponse.json(
-        { posterUrl: null, warning: "Image generation unavailable. Set OPENAI_API_KEY (DALL-E) or upgrade your Gemini plan for Imagen." },
+        { posterUrl: null, warning: "Image generation requires a paid Gemini plan (Imagen). Text features work on the free tier." },
       )
     }
 

@@ -32,6 +32,9 @@ export function VibeCheckContent() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? "Failed to generate")
       setPosterUrl((json as VibeCheckResult).posterUrl)
+      if (json.warning) {
+        toast.info(json.warning)
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to generate poster")
     } finally {

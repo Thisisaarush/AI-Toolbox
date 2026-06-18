@@ -1,18 +1,7 @@
 import "server-only"
-import OpenAI from "openai"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
-// --- Init providers (lazy) ---
-let _openai: OpenAI | null = null
 let _gemini: GoogleGenerativeAI | null = null
-
-function initOpenAI() {
-  if (_openai) return _openai
-  const key = process.env.OPENAI_API_KEY
-  if (!key) return null
-  _openai = new OpenAI({ apiKey: key })
-  return _openai
-}
 
 function initGemini() {
   if (_gemini) return _gemini
@@ -22,124 +11,40 @@ function initGemini() {
   return _gemini
 }
 
-// --- Abstraction layer ---
-
-type Provider = "openai" | "gemini"
-
-async function withBestProvider<T>(
-  handlers: {
-    openai?: () => Promise<T>
-    gemini?: () => Promise<T>
-  },
-  fallback: T,
-): Promise<T> {
-  if (handlers.openai && process.env.OPENAI_API_KEY) {
-    try {
-      return await handlers.openai()
-    } catch {
-      if (!handlers.gemini) return fallback
-    }
-  }
-  if (handlers.gemini && process.env.GEMINI_API_KEY) {
-    try {
-      return await handlers.gemini()
-    } catch {
-      return fallback
-    }
-  }
-  return fallback
+function getModel(model = "gemini-2.5-flash") {
+  const genAI = initGemini()
+  if (!genAI) return null
+  return genAI.getGenerativeModel({ model })
 }
 
-// --- Chat completions (generic) ---
+// --- Text completions ---
 
 async function chatCompletion(system: string, user: string, opts?: { json?: boolean; temperature?: number }): Promise<string> {
-  return withBestProvider(
-    {
-      openai: async () => {
-        const openai = initOpenAI()!
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [
-            { role: "system", content: system },
-            { role: "user", content: user },
-          ],
-          temperature: opts?.temperature ?? 0.7,
-          ...(opts?.json ? { response_format: { type: "json_object" } } : {}),
-        })
-        return response.choices[0]?.message?.content ?? ""
-      },
-      gemini: async () => {
-        const genAI = initGemini()!
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
-        const prompt = `${system}\n\n${user}`
-        const result = await model.generateContent(prompt)
-        return result.response.text()
-      },
-    },
-    "",
-  )
+  const model = getModel()
+  if (!model) return ""
+
+  try {
+    const prompt = opts?.json
+      ? `${system}\n\n${user}\n\nRespond with valid JSON only.`
+      : `${system}\n\n${user}`
+
+    const result = await model.generateContent(prompt)
+    return result.response.text()
+  } catch {
+    return ""
+  }
 }
 
-// --- Image generation (OpenAI DALL-E, fallback Gemini) ---
+// --- Image generation (not available on Gemini free tier) ---
 
-async function generateImage(prompt: string): Promise<string | null> {
-  return withBestProvider(
-    {
-      openai: async () => {
-        const openai = initOpenAI()!
-        const response = await openai.images.generate({
-          model: "dall-e-3",
-          prompt,
-          n: 1,
-          size: "1024x1024",
-        })
-        return response.data?.[0]?.url ?? null
-      },
-      gemini: async () => {
-        const key = process.env.GEMINI_API_KEY
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${key}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { responseModalities: ["Text", "Image"] },
-            }),
-          },
-        )
-        const data = await res.json()
-        const imagePart = data?.candidates?.[0]?.content?.parts?.find(
-          (p: Record<string, unknown>) => p.inlineData,
-        )
-        const base64 = imagePart?.inlineData?.data as string | undefined
-        const mimeType = (imagePart?.inlineData?.mimeType as string) ?? "image/png"
-        return base64 ? `data:${mimeType};base64,${base64}` : null
-      },
-    },
-    null,
-  )
+async function generateImage(_prompt: string): Promise<string | null> {
+  return null
 }
 
-// --- Audio transcription (OpenAI Whisper) ---
+// --- Audio transcription (not available on Gemini) ---
 
-async function transcribeAudio(audioBase64: string): Promise<string> {
-  return withBestProvider(
-    {
-      openai: async () => {
-        const openai = initOpenAI()!
-        const buffer = Buffer.from(audioBase64, "base64")
-        const blob = new Blob([buffer], { type: "audio/webm" })
-        const file = new File([blob], "recording.webm", { type: "audio/webm" })
-        const transcript = await openai.audio.transcriptions.create({
-          model: "whisper-1",
-          file,
-        })
-        return transcript.text
-      },
-    },
-    "",
-  )
+async function transcribeAudio(_audioBase64: string): Promise<string> {
+  return ""
 }
 
 // --- Tool-specific functions ---
@@ -151,10 +56,8 @@ export async function analyzeDream(dreamContent: string): Promise<string> {
   )
 }
 
-export async function generateDreamImage(dreamContent: string): Promise<string | null> {
-  return generateImage(
-    `A dreamlike, artistic visualization of this dream scene: ${dreamContent}. Dreamy, surreal style.`,
-  )
+export async function generateDreamImage(_dreamContent: string): Promise<string | null> {
+  return null
 }
 
 export async function generateCommitMessage(diff: string): Promise<{ message: string; type: string; scope?: string }> {
@@ -187,11 +90,65 @@ Respond with JSON:
   }
 }
 
-export async function generateVibePoster(description: string): Promise<string | null> {
-  return generateImage(
-    `Create a poster that captures this vibe/aesthetic: ${description}. Modern, artistic poster design with typography elements. Style: high-contrast, minimalist, trendy.`,
-  )
+export async function generateVibePoster(_description: string): Promise<string | null> {
+  return null
 }
 
-// Re-export for routes that use it directly
-export { transcribeAudio, chatCompletion, generateImage }
+export async function generatePrDescription(diff: string): Promise<{ title: string; description: string }> {
+  const system = `Generate a GitHub PR description from the git diff.
+
+Return JSON with:
+{
+  "title": "A concise PR title (max 72 chars)",
+  "description": "A well-structured PR description with ## Summary, ## Changes, ## Why, ## Testing sections"
+}`
+
+  const text = await chatCompletion(system, diff, { json: true, temperature: 0.3 })
+
+  try {
+    const result = JSON.parse(text)
+    return {
+      title: result.title ?? "Update codebase",
+      description: result.description ?? "See diff for details.",
+    }
+  } catch {
+    return { title: "Update codebase", description: "See diff for details." }
+  }
+}
+
+export async function generateJournalNarrative(entries: { date: string; content: string }[]): Promise<string> {
+  if (entries.length === 0) return "No entries yet."
+
+  const system = "You are a personal historian. Given a list of journal entries, write a cohesive narrative summary. Connect themes, highlight emotional arcs, and tell the story of this period. 2-3 paragraphs."
+
+  const user = entries.map(e => `[${e.date}]: ${e.content}`).join("\n\n")
+
+  const text = await chatCompletion(system, user, { temperature: 0.8 })
+  return text || "Could not generate narrative."
+}
+
+export async function categorizeRecipe(name: string, ingredients: string[]): Promise<{ category: string; cuisine: string; tags: string[] }> {
+  const system = `Given a recipe name and ingredients, categorize it.
+
+Return JSON:
+{
+  "category": "Dessert | Main Course | Appetizer | Breakfast | Salad | Soup | Drink | Snack",
+  "cuisine": "Italian | Mexican | Indian | Chinese | Japanese | American | French | Mediterranean | Thai | Other",
+  "tags": ["tag1", "tag2", "tag3"]
+}`
+
+  const text = await chatCompletion(system, `Recipe: ${name}\nIngredients: ${ingredients.join(", ")}`, { json: true })
+
+  try {
+    const result = JSON.parse(text)
+    return {
+      category: result.category ?? "Main Course",
+      cuisine: result.cuisine ?? "Other",
+      tags: Array.isArray(result.tags) ? result.tags.slice(0, 5) : [],
+    }
+  } catch {
+    return { category: "Main Course", cuisine: "Other", tags: [] }
+  }
+}
+
+export { transcribeAudio }

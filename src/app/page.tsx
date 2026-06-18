@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Code2, Moon, Music, Puzzle, GitCommit, Terminal } from "lucide-react"
+import { Code2, Moon, Music, Puzzle, GitCommit, Terminal, GitPullRequest, BookOpen, ImageIcon, Radio } from "lucide-react"
 import { Header } from "@/components/shared/header"
 
 const tools = [
@@ -58,6 +58,42 @@ const tools = [
     badge: "Dev Tool",
     color: "text-cyan-500",
     bgColor: "bg-cyan-50 dark:bg-cyan-950",
+  },
+  {
+    name: "PR-Eloquence",
+    description: "Paste your diff and get a well-written PR description with AI.",
+    icon: GitPullRequest,
+    href: "/tools/pr-eloquence",
+    badge: "Dev Tool",
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-50 dark:bg-indigo-950",
+  },
+  {
+    name: "Chronicle",
+    description: "Journal with AI narrative summaries of your life.",
+    icon: BookOpen,
+    href: "/tools/chronicle",
+    badge: "Creative",
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-50 dark:bg-indigo-950",
+  },
+  {
+    name: "Cursive",
+    description: "Type text and render it as handwriting. Download as PNG.",
+    icon: ImageIcon,
+    href: "/tools/cursive",
+    badge: "Creative",
+    color: "text-amber-500",
+    bgColor: "bg-amber-50 dark:bg-amber-950",
+  },
+  {
+    name: "Savor",
+    description: "Your family cookbook. Save, organize, and AI-categorize recipes.",
+    icon: Radio,
+    href: "/tools/savor",
+    badge: "Creative",
+    color: "text-red-500",
+    bgColor: "bg-red-50 dark:bg-red-950",
   },
 ]
 

@@ -10,7 +10,7 @@ One domain, many mini-apps. Shared infra (auth, DB, AI, payments). Build fast, c
 - **Font:** Geist (variable) — `display: swap`, `adjustFontFallback: true`
 - **Auth:** Clerk (keyless mode for dev)
 - **Database:** Prisma 7 + PostgreSQL (@prisma/adapter-pg)
-- **AI:** OpenAI (GPT-4o, DALL-E 3, Whisper) + Google Gemini 2.0 Flash (fallback)
+- **AI:** Google Gemini 2.5 Flash (primary), no OpenAI
 - **Payments:** Stripe (optional, not wired yet)
 - **Rate limiting:** In-memory sliding window (30/10 req/min)
 - **Logging:** Structured JSON (stdout/stderr)
@@ -46,14 +46,16 @@ One domain, many mini-apps. Shared infra (auth, DB, AI, payments). Build fast, c
 | SchemaViz | Dev | `/tools/schema-viz` | ✅ Live |
 | Curl-to-Type | Dev | `/tools/curl-to-type` | ✅ Live |
 
-### Future
+### Week 3 — Shipped
 
-| Tool | Type | Route | Priority |
-|------|------|-------|----------|
-| Cursive | Consumer | `/tools/cursive` | Low |
-| PR-Eloquence | Dev | `/tools/pr-eloquence` | Low |
-| Chronicle | Consumer | `/tools/chronicle` | Low |
-| Savor | Consumer | `/tools/savor` | Low |
+| Tool | Type | Route | Status |
+|------|------|-------|--------|
+| PR-Eloquence | Dev | `/tools/pr-eloquence` | ✅ Live |
+| Chronicle | Consumer | `/tools/chronicle` | ✅ Live |
+| Cursive | Consumer | `/tools/cursive` | ✅ Live |
+| Savor | Consumer | `/tools/savor` | ✅ Live |
+
+### All 10 tools complete 🎉
 
 ## Project Structure
 
@@ -91,7 +93,7 @@ src/
 │   ├── ui/                       # shadcn primitives
 │   └── shared/                   # App-wide (header, tool-header, error-boundary)
 ├── lib/                          # Shared infra
-│   ├── ai.ts                     # Multi-provider AI (OpenAI + Gemini)
+│   ├── ai.ts                     # Gemini-only AI (text gen via 2.5 Flash)
 │   ├── api-error.ts              # ApiError class + handler
 │   ├── db.ts                     # Prisma client (lazy, server-only, env)
 │   ├── env.ts                    # Zod env validation
@@ -104,13 +106,12 @@ src/
 
 ## AI Provider Strategy
 
-OpenAI is primary (GPT-4o, DALL-E 3, Whisper). Google Gemini 2.0 Flash is fallback for text completions. **Neither is required** — tools degrade gracefully with user-visible messages if no AI provider is configured.
+Single provider: **Google Gemini 2.5 Flash** for text generation. Image generation and audio transcription are unavailable on the free tier (Gemini image gen requires a paid plan).
 
-- Text generation: tries OpenAI → fails → tries Gemini → fails → returns empty string
-- Image generation: OpenAI only (DALL-E 3) → returns null if unavailable
-- Audio transcription: OpenAI only (Whisper-1) → returns empty string if unavailable
-- Env vars: `OPENAI_API_KEY` and `GEMINI_API_KEY` both optional in Zod schema
-- At dev startup: warning logged if neither is set, no crash
+- Text: `gemini-2.5-flash` via `@google/generative-ai` SDK
+- Images: Not available (returns null + friendly message)
+- Audio: Not available (returns empty string)
+- Env var: `GEMINI_API_KEY` is required in Zod schema
 
 ## Payments (Stripe — optional)
 
