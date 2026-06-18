@@ -119,9 +119,7 @@ export function PromptHubContent() {
             <p className="text-muted-foreground">Save, organize, and copy your AI prompts.</p>
           </div>
           <Dialog open={newPrompt.open} onOpenChange={(open) => setNewPrompt(prev => ({ ...prev, open }))}>
-            <DialogTrigger>
-              <Button><Plus className="w-4 h-4 mr-2" /> New Prompt</Button>
-            </DialogTrigger>
+            <DialogTrigger render={<Button><Plus className="w-4 h-4 mr-2" /> New Prompt</Button>} />
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>New Prompt</DialogTitle>

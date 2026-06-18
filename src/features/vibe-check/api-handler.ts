@@ -23,19 +23,29 @@ export async function POST(req: Request) {
 
     const posterUrl = await generateVibePoster(description)
 
-    const prisma = db()
-    if (prisma) {
-      const user = await prisma.user.findUnique({ where: { clerkId: userId } })
-      if (user) {
-        await prisma.vibeCheck.create({
-          data: {
-            userId: user.id,
-            description,
-            playlistUrl,
-            posterUrl,
-          },
-        })
+    try {
+      const prisma = db()
+      if (prisma) {
+        const user = await prisma.user.findUnique({ where: { clerkId: userId } })
+        if (user) {
+          await prisma.vibeCheck.create({
+            data: {
+              userId: user.id,
+              description,
+              playlistUrl: playlistUrl ?? null,
+              posterUrl,
+            },
+          })
+        }
       }
+    } catch {
+      // DB not available — skip saving, still return the poster
+    }
+
+    if (!posterUrl) {
+      return NextResponse.json(
+        { posterUrl: null, warning: "Image generation unavailable. Set OPENAI_API_KEY (DALL-E) or upgrade your Gemini plan for Imagen." },
+      )
     }
 
     return NextResponse.json({ posterUrl })

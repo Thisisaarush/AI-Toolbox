@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Code2, Moon, Music, Puzzle, GitCommit, Terminal, Image, BookOpen, Radio } from "lucide-react"
+import { Code2, Moon, Music, Puzzle, GitCommit, Terminal } from "lucide-react"
 import { Header } from "@/components/shared/header"
 
 const tools = [
@@ -34,7 +34,7 @@ const tools = [
   },
   {
     name: "PromptHub",
-    description: "Version-track, test, and manage your AI prompts in production.",
+    description: "Save, organize, and copy your AI prompts.",
     icon: Puzzle,
     href: "/tools/prompt-hub",
     badge: "Dev Tool",
@@ -58,33 +58,6 @@ const tools = [
     badge: "Dev Tool",
     color: "text-cyan-500",
     bgColor: "bg-cyan-50 dark:bg-cyan-950",
-  },
-  {
-    name: "Cursive",
-    description: "Upload your handwriting sample and generate handwritten letters with AI.",
-    icon: Image,
-    href: "/tools/cursive",
-    badge: "Creative",
-    color: "text-amber-500",
-    bgColor: "bg-amber-50 dark:bg-amber-950",
-  },
-  {
-    name: "Chronicle",
-    description: "Your personal historian. Weekly journaling with AI narrative + printed yearbook.",
-    icon: BookOpen,
-    href: "/tools/chronicle",
-    badge: "Creative",
-    color: "text-indigo-500",
-    bgColor: "bg-indigo-50 dark:bg-indigo-950",
-  },
-  {
-    name: "Savor",
-    description: "AI family cookbook — organize recipes, generate photos, print hardcover books.",
-    icon: Radio,
-    href: "/tools/savor",
-    badge: "Creative",
-    color: "text-red-500",
-    bgColor: "bg-red-50 dark:bg-red-950",
   },
 ]
 

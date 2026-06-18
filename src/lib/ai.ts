@@ -80,7 +80,7 @@ async function chatCompletion(system: string, user: string, opts?: { json?: bool
   )
 }
 
-// --- Image generation (OpenAI only for now, DALL-E) ---
+// --- Image generation (OpenAI DALL-E, fallback Gemini) ---
 
 async function generateImage(prompt: string): Promise<string | null> {
   return withBestProvider(
@@ -94,6 +94,27 @@ async function generateImage(prompt: string): Promise<string | null> {
           size: "1024x1024",
         })
         return response.data?.[0]?.url ?? null
+      },
+      gemini: async () => {
+        const key = process.env.GEMINI_API_KEY
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${key}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { responseModalities: ["Text", "Image"] },
+            }),
+          },
+        )
+        const data = await res.json()
+        const imagePart = data?.candidates?.[0]?.content?.parts?.find(
+          (p: Record<string, unknown>) => p.inlineData,
+        )
+        const base64 = imagePart?.inlineData?.data as string | undefined
+        const mimeType = (imagePart?.inlineData?.mimeType as string) ?? "image/png"
+        return base64 ? `data:${mimeType};base64,${base64}` : null
       },
     },
     null,

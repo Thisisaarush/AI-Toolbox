@@ -26,19 +26,23 @@ export async function POST(req: Request) {
       generateDreamImage(content),
     ])
 
-    const prisma = db()
-    if (prisma) {
-      const user = await prisma.user.findUnique({ where: { clerkId: userId } })
-      if (user) {
-        await prisma.dream.create({
-          data: {
-            userId: user.id,
-            content,
-            analysis,
-            imageUrl,
-          },
-        })
+    try {
+      const prisma = db()
+      if (prisma) {
+        const user = await prisma.user.findUnique({ where: { clerkId: userId } })
+        if (user) {
+          await prisma.dream.create({
+            data: {
+              userId: user.id,
+              content,
+              analysis,
+              imageUrl,
+            },
+          })
+        }
       }
+    } catch {
+      // DB not available — skip saving
     }
 
     logger.info("dream-scape: analyzed", { userId })
@@ -54,23 +58,27 @@ export async function GET() {
     const { userId } = await auth()
     if (!userId) throw new ApiError("Unauthorized", 401)
 
-    const prisma = db()
-    if (!prisma) {
+    try {
+      const prisma = db()
+      if (!prisma) {
+        return NextResponse.json({ dreams: [] })
+      }
+
+      const user = await prisma.user.findUnique({ where: { clerkId: userId } })
+      if (!user) {
+        return NextResponse.json({ dreams: [] })
+      }
+
+      const dreams = await prisma.dream.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      })
+
+      return NextResponse.json({ dreams })
+    } catch {
       return NextResponse.json({ dreams: [] })
     }
-
-    const user = await prisma.user.findUnique({ where: { clerkId: userId } })
-    if (!user) {
-      return NextResponse.json({ dreams: [] })
-    }
-
-    const dreams = await prisma.dream.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    })
-
-    return NextResponse.json({ dreams })
   } catch (err) {
     return handleApiError(err)
   }

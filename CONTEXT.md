@@ -65,7 +65,7 @@ src/
 │   ├── not-found.tsx             # 404
 │   ├── layout.tsx
 │   ├── globals.css
-│   ├── proxy.ts                  # Clerk auth proxy
+│   ├── proxy.ts                  # Clerk auth middleware (Next.js 16)
 │   ├── tools/<tool>/page.tsx     # Re-exports from features/
 │   └── api/<tool>/route.ts       # Re-exports from features/
 ├── features/                     # Co-located feature modules
@@ -93,14 +93,13 @@ src/
 ├── lib/                          # Shared infra
 │   ├── ai.ts                     # Multi-provider AI (OpenAI + Gemini)
 │   ├── api-error.ts              # ApiError class + handler
-│   ├── api.ts                    # Generic API response helpers
-│   ├── db.ts                     # Prisma client (lazy, server-only)
+│   ├── db.ts                     # Prisma client (lazy, server-only, env)
 │   ├── env.ts                    # Zod env validation
 │   ├── logger.ts                 # Structured JSON logger
 │   ├── rate-limit.ts             # In-memory rate limiter
 │   ├── stripe.ts                 # Stripe client (lazy, server-only)
 │   └── utils.ts                  # shadcn cn() helper
-└── proxy.ts                      # Clerk auth proxy
+└── proxy.ts                     # Clerk auth middleware (Next.js 16)
 ```
 
 ## AI Provider Strategy

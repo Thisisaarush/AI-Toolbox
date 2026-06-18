@@ -2,12 +2,12 @@ import type { NextConfig } from "next"
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.toolbox.app",
+  "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.toolbox.app https://*.clerk.accounts.dev",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' blob: data: https://oaidalleapiprodscus.blob.core.windows.net https://img.clerk.com",
   "font-src 'self'",
-  "connect-src 'self' https://api.openai.com https://api.clerk.com https://api.stripe.com",
-  "frame-src 'self' https://clerk.toolbox.app",
+  "connect-src 'self' https://api.openai.com https://api.clerk.com https://api.stripe.com https://*.clerk.accounts.dev",
+  "frame-src 'self' https://clerk.toolbox.app https://*.clerk.accounts.dev",
   "frame-ancestors 'none'",
 ].join("; ")
 
