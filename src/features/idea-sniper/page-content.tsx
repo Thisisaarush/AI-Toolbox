@@ -5,7 +5,7 @@ import { ToolHeader } from "@/components/shared/tool-header"
 import {
   Target, Sparkles, Copy, Check, Loader2, Trash2,
   TrendingUp, TrendingDown, Minus, Users, Search,
-  MessageSquare, AlertTriangle, History,
+  MessageSquare, AlertTriangle, History, ExternalLink, Download, Pencil,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,11 +17,102 @@ import type { IdeaAnalysis, IdeaRecord } from "./types"
 
 const STORAGE_KEY = "idea-sniper-v1"
 
+// Module-level constant — no recreation on every render
+const verdictConfig = {
+  go: { icon: TrendingUp, color: "text-green-500", bg: "bg-green-50 dark:bg-green-950", label: "GO", border: "border-green-300 dark:border-green-700" },
+  "no-go": { icon: TrendingDown, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950", label: "NO-GO", border: "border-red-300 dark:border-red-700" },
+  pivot: { icon: Minus, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950", label: "PIVOT", border: "border-amber-300 dark:border-amber-700" },
+}
+
 function load(): IdeaRecord[] {
   if (typeof window === "undefined") return []
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]") } catch { return [] }
 }
 function save(r: IdeaRecord[]) { localStorage.setItem(STORAGE_KEY, JSON.stringify(r.slice(0, 20))) }
+
+function exportAnalysisMarkdown(ideaInput: string, analysis: IdeaAnalysis) {
+  const title = (ideaInput.split("\n")[0] ?? "").slice(0, 80) || "Idea"
+  const lines: string[] = [
+    `# Idea Analysis: ${title}`,
+    `**Pain Score:** ${analysis.painScore}/10`,
+    `**Verdict:** ${analysis.verdict.toUpperCase()}`,
+    "",
+    "## Pain Reasoning",
+    analysis.painScoreReasoning,
+    "",
+    "## Personas",
+    ...analysis.personas.map((p) =>
+      `### ${p.jobTitle}\n${p.context}\n- **Frequency:** ${p.frequency}\n- **Workaround:** ${p.workaround}\n- **WTP:** ${p.willingToPay}`
+    ),
+    "",
+    "## Competitors",
+    ...analysis.competitors.map((c) =>
+      `### ${c.name} (${c.pricing})\n${c.description}\n**Pros:** ${c.pros.join(", ")}\n**Cons:** ${c.cons.join(", ")}`
+    ),
+    "",
+    "## Search Queries",
+    ...analysis.searchQueries.map((q) => `- ${q}`),
+    "",
+    "## Where to Find Customers",
+    ...analysis.whereTofindCustomers.map((c) => `- **${c.name}** (${c.type}): ${c.link}`),
+    "",
+    "## Exact Language",
+    ...analysis.exactLanguage.map((p) => `- "${p}"`),
+    "",
+    "## Outreach Message",
+    analysis.outreachMessage,
+  ]
+  const md = lines.join("\n")
+  const blob = new Blob([md], { type: "text/markdown" })
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(blob)
+  a.download = `idea-analysis-${Date.now()}.md`
+  a.click()
+  URL.revokeObjectURL(a.href)
+  toast.success("Exported as Markdown")
+}
+
+// Named sub-component for the verdict hero card
+function VerdictHero({ analysis }: { analysis: IdeaAnalysis }) {
+  const vc = verdictConfig[analysis.verdict]
+  const VerdictIcon = vc.icon
+  const scoreColor = analysis.painScore >= 7 ? "text-red-500" : analysis.painScore >= 5 ? "text-amber-500" : "text-green-500"
+  const barColor = analysis.painScore >= 7 ? "bg-red-500" : analysis.painScore >= 5 ? "bg-amber-500" : "bg-green-500"
+
+  return (
+    <div className="grid sm:grid-cols-2 gap-4">
+      {/* Pain score card */}
+      <Card>
+        <CardContent className="pt-5">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Pain Score</p>
+          <div className="flex items-end gap-2 mb-3">
+            <span className={`text-5xl font-black ${scoreColor}`}>{analysis.painScore}</span>
+            <span className="text-xl text-muted-foreground mb-1">/10</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2 mb-3">
+            <div
+              className={`h-2 rounded-full ${barColor}`}
+              style={{ width: `${analysis.painScore * 10}%` }}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">{analysis.painScoreReasoning}</p>
+        </CardContent>
+      </Card>
+
+      {/* Verdict card */}
+      <Card className={`border-2 ${vc.border}`}>
+        <CardContent className="pt-5">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Verdict</p>
+          <div className={`flex items-center gap-3 p-3 rounded-xl ${vc.bg} mb-3`}>
+            <VerdictIcon className={`w-7 h-7 ${vc.color} shrink-0`} />
+            <span className={`text-3xl font-black ${vc.color}`}>{vc.label}</span>
+          </div>
+          <p className="text-sm text-muted-foreground">{analysis.verdictReasoning}</p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
 export function IdeaSniperContent() {
   const [records, setRecords] = useState<IdeaRecord[]>([])
@@ -30,6 +121,10 @@ export function IdeaSniperContent() {
   const [analysis, setAnalysis] = useState<IdeaAnalysis | null>(null)
   const [view, setView] = useState<"input" | "result" | "history">("input")
   const [copiedKey, setCopiedKey] = useState("")
+
+  // Edit-and-rerun state
+  const [editingIdea, setEditingIdea] = useState(false)
+  const [editDraft, setEditDraft] = useState("")
 
   useEffect(() => { setRecords(load()) }, [])
 
@@ -40,21 +135,22 @@ export function IdeaSniperContent() {
     toast.success("Copied!")
   }
 
-  async function handleAnalyze() {
-    if (!ideaInput.trim()) { toast.error("Describe your idea first"); return }
+  async function handleAnalyze(overrideIdea?: string) {
+    const idea = overrideIdea ?? ideaInput
+    if (!idea.trim()) { toast.error("Describe your idea first"); return }
     setLoading(true)
     try {
       const res = await fetch("/api/idea-sniper", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "analyze", idea: ideaInput }),
+        body: JSON.stringify({ action: "analyze", idea }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Analysis failed")
       setAnalysis(data.analysis)
       const record: IdeaRecord = {
         id: crypto.randomUUID(),
-        input: ideaInput,
+        input: idea,
         analysis: data.analysis,
         createdAt: new Date().toISOString(),
       }
@@ -64,17 +160,12 @@ export function IdeaSniperContent() {
         return next
       })
       setView("result")
+      setEditingIdea(false)
       toast.success("Analysis complete!")
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Analysis failed")
     }
     setLoading(false)
-  }
-
-  const verdictConfig = {
-    go: { icon: TrendingUp, color: "text-green-500", bg: "bg-green-50 dark:bg-green-950", label: "GO", border: "border-green-300 dark:border-green-700" },
-    "no-go": { icon: TrendingDown, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950", label: "NO-GO", border: "border-red-300 dark:border-red-700" },
-    pivot: { icon: Minus, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950", label: "PIVOT", border: "border-amber-300 dark:border-amber-700" },
   }
 
   return (
@@ -116,7 +207,7 @@ export function IdeaSniperContent() {
                   />
                   <p className="text-xs text-muted-foreground mt-1.5">Include: what problem it solves, who has the pain, and your approach</p>
                 </div>
-                <Button className="w-full" onClick={handleAnalyze} disabled={loading}>
+                <Button className="w-full" onClick={() => handleAnalyze()} disabled={loading}>
                   {loading
                     ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing market...</>
                     : <><Sparkles className="w-4 h-4 mr-2" /> Snipe This Idea</>
@@ -166,44 +257,46 @@ export function IdeaSniperContent() {
         {/* ── RESULT ───────────────────────────────────────────────────────── */}
         {view === "result" && analysis && (
           <div className="space-y-6">
-            {/* Verdict hero */}
-            {(() => {
-              const vc = verdictConfig[analysis.verdict]
-              const VerdictIcon = vc.icon
-              return (
-                <Card className={`border-2 ${vc.border}`}>
-                  <CardContent className="pt-5">
-                    <div className="flex items-start gap-6">
-                      <div className={`p-4 rounded-xl ${vc.bg} shrink-0`}>
-                        <VerdictIcon className={`w-8 h-8 ${vc.color}`} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className={`text-2xl font-black ${vc.color}`}>{vc.label}</span>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sm text-muted-foreground">Pain score</span>
-                            <span className={`text-2xl font-bold ${analysis.painScore >= 7 ? "text-red-500" : analysis.painScore >= 5 ? "text-amber-500" : "text-green-500"}`}>
-                              {analysis.painScore}/10
-                            </span>
-                          </div>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-2 mb-3">
-                          <div
-                            className={`h-2 rounded-full ${analysis.painScore >= 7 ? "bg-red-500" : analysis.painScore >= 5 ? "bg-amber-500" : "bg-green-500"}`}
-                            style={{ width: `${analysis.painScore * 10}%` }}
-                          />
-                        </div>
-                        <p className="text-sm text-muted-foreground">{analysis.painScoreReasoning}</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 p-4 bg-muted/30 rounded-lg border">
-                      <p className="text-sm font-medium mb-1">Verdict</p>
-                      <p className="text-sm text-muted-foreground">{analysis.verdictReasoning}</p>
+            {/* Verdict hero — split cards */}
+            <VerdictHero analysis={analysis} />
+
+            {/* Edit idea inline */}
+            <div>
+              {!editingIdea ? (
+                <button
+                  onClick={() => { setEditDraft(ideaInput); setEditingIdea(true) }}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Pencil className="w-3 h-3" /> Edit idea
+                </button>
+              ) : (
+                <Card className="border-rose-200 dark:border-rose-800">
+                  <CardContent className="pt-4 space-y-3">
+                    <p className="text-xs font-medium">Edit your idea</p>
+                    <Textarea
+                      value={editDraft}
+                      onChange={(e) => setEditDraft(e.target.value)}
+                      rows={5}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setIdeaInput(editDraft)
+                          setEditingIdea(false)
+                          handleAnalyze(editDraft)
+                        }}
+                        disabled={loading}
+                      >
+                        {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
+                        Re-analyze
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => setEditingIdea(false)}>Cancel</Button>
                     </div>
                   </CardContent>
                 </Card>
-              )
-            })()}
+              )}
+            </div>
 
             {/* Search queries */}
             <Card>
@@ -213,9 +306,9 @@ export function IdeaSniperContent() {
               <CardContent>
                 <div className="space-y-2">
                   {analysis.searchQueries.map((q, i) => (
-                    <div key={i} className="group flex items-center gap-2">
+                    <div key={i} className="flex items-center gap-2">
                       <code className="text-xs bg-muted/50 px-3 py-2 rounded border flex-1 font-mono">{q}</code>
-                      <button onClick={() => copyText(q, `sq-${i}`)} className="opacity-0 group-hover:opacity-100 shrink-0 transition-opacity">
+                      <button onClick={() => copyText(q, `sq-${i}`)} className="shrink-0">
                         {copiedKey === `sq-${i}` ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
                       </button>
                     </div>
@@ -313,9 +406,18 @@ export function IdeaSniperContent() {
                   {analysis.whereTofindCustomers.map((c, i) => (
                     <div key={i} className="flex items-center gap-3 p-3 border rounded-lg">
                       <Badge variant="secondary" className="text-[10px] shrink-0">{c.type}</Badge>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium truncate">{c.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{c.link}</p>
+                        <a
+                          href={c.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-xs text-rose-500 hover:text-rose-600 truncate mt-0.5"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{c.link}</span>
+                        </a>
                       </div>
                     </div>
                   ))}
@@ -363,9 +465,12 @@ export function IdeaSniperContent() {
               </CardContent>
             </Card>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Button variant="outline" onClick={() => setView("input")}>Analyze New Idea</Button>
-              <Button variant="outline" onClick={handleAnalyze} disabled={loading}>
+              <Button variant="outline" onClick={() => exportAnalysisMarkdown(ideaInput, analysis)}>
+                <Download className="w-3.5 h-3.5 mr-1" /> Export
+              </Button>
+              <Button variant="outline" onClick={() => handleAnalyze()} disabled={loading}>
                 {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
                 Re-run Analysis
               </Button>

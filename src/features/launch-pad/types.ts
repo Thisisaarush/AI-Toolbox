@@ -38,6 +38,9 @@ export interface LaunchOutput {
     subject: string
     body: string
   }
+  linkedInPost: {
+    body: string
+  }
 }
 
 export interface LaunchRecord {

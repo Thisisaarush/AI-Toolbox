@@ -23,6 +23,7 @@ const tools = [
     badge: "Finance",
     color: "text-red-500",
     bgColor: "bg-red-50 dark:bg-red-950",
+    borderColor: "border-t-red-500",
     status: "live",
   },
   {
@@ -34,6 +35,7 @@ const tools = [
     badge: "Finance",
     color: "text-green-500",
     bgColor: "bg-green-50 dark:bg-green-950",
+    borderColor: "border-t-green-500",
     status: "live",
   },
   {
@@ -45,6 +47,7 @@ const tools = [
     badge: "Launch",
     color: "text-purple-500",
     bgColor: "bg-purple-50 dark:bg-purple-950",
+    borderColor: "border-t-purple-500",
     status: "live",
   },
   {
@@ -56,6 +59,7 @@ const tools = [
     badge: "Launch",
     color: "text-orange-500",
     bgColor: "bg-orange-50 dark:bg-orange-950",
+    borderColor: "border-t-orange-500",
     status: "live",
   },
   {
@@ -67,6 +71,7 @@ const tools = [
     badge: "Research",
     color: "text-yellow-500",
     bgColor: "bg-yellow-50 dark:bg-yellow-950",
+    borderColor: "border-t-yellow-500",
     status: "live",
   },
   {
@@ -78,6 +83,7 @@ const tools = [
     badge: "Dev Tool",
     color: "text-blue-500",
     bgColor: "bg-blue-50 dark:bg-blue-950",
+    borderColor: "border-t-blue-500",
     status: "live",
   },
   {
@@ -89,19 +95,32 @@ const tools = [
     badge: "Dev Tool",
     color: "text-cyan-500",
     bgColor: "bg-cyan-50 dark:bg-cyan-950",
+    borderColor: "border-t-cyan-500",
     status: "live",
   },
   {
     num: "08",
     name: "Env Manager",
-    description: "Visual .env editor across all projects. Sync to Vercel, Railway, and Fly with one click. Share secrets securely. Never lose a credential.",
+    description: "Visual .env editor across all projects. Sync to Vercel, Railway, and Fly.io with one click. Share secrets securely. Never lose a credential.",
     icon: KeyRound,
     href: "/tools/env-manager",
     badge: "Dev Tool",
     color: "text-indigo-500",
     bgColor: "bg-indigo-50 dark:bg-indigo-950",
+    borderColor: "border-t-indigo-500",
     status: "live",
   },
+]
+
+const heroPills = [
+  "Sub Sheriff",
+  "Invoice Zero",
+  "OG Craft",
+  "Launch Pad",
+  "Idea Sniper",
+  "Changelog AI",
+  "DNS Desk",
+  "Env Manager",
 ]
 
 export default function Home() {
@@ -110,65 +129,103 @@ export default function Home() {
       <Header />
 
       <main className="flex-1">
-        <section className="max-w-6xl mx-auto px-4 py-16 md:py-24">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-              Tools you'll actually use
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Eight deep tools built for developers and solo builders.
-              Each one slots into something you already do — no new habits required.
+        {/* Hero — dark section */}
+        <section className="bg-[#0a0a0a] text-white">
+          <div className="max-w-6xl mx-auto px-4 py-20 md:py-32 text-center">
+            <p className="text-xs font-mono tracking-widest uppercase text-white/40 mb-6">
+              TOOLBOX
             </p>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.08]">
+              8 tools you'll actually use.
+            </h1>
+            <p className="text-lg md:text-xl text-white/50 max-w-xl mx-auto mb-10 leading-relaxed">
+              Built for developers and solo builders. Each one slots into something you already do.
+            </p>
+            {/* Pill badges */}
+            <div className="flex flex-wrap justify-center gap-2">
+              {heroPills.map((pill) => (
+                <span
+                  key={pill}
+                  className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/60 backdrop-blur-sm"
+                >
+                  {pill}
+                </span>
+              ))}
+            </div>
           </div>
+        </section>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tools.map((tool) => (
-              tool.status === "live" ? (
-                <Link key={tool.name} href={tool.href} className="group">
-                  <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col">
-                    <CardHeader className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className={`w-12 h-12 rounded-lg ${tool.bgColor} flex items-center justify-center`}>
-                          <tool.icon className={`w-6 h-6 ${tool.color}`} />
+        {/* Tool grid — light section */}
+        <section className="bg-background">
+          <div className="max-w-7xl mx-auto px-4 py-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {tools.map((tool) =>
+                tool.status === "live" ? (
+                  <Link key={tool.name} href={tool.href} className="group">
+                    <Card
+                      className={`h-full transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col border-t-2 ${tool.borderColor}`}
+                    >
+                      <CardHeader className="flex-1">
+                        <div className="flex items-start justify-between mb-3">
+                          <div
+                            className={`relative w-11 h-11 rounded-lg ${tool.bgColor} flex items-center justify-center`}
+                          >
+                            <tool.icon className={`w-5 h-5 ${tool.color}`} />
+                            <span className="absolute -top-1.5 -right-1.5 text-[9px] font-mono text-muted-foreground bg-background border border-border rounded px-0.5 leading-tight">
+                              {tool.num}
+                            </span>
+                          </div>
                         </div>
-                        <span className="text-xs font-mono text-muted-foreground">{tool.num}</span>
+                        <CardTitle className="text-base">{tool.name}</CardTitle>
+                        <CardDescription className="text-sm leading-relaxed">
+                          {tool.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <div className="px-(--card-spacing) pb-(--card-spacing)">
+                        <Badge variant="secondary">{tool.badge}</Badge>
                       </div>
-                      <CardTitle className="text-lg">{tool.name}</CardTitle>
-                      <CardDescription>{tool.description}</CardDescription>
-                    </CardHeader>
-                    <div className="px-(--card-spacing) pb-(--card-spacing)">
-                      <Badge variant="secondary">{tool.badge}</Badge>
-                    </div>
-                  </Card>
-                </Link>
-              ) : (
-                <div key={tool.name} className="opacity-60 cursor-not-allowed">
-                  <Card className="h-full flex flex-col">
-                    <CardHeader className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className={`w-12 h-12 rounded-lg ${tool.bgColor} flex items-center justify-center`}>
-                          <tool.icon className={`w-6 h-6 ${tool.color}`} />
+                    </Card>
+                  </Link>
+                ) : (
+                  <div key={tool.name} className="cursor-not-allowed">
+                    <Card
+                      className={`h-full flex flex-col border-t-2 ${tool.borderColor} opacity-50 grayscale`}
+                    >
+                      <CardHeader className="flex-1">
+                        <div className="flex items-start justify-between mb-3">
+                          <div
+                            className={`relative w-11 h-11 rounded-lg ${tool.bgColor} flex items-center justify-center`}
+                          >
+                            <tool.icon className={`w-5 h-5 ${tool.color}`} />
+                            <span className="absolute -top-1.5 -right-1.5 text-[9px] font-mono text-muted-foreground bg-background border border-border rounded px-0.5 leading-tight">
+                              {tool.num}
+                            </span>
+                          </div>
                         </div>
-                        <span className="text-xs font-mono text-muted-foreground">{tool.num}</span>
+                        <CardTitle className="text-base">{tool.name}</CardTitle>
+                        <CardDescription className="text-sm leading-relaxed">
+                          {tool.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <div className="flex gap-2 px-(--card-spacing) pb-(--card-spacing)">
+                        <Badge variant="secondary">{tool.badge}</Badge>
+                        <Badge variant="outline" className="text-muted-foreground">
+                          Coming soon
+                        </Badge>
                       </div>
-                      <CardTitle className="text-lg">{tool.name}</CardTitle>
-                      <CardDescription>{tool.description}</CardDescription>
-                    </CardHeader>
-                    <div className="flex gap-2 px-(--card-spacing) pb-(--card-spacing)">
-                      <Badge variant="secondary">{tool.badge}</Badge>
-                      <Badge variant="outline" className="text-muted-foreground">Coming soon</Badge>
-                    </div>
-                  </Card>
-                </div>
-              )
-            ))}
+                    </Card>
+                  </div>
+                )
+              )}
+            </div>
           </div>
         </section>
       </main>
 
       <footer className="border-t py-8">
-        <div className="max-w-6xl mx-auto px-4 text-center text-sm text-muted-foreground">
-          Built for developers who ship.
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+          <span className="font-medium">Toolbox</span>
+          <span>8 tools for developers who ship.</span>
         </div>
       </footer>
     </div>

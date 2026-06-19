@@ -30,7 +30,7 @@ function save(subs: Subscription[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(subs))
 }
 
-type View = "dashboard" | "import" | "add" | "detail"
+type View = "dashboard" | "import" | "add" | "detail" | "edit-sub"
 type SortKey = "name" | "amount" | "renewal" | "added"
 
 const USAGE_OPTIONS: { value: UsageStatus; label: string; color: string }[] = [
@@ -48,14 +48,14 @@ export function SubSheriffContent() {
   const [filterUsage, setFilterUsage] = useState<UsageStatus | "all">("all")
   const [sortKey, setSortKey] = useState<SortKey>("amount")
   const [sortDesc, setSortDesc] = useState(true)
-  const [expandedCategory, setExpandedCategory] = useState<Category | null>(null)
 
   // Import state
   const [emailText, setEmailText] = useState("")
   const [isParsing, setIsParsing] = useState(false)
   const [parsedResults, setParsedResults] = useState<(ParsedSubscription & { selected: boolean })[]>([])
 
-  // Add form state
+  // Add / edit form state
+  const [editingSubId, setEditingSubId] = useState<string | null>(null)
   const [addName, setAddName] = useState("")
   const [addAmount, setAddAmount] = useState("")
   const [addCycle, setAddCycle] = useState<BillingCycle>("monthly")
@@ -140,6 +140,45 @@ export function SubSheriffContent() {
     setSubs((prev) => prev.filter((s) => s.id !== id))
     if (selectedSub?.id === id) { setSelectedSub(null); setView("dashboard") }
     toast.success("Subscription removed")
+  }
+
+  function openEdit(sub: Subscription) {
+    setEditingSubId(sub.id)
+    setAddName(sub.name)
+    setAddAmount(String(sub.rawAmount))
+    setAddCycle(sub.billingCycle)
+    setAddCategory(sub.category)
+    setAddRenewal(sub.renewalDate ?? "")
+    setAddUrl(sub.url ?? "")
+    setAddNotes(sub.notes ?? "")
+    setView("edit-sub")
+  }
+
+  function saveEdit() {
+    if (!editingSubId) return
+    if (!addName.trim() || !addAmount) { toast.error("Name and amount are required"); return }
+    const raw = parseFloat(addAmount)
+    if (isNaN(raw)) { toast.error("Invalid amount"); return }
+    const patch = {
+      name: addName.trim(),
+      url: addUrl || undefined,
+      rawAmount: raw,
+      amount: toMonthly(raw, addCycle),
+      billingCycle: addCycle,
+      category: addCategory,
+      renewalDate: addRenewal || undefined,
+      notes: addNotes || undefined,
+      updatedAt: new Date().toISOString(),
+    }
+    setSubs((prev) => prev.map((s) => s.id === editingSubId ? { ...s, ...patch } : s))
+    if (selectedSub?.id === editingSubId) {
+      setSelectedSub((p) => p ? { ...p, ...patch } : p)
+    }
+    setEditingSubId(null)
+    setAddName(""); setAddAmount(""); setAddCycle("monthly")
+    setAddCategory("other"); setAddRenewal(""); setAddUrl(""); setAddNotes("")
+    toast.success("Subscription updated")
+    setView("detail")
   }
 
   function addSub() {
@@ -273,7 +312,10 @@ export function SubSheriffContent() {
         actions={
           <div className="flex gap-2">
             {view !== "dashboard" ? (
-              <Button variant="outline" size="sm" onClick={() => { setView("dashboard"); setParsedResults([]) }}>
+              <Button variant="outline" size="sm" onClick={() => {
+                if (view === "edit-sub") { setView("detail"); return }
+                setView("dashboard"); setParsedResults([])
+              }}>
                 ← Back
               </Button>
             ) : (
@@ -360,7 +402,7 @@ export function SubSheriffContent() {
                 </div>
 
                 {/* Alerts */}
-                {(summary.unusedMonthly > 0 || summary.duplicates.length > 0) && (
+                {(summary.unusedMonthly > 0 || summary.rarelyMonthly > 0 || summary.duplicates.length > 0) && (
                   <div className="space-y-2">
                     {summary.unusedMonthly > 0 && (
                       <Alert
@@ -368,6 +410,14 @@ export function SubSheriffContent() {
                         message={`You're paying ${formatCurrency(summary.unusedMonthly)}/mo for subscriptions you marked "Not using" — that's ${formatCurrency(summary.unusedMonthly * 12)}/yr.`}
                         action="Review unused"
                         onAction={() => setFilterUsage("unused")}
+                      />
+                    )}
+                    {summary.rarelyMonthly > 0 && (
+                      <Alert
+                        icon={<AlertTriangle className="w-4 h-4 text-amber-500" />}
+                        message={`${formatCurrency(summary.rarelyMonthly)}/mo on subscriptions you "Rarely use" — consider downgrading or cancelling.`}
+                        action="Review rarely used"
+                        onAction={() => setFilterUsage("rarely")}
                       />
                     )}
                     {summary.duplicates.length > 0 && (
@@ -433,8 +483,8 @@ export function SubSheriffContent() {
                                 <span className={`text-xs font-medium w-28 shrink-0 ${meta.color}`}>{meta.label}</span>
                                 <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
                                   <div
-                                    className="h-full rounded-full bg-current opacity-60 transition-all"
-                                    style={{ width: `${pct}%`, color: meta.color.replace("text-", "bg-").replace("600", "500") }}
+                                    className={`h-full rounded-full transition-all ${meta.barColor}`}
+                                    style={{ width: `${pct}%` }}
                                   />
                                 </div>
                                 <span className="text-xs text-muted-foreground w-20 text-right shrink-0">
@@ -735,6 +785,100 @@ export function SubSheriffContent() {
           </div>
         )}
 
+        {/* ── Edit Subscription ──────────────────────────────────────────── */}
+        {view === "edit-sub" && editingSubId && (
+          <div className="max-w-lg mx-auto space-y-6">
+            <div>
+              <h1 className="text-2xl font-bold mb-1">Edit Subscription</h1>
+              <p className="text-muted-foreground text-sm">Update the subscription details.</p>
+            </div>
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Service name *</label>
+                  <Input
+                    placeholder="GitHub Copilot"
+                    value={addName}
+                    onChange={(e) => setAddName(e.target.value)}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Amount *</label>
+                    <Input
+                      type="number"
+                      placeholder="10.00"
+                      value={addAmount}
+                      onChange={(e) => setAddAmount(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Billing cycle</label>
+                    <select
+                      value={addCycle}
+                      onChange={(e) => setAddCycle(e.target.value as BillingCycle)}
+                      className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      {Object.entries(BILLING_CYCLE_LABELS).map(([k, v]) => (
+                        <option key={k} value={k}>{v}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Category</label>
+                  <select
+                    value={addCategory}
+                    onChange={(e) => setAddCategory(e.target.value as Category)}
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    {Object.entries(CATEGORY_META).map(([k, v]) => (
+                      <option key={k} value={k}>{v.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Next renewal date</label>
+                  <Input
+                    type="date"
+                    value={addRenewal}
+                    onChange={(e) => setAddRenewal(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Website URL</label>
+                  <Input
+                    placeholder="https://..."
+                    value={addUrl}
+                    onChange={(e) => setAddUrl(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Notes</label>
+                  <Textarea
+                    placeholder="What is this for?"
+                    value={addNotes}
+                    onChange={(e) => setAddNotes(e.target.value)}
+                    rows={2}
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-1">
+                  <Button className="flex-1" onClick={saveEdit}>
+                    <Check className="w-3.5 h-3.5 mr-1" /> Save changes
+                  </Button>
+                  <Button variant="outline" onClick={() => setView("detail")}>Cancel</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* ── Detail ─────────────────────────────────────────────────────── */}
         {view === "detail" && selectedSub && (
           <div className="max-w-lg mx-auto space-y-4">
@@ -746,6 +890,13 @@ export function SubSheriffContent() {
                   {formatCurrency(selectedSub.amount)}/mo
                 </p>
               </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline" size="sm"
+                onClick={() => openEdit(selectedSub)}
+              >
+                Edit
+              </Button>
               <Button
                 variant="ghost" size="sm"
                 onClick={() => deleteSub(selectedSub.id)}
@@ -753,6 +904,7 @@ export function SubSheriffContent() {
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
+            </div>
             </div>
 
             <Card>
@@ -763,8 +915,15 @@ export function SubSheriffContent() {
                   </span>
                 } />
                 <Row label="Billing" value={`${formatCurrency(selectedSub.rawAmount)} ${BILLING_CYCLE_LABELS[selectedSub.billingCycle].toLowerCase()}`} />
-                <Row label="Monthly equivalent" value={formatCurrency(selectedSub.amount)} />
-                <Row label="Annual cost" value={`${formatCurrency(selectedSub.amount * 12)}/yr`} />
+                <Row
+                  label="Monthly equivalent"
+                  value={
+                    selectedSub.billingCycle === "one-time"
+                      ? <span className="text-muted-foreground italic">One-time charge</span>
+                      : formatCurrency(selectedSub.amount)
+                  }
+                />
+                <Row label="Annual cost" value={selectedSub.billingCycle === "one-time" ? "N/A" : `${formatCurrency(selectedSub.amount * 12)}/yr`} />
                 {selectedSub.renewalDate && (
                   <Row
                     label="Next renewal"
@@ -885,10 +1044,14 @@ function SubscriptionRow({
       </button>
 
       <div className="col-span-2">
-        <p className="text-sm font-medium">{formatCurrency(sub.amount)}</p>
-        {sub.billingCycle !== "monthly" && (
+        <p className="text-sm font-medium">
+          {sub.billingCycle === "one-time" ? formatCurrency(sub.rawAmount) : formatCurrency(sub.amount)}
+        </p>
+        {sub.billingCycle === "one-time" ? (
+          <p className="text-[10px] text-muted-foreground">One-time</p>
+        ) : sub.billingCycle !== "monthly" ? (
           <p className="text-[10px] text-muted-foreground">{formatCurrency(sub.rawAmount)}/{sub.billingCycle.slice(0, 3)}</p>
-        )}
+        ) : null}
       </div>
 
       <div className="col-span-2">
@@ -918,7 +1081,7 @@ function SubscriptionRow({
               : `${daysUntilRenewal(sub.renewalDate)}d`
             : "—"}
         </span>
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           {sub.cancelUrl && (
             <a
               href={sub.cancelUrl}

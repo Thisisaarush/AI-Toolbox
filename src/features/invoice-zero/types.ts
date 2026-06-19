@@ -94,8 +94,8 @@ export function isOverdue(invoice: Invoice): boolean {
 }
 
 export const STATUS_META: Record<InvoiceStatus, { label: string; color: string; bg: string }> = {
-  draft: { label: "Draft", color: "text-gray-600", bg: "bg-gray-100" },
-  sent: { label: "Sent", color: "text-blue-600", bg: "bg-blue-100" },
-  paid: { label: "Paid", color: "text-green-600", bg: "bg-green-100" },
-  overdue: { label: "Overdue", color: "text-red-600", bg: "bg-red-100" },
+  draft:   { label: "Draft",   color: "text-gray-600",  bg: "bg-gray-100 dark:bg-gray-800" },
+  sent:    { label: "Sent",    color: "text-blue-600",  bg: "bg-blue-100 dark:bg-blue-900/40" },
+  paid:    { label: "Paid",    color: "text-green-600", bg: "bg-green-100 dark:bg-green-900/40" },
+  overdue: { label: "Overdue", color: "text-red-600",   bg: "bg-red-100 dark:bg-red-900/40" },
 }

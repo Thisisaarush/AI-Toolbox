@@ -5,7 +5,7 @@ import { ToolHeader } from "@/components/shared/tool-header"
 import {
   Lock, Plus, Trash2, Copy, Check, Eye, EyeOff, Search, Loader2,
   Download, Upload, ArrowRight, X, AlertCircle,
-  Layers, GitCompare, Zap, Shield,
+  Layers, GitCompare, Zap, Shield, AlertTriangle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,6 +13,9 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog"
 import {
   type Project, type Environment, type EnvVar, type VarType, type AuditEntry,
   VAR_TYPE_META, parseEnvFile, generateEnvFile, diffEnvironments, VAR_TEMPLATES,
@@ -103,18 +106,47 @@ export function EnvManagerContent() {
   const [diffEnvB, setDiffEnvB] = useState<string>("")
 
   // Sync
-  const [syncPlatform, setSyncPlatform] = useState<"vercel" | "railway">("vercel")
+  const [syncPlatform, setSyncPlatform] = useState<"vercel" | "railway" | "fly">("vercel")
   const [syncToken, setSyncToken] = useState("")
   const [syncProjectId, setSyncProjectId] = useState("")
   const [syncLoading, setSyncLoading] = useState(false)
   const [syncEnvId, setSyncEnvId] = useState<string>("")
 
-  // Share URL state removed (share generates from selected env directly)
+  // Variable search within project
+  const [varSearch, setVarSearch] = useState("")
+
+  // Editing state: track which var is being edited and its draft value
+  const [editingVarId, setEditingVarId] = useState<string | null>(null)
+  const [editingVarValue, setEditingVarValue] = useState("")
+
+  // Editing description inline
+  const [editingDescId, setEditingDescId] = useState<string | null>(null)
+  const [editingDescValue, setEditingDescValue] = useState("")
+
+  // Delete confirmation dialog
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    type: "project" | "env"
+    id: string
+    name: string
+    varCount: number
+    envCount: number
+  } | null>(null)
+
+  // Share URL warning gate
+  const [showShareWarning, setShowShareWarning] = useState(false)
+  const [pendingShareEnv, setPendingShareEnv] = useState<Environment | null>(null)
 
   useEffect(() => {
     setProjects(load())
     setAudit(loadAudit())
   }, [])
+
+  // Clear missing vars + example input when env changes
+  useEffect(() => {
+    setMissingVars([])
+    setExampleInput("")
+    setVarSearch("")
+  }, [selectedEnvId])
 
   const selectedEnv = useMemo(
     () => selectedProject?.environments.find((e) => e.id === selectedEnvId) ?? null,
@@ -157,6 +189,17 @@ export function EnvManagerContent() {
     setNewProjectName(""); setNewProjectDesc("")
     setShowNewProject(false)
     toast.success("Project created")
+  }
+
+  function confirmDeleteProject(p: Project) {
+    const totalVars = p.environments.reduce((sum, env) => sum + env.vars.length, 0)
+    setDeleteConfirm({
+      type: "project",
+      id: p.id,
+      name: p.name,
+      varCount: totalVars,
+      envCount: p.environments.length,
+    })
   }
 
   function deleteProject(id: string) {
@@ -286,7 +329,12 @@ export function EnvManagerContent() {
     toast.success(`Downloaded .env.${env.name}`)
   }
 
-  function generateShareURL(env: Environment) {
+  function requestShareURL(env: Environment) {
+    setPendingShareEnv(env)
+    setShowShareWarning(true)
+  }
+
+  function doGenerateShareURL(env: Environment) {
     if (!selectedProject) return
     const data = env.vars.map((v) => `${v.key}=${v.value}`).join("\n")
     const encoded = btoa(encodeURIComponent(data))
@@ -300,20 +348,43 @@ export function EnvManagerContent() {
     const env = selectedProject.environments.find((e) => e.id === syncEnvId)
     if (!env) { toast.error("Select an environment"); return }
     if (!syncToken.trim()) { toast.error("Token required"); return }
-    if (!syncProjectId.trim()) { toast.error("Project/Service ID required"); return }
+    if (!syncProjectId.trim()) { toast.error("Project/Service/App ID required"); return }
 
     setSyncLoading(true)
     try {
+      let action: string
+      let body: Record<string, unknown>
+      if (syncPlatform === "vercel") {
+        action = "sync-vercel"
+        body = {
+          action,
+          token: syncToken,
+          projectId: syncProjectId,
+          envVars: env.vars.map((v) => ({ key: v.key, value: v.value, type: v.type })),
+          environment: env.name,
+        }
+      } else if (syncPlatform === "railway") {
+        action = "sync-railway"
+        body = {
+          action,
+          token: syncToken,
+          serviceId: syncProjectId,
+          envVars: env.vars.map((v) => ({ key: v.key, value: v.value, type: v.type })),
+          environment: env.name,
+        }
+      } else {
+        action = "sync-fly"
+        body = {
+          action,
+          flyToken: syncToken,
+          flyAppName: syncProjectId,
+          envVars: env.vars.map((v) => ({ key: v.key, value: v.value })),
+        }
+      }
       const res = await fetch("/api/env-manager", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: syncPlatform === "vercel" ? "sync-vercel" : "sync-railway",
-          token: syncToken,
-          [syncPlatform === "vercel" ? "projectId" : "serviceId"]: syncProjectId,
-          envVars: env.vars.map((v) => ({ key: v.key, value: v.value, type: v.type })),
-          environment: env.name,
-        }),
+        body: JSON.stringify(body),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Sync failed")
@@ -357,8 +428,74 @@ export function EnvManagerContent() {
     })
   }
 
+  // Filtered vars for the current env view
+  const filteredVars = useMemo(() => {
+    if (!selectedEnv) return []
+    if (!varSearch.trim()) return selectedEnv.vars
+    const q = varSearch.toLowerCase()
+    return selectedEnv.vars.filter((v) =>
+      v.key.toLowerCase().includes(q) || v.value.toLowerCase().includes(q)
+    )
+  }, [selectedEnv, varSearch])
+
+  const syncPlatformLabel = syncPlatform === "vercel" ? "Vercel" : syncPlatform === "railway" ? "Railway" : "Fly.io"
+
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Delete confirmation dialog */}
+      <Dialog open={!!deleteConfirm} onOpenChange={(open) => { if (!open) setDeleteConfirm(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete {deleteConfirm?.name}?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This will permanently delete all{" "}
+            <strong>{deleteConfirm?.varCount} variable{deleteConfirm?.varCount !== 1 ? "s" : ""}</strong>{" "}
+            across{" "}
+            <strong>{deleteConfirm?.envCount} environment{deleteConfirm?.envCount !== 1 ? "s" : ""}</strong>.{" "}
+            This cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (deleteConfirm) deleteProject(deleteConfirm.id)
+                setDeleteConfirm(null)
+              }}
+            >
+              Delete
+            </Button>
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share URL warning dialog */}
+      <Dialog open={showShareWarning} onOpenChange={(open) => { if (!open) { setShowShareWarning(false); setPendingShareEnv(null) } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" /> Security Warning
+            </DialogTitle>
+          </DialogHeader>
+          <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-700 p-4 text-sm text-amber-800 dark:text-amber-200">
+            This URL contains your secret values in encoded form. Anyone with this link can decode them. Only share with trusted collaborators.
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                if (pendingShareEnv) doGenerateShareURL(pendingShareEnv)
+                setShowShareWarning(false)
+                setPendingShareEnv(null)
+              }}
+            >
+              I understand, generate link
+            </Button>
+            <Button variant="outline" onClick={() => { setShowShareWarning(false); setPendingShareEnv(null) }}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <ToolHeader
         title="Env Manager"
         icon={Lock}
@@ -383,7 +520,7 @@ export function EnvManagerContent() {
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold mb-1">Env Manager</h1>
-              <p className="text-muted-foreground">Visual .env editor across all your projects and environments.</p>
+              <p className="text-muted-foreground">Visual .env editor across all your projects and environments. Sync to Vercel, Railway, and Fly.io.</p>
             </div>
 
             {/* Global search */}
@@ -481,7 +618,7 @@ export function EnvManagerContent() {
                                 </Badge>
                               ))}
                             </div>
-                            <Button variant="ghost" size="icon-sm" onClick={(e) => { e.stopPropagation(); deleteProject(p.id) }}>
+                            <Button variant="ghost" size="icon-sm" onClick={(e) => { e.stopPropagation(); confirmDeleteProject(p) }}>
                               <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
                             </Button>
                           </div>
@@ -524,7 +661,7 @@ export function EnvManagerContent() {
                   <Button variant="outline" size="sm" onClick={() => setShowImport(true)}><Upload className="w-3.5 h-3.5 mr-1" /> Import .env</Button>
                   <Button variant="outline" size="sm" onClick={() => downloadEnv(selectedEnv)}><Download className="w-3.5 h-3.5 mr-1" /> Export .env</Button>
                   <Button variant="outline" size="sm" onClick={() => downloadEnv(selectedEnv, true)}><Shield className="w-3.5 h-3.5 mr-1" /> Export .env.example</Button>
-                  <Button variant="outline" size="sm" onClick={() => generateShareURL(selectedEnv)}><Copy className="w-3.5 h-3.5 mr-1" /> Share URL</Button>
+                  <Button variant="outline" size="sm" onClick={() => requestShareURL(selectedEnv)}><Copy className="w-3.5 h-3.5 mr-1" /> Share URL</Button>
                   {/* Copy to another env */}
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-muted-foreground">Copy to:</span>
@@ -674,42 +811,101 @@ export function EnvManagerContent() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm">{selectedEnv.name} Variables ({selectedEnv.vars.length})</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-3">
+                    {/* Variable search */}
+                    {selectedEnv.vars.length > 0 && (
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                        <Input
+                          placeholder="Filter by key or value..."
+                          value={varSearch}
+                          onChange={(e) => setVarSearch(e.target.value)}
+                          className="pl-8 h-8 text-xs"
+                        />
+                      </div>
+                    )}
                     {selectedEnv.vars.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-4">No variables yet. Add one or use a template.</p>
+                    ) : filteredVars.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">No variables match your search.</p>
                     ) : (
                       <div className="space-y-1">
-                        {selectedEnv.vars.map((v) => {
+                        {filteredVars.map((v) => {
                           const isRevealed = revealedSecrets.has(v.id)
-                          const displayValue = v.type === "secret" && !isRevealed ? "••••••••" : v.value
+                          const isEditingValue = editingVarId === v.id
+                          const isEditingDesc = editingDescId === v.id
                           return (
-                            <div key={v.id} className="group grid grid-cols-12 gap-2 p-2 border rounded items-center hover:bg-muted/20">
-                              <div className="col-span-4 flex items-center gap-2 min-w-0">
-                                <span className={`text-[10px] font-medium ${VAR_TYPE_META[v.type].color} shrink-0`}>
-                                  {VAR_TYPE_META[v.type].label}
-                                </span>
-                                <code className="text-xs font-semibold truncate">{v.key}</code>
+                            <div key={v.id} className="group border rounded px-2 py-1.5 hover:bg-muted/20">
+                              <div className="grid grid-cols-12 gap-2 items-center">
+                                <div className="col-span-4 flex items-center gap-2 min-w-0">
+                                  <span className={`text-[10px] font-medium ${VAR_TYPE_META[v.type].color} shrink-0`}>
+                                    {VAR_TYPE_META[v.type].label}
+                                  </span>
+                                  <code className="text-xs font-semibold truncate">{v.key}</code>
+                                </div>
+                                <div className="col-span-6 flex items-center gap-1 min-w-0">
+                                  <Input
+                                    type={v.type === "secret" && !isRevealed ? "password" : "text"}
+                                    value={isEditingValue ? editingVarValue : v.value}
+                                    onChange={(e) => {
+                                      if (!isEditingValue) {
+                                        setEditingVarId(v.id)
+                                        setEditingVarValue(e.target.value)
+                                      } else {
+                                        setEditingVarValue(e.target.value)
+                                      }
+                                    }}
+                                    onFocus={() => {
+                                      setEditingVarId(v.id)
+                                      setEditingVarValue(v.value)
+                                    }}
+                                    onBlur={() => {
+                                      if (isEditingValue) {
+                                        updateVar(v.id, { value: editingVarValue })
+                                        setEditingVarId(null)
+                                        setEditingVarValue("")
+                                      }
+                                    }}
+                                    className="h-7 text-xs font-mono"
+                                  />
+                                  {v.type === "secret" && (
+                                    <button onClick={() => toggleSecret(v.id)} className="shrink-0">
+                                      {isRevealed ? <EyeOff className="w-3.5 h-3.5 text-muted-foreground" /> : <Eye className="w-3.5 h-3.5 text-muted-foreground" />}
+                                    </button>
+                                  )}
+                                </div>
+                                <div className="col-span-2 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button onClick={() => copyText(v.value, v.id)}>
+                                    {copiedKey === v.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+                                  </button>
+                                  <button onClick={() => deleteVar(v.id)}>
+                                    <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                                  </button>
+                                </div>
                               </div>
-                              <div className="col-span-6 flex items-center gap-1 min-w-0">
-                                <Input
-                                  type={v.type === "secret" && !isRevealed ? "password" : "text"}
-                                  value={v.value}
-                                  onChange={(e) => updateVar(v.id, { value: e.target.value })}
-                                  className="h-7 text-xs font-mono"
-                                />
-                                {v.type === "secret" && (
-                                  <button onClick={() => toggleSecret(v.id)} className="shrink-0">
-                                    {isRevealed ? <EyeOff className="w-3.5 h-3.5 text-muted-foreground" /> : <Eye className="w-3.5 h-3.5 text-muted-foreground" />}
+                              {/* Description — editable inline, blur-to-save */}
+                              <div className="mt-0.5 pl-2">
+                                {isEditingDesc ? (
+                                  <Input
+                                    value={editingDescValue}
+                                    onChange={(e) => setEditingDescValue(e.target.value)}
+                                    onBlur={() => {
+                                      updateVar(v.id, { description: editingDescValue })
+                                      setEditingDescId(null)
+                                      setEditingDescValue("")
+                                    }}
+                                    autoFocus
+                                    className="h-6 text-[11px] text-muted-foreground"
+                                    placeholder="Add description..."
+                                  />
+                                ) : (
+                                  <button
+                                    onClick={() => { setEditingDescId(v.id); setEditingDescValue(v.description ?? "") }}
+                                    className="text-[11px] text-muted-foreground hover:text-foreground transition-colors text-left truncate max-w-full"
+                                  >
+                                    {v.description || <span className="opacity-40 italic">Add description</span>}
                                   </button>
                                 )}
-                              </div>
-                              <div className="col-span-2 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => copyText(v.value, v.id)}>
-                                  {copiedKey === v.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
-                                </button>
-                                <button onClick={() => deleteVar(v.id)}>
-                                  <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
-                                </button>
                               </div>
                             </div>
                           )
@@ -813,18 +1009,15 @@ export function EnvManagerContent() {
                 <div>
                   <label className="text-xs font-medium mb-2 block">Platform</label>
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => setSyncPlatform("vercel")}
-                      className={`flex-1 py-2 rounded border text-sm font-medium transition-colors ${syncPlatform === "vercel" ? "bg-indigo-500 text-white border-indigo-500" : "border-border hover:bg-muted"}`}
-                    >
-                      Vercel
-                    </button>
-                    <button
-                      onClick={() => setSyncPlatform("railway")}
-                      className={`flex-1 py-2 rounded border text-sm font-medium transition-colors ${syncPlatform === "railway" ? "bg-indigo-500 text-white border-indigo-500" : "border-border hover:bg-muted"}`}
-                    >
-                      Railway
-                    </button>
+                    {(["vercel", "railway", "fly"] as const).map((platform) => (
+                      <button
+                        key={platform}
+                        onClick={() => setSyncPlatform(platform)}
+                        className={`flex-1 py-2 rounded border text-sm font-medium transition-colors ${syncPlatform === platform ? "bg-indigo-500 text-white border-indigo-500" : "border-border hover:bg-muted"}`}
+                      >
+                        {platform === "fly" ? "Fly.io" : platform.charAt(0).toUpperCase() + platform.slice(1)}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 <div>
@@ -835,15 +1028,26 @@ export function EnvManagerContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium mb-1 block">{syncPlatform === "vercel" ? "Vercel Token" : "Railway Token"}</label>
+                  <label className="text-xs font-medium mb-1 block">
+                    {syncPlatform === "vercel" ? "Vercel Token" : syncPlatform === "railway" ? "Railway Token" : "Fly.io Token"}
+                  </label>
                   <Input type="password" placeholder="Your API token" value={syncToken} onChange={(e) => setSyncToken(e.target.value)} />
                 </div>
                 <div>
-                  <label className="text-xs font-medium mb-1 block">{syncPlatform === "vercel" ? "Vercel Project ID" : "Railway Service ID"}</label>
-                  <Input placeholder={syncPlatform === "vercel" ? "prj_xxx" : "service-uuid"} value={syncProjectId} onChange={(e) => setSyncProjectId(e.target.value)} />
+                  <label className="text-xs font-medium mb-1 block">
+                    {syncPlatform === "vercel" ? "Vercel Project ID" : syncPlatform === "railway" ? "Railway Service ID" : "Fly App Name"}
+                  </label>
+                  <Input
+                    placeholder={syncPlatform === "vercel" ? "prj_xxx" : syncPlatform === "railway" ? "service-uuid" : "my-fly-app"}
+                    value={syncProjectId}
+                    onChange={(e) => setSyncProjectId(e.target.value)}
+                  />
                 </div>
                 <Button className="w-full" onClick={handleSync} disabled={syncLoading}>
-                  {syncLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Syncing...</> : <><Zap className="w-4 h-4 mr-2" /> Sync to {syncPlatform === "vercel" ? "Vercel" : "Railway"}</>}
+                  {syncLoading
+                    ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Syncing...</>
+                    : <><Zap className="w-4 h-4 mr-2" /> Sync to {syncPlatformLabel}</>
+                  }
                 </Button>
               </CardContent>
             </Card>

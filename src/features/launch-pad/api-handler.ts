@@ -17,10 +17,44 @@ export async function POST(req: Request) {
 
     const body = await req.json()
     const { action } = body
-    if (action !== "generate") throw new ApiError(`Unknown action: ${action}`, 400)
+    if (action !== "generate" && action !== "regenerate-platform") throw new ApiError(`Unknown action: ${action}`, 400)
 
     const input: LaunchInput = body.input
     if (!input?.productName) throw new ApiError("productName required", 400)
+
+    // Handle single-platform regeneration
+    if (action === "regenerate-platform") {
+      const platform: string = body.platform ?? ""
+      const key = process.env.GEMINI_API_KEY
+      if (!key) throw new ApiError("AI not configured", 503)
+      const genAI = new GoogleGenerativeAI(key)
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
+      const toneGuide = {
+        professional: "Use polished, business-appropriate language. Avoid hype.",
+        casual: "Be friendly, conversational, like talking to a friend. Use 'you' and 'we'.",
+        technical: "Lead with technical details. Assume a developer audience. Be precise.",
+        excited: "High energy! Use exclamation points (sparingly). Show genuine enthusiasm.",
+      }[input.tone] ?? ""
+      const platformPrompts: Record<string, string> = {
+        ph: `Generate a Product Hunt listing JSON: { "productHunt": { "name": "...", "tagline": "max 60 chars", "description": "max 260 chars", "firstComment": "200-300 words" } }`,
+        hn: `Generate a Hacker News Show HN JSON: { "hackerNews": { "title": "Show HN: [Name] – [one-liner]", "body": "150-250 words, honest, no marketing speak" } }`,
+        tweet: `Generate a tweet thread JSON: { "tweetThread": ["tweet1", "tweet2", "tweet3", "tweet4", "tweet5", "tweet6"] } Each tweet under 280 chars.`,
+        reddit: `Generate a Reddit r/SideProject post JSON: { "reddit": { "title": "...", "body": "200-300 words, genuine tone" } }`,
+        email: `Generate a cold email JSON: { "coldEmail": { "subject": "max 50 chars", "body": "3-4 paragraphs with [Name] placeholder" } }`,
+        linkedin: `Generate a LinkedIn post JSON: { "linkedInPost": { "body": "~1300 char professional post with emojis, structured paragraphs, 3-5 relevant hashtags" } }`,
+      }
+      const platformPrompt = platformPrompts[platform]
+      if (!platformPrompt) throw new ApiError(`Unknown platform: ${platform}`, 400)
+      const singlePrompt = `Product: ${input.productName}\nTagline: ${input.tagline}\nDescription: ${input.description}\nAudience: ${input.targetAudience}\nFeatures: ${input.keyFeatures.filter(Boolean).join(", ")}\nURL: ${input.launchUrl}\nTone: ${toneGuide}\n\n${platformPrompt}\n\nReturn only valid JSON, no markdown fences.`
+      try {
+        const result = await model.generateContent(singlePrompt)
+        const text = result.response.text().replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+        const partial = JSON.parse(text)
+        return NextResponse.json({ ok: true, partial })
+      } catch {
+        return NextResponse.json({ ok: true, partial: {} })
+      }
+    }
 
     const key = process.env.GEMINI_API_KEY
     if (!key) throw new ApiError("AI not configured", 503)
@@ -73,6 +107,9 @@ Return a single JSON object with this exact structure:
   "coldEmail": {
     "subject": "compelling subject line, personalized, max 50 chars",
     "body": "Hi [Name],\\n\\n[3-4 short paragraphs: hook with their specific pain, introduce solution briefly, one concrete result/feature, CTA]\\n\\nBest,\\n[Your name]\\n\\nP.S. [relevant postscript]"
+  },
+  "linkedInPost": {
+    "body": "~1300 character professional LinkedIn post. Start with a hook line, use short structured paragraphs, include 2-3 relevant emojis naturally, end with 3-5 hashtags. Genuine founder voice, professional but engaging."
   }
 }
 
@@ -113,6 +150,9 @@ IMPORTANT:
         coldEmail: {
           subject: `${input.productName} for ${input.targetAudience}`,
           body: `Hi [Name],\n\n${input.description}\n\nCheck it out at ${input.launchUrl}\n\nBest,\n[Your name]`,
+        },
+        linkedInPost: {
+          body: `Excited to share ${input.productName} with the community! 🚀\n\n${input.description}\n\nBuilt for ${input.targetAudience}.\n\nKey features: ${input.keyFeatures.filter(Boolean).join(", ")}\n\nCheck it out: ${input.launchUrl}\n\n#buildinpublic #startup #saas`,
         },
       }
       return NextResponse.json({ ok: true, output: fallback })

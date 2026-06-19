@@ -32,8 +32,6 @@ function saveHistory(h: HistoryItem[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(0, 20)))
 }
 
-const FONT_SIZES = { sm: "text-2xl", md: "text-3xl", lg: "text-4xl", xl: "text-5xl" }
-
 export function OGCraftContent() {
   const [tab, setTab] = useState<TabId>("checker")
   const [urlInput, setUrlInput] = useState("")
@@ -61,6 +59,7 @@ export function OGCraftContent() {
   const [genUrl, setGenUrl] = useState("")
 
   // AI copy state
+  const [showAiCopy, setShowAiCopy] = useState(false)
   const [aiDesc, setAiDesc] = useState("")
   const [aiLoading, setAiLoading] = useState(false)
   const [aiResult, setAiResult] = useState<{ ogTitle: string; ogDescription: string; twitterTitle: string; twitterDescription: string } | null>(null)
@@ -69,6 +68,7 @@ export function OGCraftContent() {
   const [batchInput, setBatchInput] = useState("")
   const [batchResults, setBatchResults] = useState<Array<{ url: string; status: "pending" | "ok" | "error"; ogData?: OGData; error?: string }>>([])
   const [batchLoading, setBatchLoading] = useState(false)
+  const [batchProgress, setBatchProgress] = useState(0)
 
   useEffect(() => { setHistory(loadHistory()) }, [])
 
@@ -131,8 +131,10 @@ export function OGCraftContent() {
     if (urls.length === 0) { toast.error("Enter at least one URL"); return }
     if (urls.length > 10) { toast.error("Max 10 URLs at once"); return }
     setBatchLoading(true)
+    setBatchProgress(0)
     setBatchResults(urls.map((url) => ({ url, status: "pending" })))
     for (let i = 0; i < urls.length; i++) {
+      setBatchProgress(i + 1)
       const url = urls[i]!
       try {
         const res = await fetch("/api/og-craft", {
@@ -147,6 +149,7 @@ export function OGCraftContent() {
         setBatchResults((prev) => prev.map((r, j) => j === i ? { ...r, status: "error", error: err instanceof Error ? err.message : "Failed" } : r))
       }
     }
+    setBatchProgress(0)
     setBatchLoading(false)
     toast.success("Batch check complete")
   }
@@ -256,6 +259,24 @@ ${genImage ? `<meta property="og:image" content="${genImage}" />` : ""}
 <meta property="twitter:description" content="${genDesc}" />
 ${genImage ? `<meta property="twitter:image" content="${genImage}" />` : ""}`
 
+  const nextjsMetaBlock = `import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "${genTitle}",
+  description: "${genDesc}",
+  openGraph: {
+    type: "website",
+    url: "${genUrl}",
+    title: "${genTitle}",
+    description: "${genDesc}",${genImage ? `\n    images: ["${genImage}"],` : ""}
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "${genTitle}",
+    description: "${genDesc}",${genImage ? `\n    images: ["${genImage}"],` : ""}
+  },
+}`
+
   const TABS: { id: TabId; label: string }[] = [
     { id: "checker", label: "URL Checker" },
     { id: "designer", label: "OG Designer" },
@@ -300,47 +321,53 @@ ${genImage ? `<meta property="twitter:image" content="${genImage}" />` : ""}`
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                 <span className="ml-1 hidden sm:inline">Check</span>
               </Button>
+              <Button variant="outline" onClick={() => setShowAiCopy(!showAiCopy)}>
+                <Sparkles className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">Generate Copy</span>
+              </Button>
             </div>
 
-            {/* AI copy generator inline */}
-            <Card className="border-violet-200 dark:border-violet-800">
-              <CardContent className="pt-4 space-y-3">
-                <p className="text-sm font-medium text-violet-700 dark:text-violet-300 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" /> AI OG Copy Generator
-                </p>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Describe your product or page..."
-                    value={aiDesc}
-                    onChange={(e) => setAiDesc(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button size="sm" onClick={handleAiCopy} disabled={aiLoading}>
-                    {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                  </Button>
-                </div>
-                {aiResult && (
-                  <div className="grid sm:grid-cols-2 gap-3 pt-1">
-                    {[
-                      { label: "og:title", value: aiResult.ogTitle, key: "ogt" },
-                      { label: "og:description", value: aiResult.ogDescription, key: "ogd" },
-                      { label: "twitter:title", value: aiResult.twitterTitle, key: "twt" },
-                      { label: "twitter:description", value: aiResult.twitterDescription, key: "twd" },
-                    ].map((item) => (
-                      <div key={item.key} className="group relative">
-                        <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-                        <div className="flex items-start gap-2 bg-muted/50 rounded p-2">
-                          <p className="text-sm flex-1">{item.value}</p>
-                          <button onClick={() => copyText(item.value, item.key)} className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {copiedKey === item.key ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+            {/* AI copy generator — collapsible, hidden by default */}
+            {showAiCopy && (
+              <Card className="border-violet-200 dark:border-violet-800">
+                <CardContent className="pt-4 space-y-3">
+                  <p className="text-sm font-medium text-violet-700 dark:text-violet-300 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" /> AI OG Copy Generator
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Describe your product or page..."
+                      value={aiDesc}
+                      onChange={(e) => setAiDesc(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button size="sm" onClick={handleAiCopy} disabled={aiLoading}>
+                      {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                    </Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                  {aiResult && (
+                    <div className="grid sm:grid-cols-2 gap-3 pt-1">
+                      {[
+                        { label: "og:title", value: aiResult.ogTitle, key: "ogt" },
+                        { label: "og:description", value: aiResult.ogDescription, key: "ogd" },
+                        { label: "twitter:title", value: aiResult.twitterTitle, key: "twt" },
+                        { label: "twitter:description", value: aiResult.twitterDescription, key: "twd" },
+                      ].map((item) => (
+                        <div key={item.key} className="group relative">
+                          <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
+                          <div className="flex items-start gap-2 bg-muted/50 rounded p-2">
+                            <p className="text-sm flex-1">{item.value}</p>
+                            <button onClick={() => copyText(item.value, item.key)} className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {copiedKey === item.key ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {error && (
               <div className="flex items-center gap-2 p-3 rounded-lg border border-red-200 bg-red-50 dark:bg-red-950 text-red-600 text-sm">
@@ -416,7 +443,7 @@ ${genImage ? `<meta property="twitter:image" content="${genImage}" />` : ""}`
             )}
 
             {/* History */}
-            {history.length > 0 && !ogData && (
+            {history.length > 0 && !loading && (
               <div>
                 <p className="text-sm font-medium mb-3 text-muted-foreground">Recent checks</p>
                 <div className="flex flex-wrap gap-2">
@@ -547,6 +574,18 @@ ${genImage ? `<meta property="twitter:image" content="${genImage}" />` : ""}`
                 <pre className="text-xs bg-muted/50 p-4 rounded-xl border overflow-auto max-h-96 font-mono whitespace-pre-wrap">
                   {metaTagBlock}
                 </pre>
+
+                {/* Next.js metadata export */}
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-sm font-medium flex items-center gap-2"><Code className="w-4 h-4" /> Next.js <code className="text-xs bg-muted px-1 rounded">metadata</code> export</p>
+                  <Button variant="outline" size="sm" onClick={() => copyText(nextjsMetaBlock, "nextjs-block")}>
+                    {copiedKey === "nextjs-block" ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                    Copy
+                  </Button>
+                </div>
+                <pre className="text-xs bg-muted/50 p-4 rounded-xl border overflow-auto max-h-64 font-mono whitespace-pre-wrap">
+                  {nextjsMetaBlock}
+                </pre>
               </div>
             </div>
           </div>
@@ -567,7 +606,9 @@ ${genImage ? `<meta property="twitter:image" content="${genImage}" />` : ""}`
                   rows={6}
                 />
                 <Button onClick={handleBatchCheck} disabled={batchLoading}>
-                  {batchLoading ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Checking...</> : <><Search className="w-3.5 h-3.5 mr-1" /> Check All</>}
+                  {batchLoading
+                    ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Checking {batchProgress}/{batchInput.split("\n").filter((u) => u.trim()).length}...</>
+                    : <><Search className="w-3.5 h-3.5 mr-1" /> Check All</>}
                 </Button>
               </CardContent>
             </Card>

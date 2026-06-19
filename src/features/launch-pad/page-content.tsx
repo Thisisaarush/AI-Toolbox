@@ -25,7 +25,7 @@ function load(): LaunchRecord[] {
 }
 function save(r: LaunchRecord[]) { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)) }
 
-type OutputTab = "ph" | "hn" | "tweet" | "reddit" | "email"
+type OutputTab = "ph" | "hn" | "tweet" | "reddit" | "email" | "linkedin"
 
 const OUTPUT_TABS: { id: OutputTab; label: string }[] = [
   { id: "ph", label: "Product Hunt" },
@@ -33,20 +33,11 @@ const OUTPUT_TABS: { id: OutputTab; label: string }[] = [
   { id: "tweet", label: "Tweet Thread" },
   { id: "reddit", label: "Reddit" },
   { id: "email", label: "Cold Email" },
+  { id: "linkedin", label: "LinkedIn" },
 ]
 
-export function LaunchPadContent() {
-  const [records, setRecords] = useState<LaunchRecord[]>([])
-  const [view, setView] = useState<"form" | "output" | "history">("form")
-  const [loading, setLoading] = useState(false)
-  const [currentOutput, setCurrentOutput] = useState<LaunchOutput | null>(null)
-  const [outputTab, setOutputTab] = useState<OutputTab>("ph")
-  const [copiedKey, setCopiedKey] = useState("")
-  const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({})
-  const [showChecklist, setShowChecklist] = useState(false)
-
-  // Form
-  const [form, setForm] = useState<LaunchInput>({
+function defaultForm(): LaunchInput {
+  return {
     productName: "",
     tagline: "",
     description: "",
@@ -55,7 +46,23 @@ export function LaunchPadContent() {
     techStack: "",
     launchUrl: "",
     tone: "casual",
-  })
+  }
+}
+
+export function LaunchPadContent() {
+  const [records, setRecords] = useState<LaunchRecord[]>([])
+  const [view, setView] = useState<"form" | "output" | "history">("form")
+  const [loading, setLoading] = useState(false)
+  const [regenLoading, setRegenLoading] = useState<OutputTab | null>(null)
+  const [currentOutput, setCurrentOutput] = useState<LaunchOutput | null>(null)
+  const [outputTab, setOutputTab] = useState<OutputTab>("ph")
+  const [copiedKey, setCopiedKey] = useState("")
+  const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({})
+  const [showChecklist, setShowChecklist] = useState(false)
+  const [editingNotes, setEditingNotes] = useState<string | null>(null)
+
+  // Form
+  const [form, setForm] = useState<LaunchInput>(defaultForm)
 
   useEffect(() => { setRecords(load()) }, [])
 
@@ -92,7 +99,7 @@ export function LaunchPadContent() {
         return next
       })
       setView("output")
-      toast.success("All 5 formats generated!")
+      toast.success("All 6 formats generated!")
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Generation failed")
     }
@@ -118,6 +125,35 @@ export function LaunchPadContent() {
     setView("output")
   }
 
+  async function regeneratePlatform(platform: OutputTab) {
+    if (!currentOutput) return
+    setRegenLoading(platform)
+    try {
+      const res = await fetch("/api/launch-pad", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "regenerate-platform", input: form, platform }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? "Regeneration failed")
+      if (data.partial && Object.keys(data.partial).length > 0) {
+        setCurrentOutput((prev) => prev ? { ...prev, ...data.partial } : prev)
+        toast.success("Regenerated!")
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Regeneration failed")
+    }
+    setRegenLoading(null)
+  }
+
+  function updateRecordNotes(id: string, notes: string) {
+    setRecords((prev) => {
+      const next = prev.map((r) => r.id === id ? { ...r, notes } : r)
+      save(next)
+      return next
+    })
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <ToolHeader
@@ -127,7 +163,7 @@ export function LaunchPadContent() {
         badge="Marketing"
         actions={
           <div className="flex gap-2">
-            {view !== "form" && <Button variant="outline" size="sm" onClick={() => setView("form")}>← New Launch</Button>}
+            {view !== "form" && <Button variant="outline" size="sm" onClick={() => { setForm(defaultForm()); setView("form") }}>← New Launch</Button>}
             {records.length > 0 && (
               <Button variant="ghost" size="sm" onClick={() => setView(view === "history" ? "form" : "history")}>
                 <History className="w-3.5 h-3.5 mr-1" /> History
@@ -237,7 +273,7 @@ export function LaunchPadContent() {
 
                 <Button className="w-full" onClick={handleGenerate} disabled={loading}>
                   {loading
-                    ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating all 5 formats...</>
+                    ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating all 6 formats...</>
                     : <><Sparkles className="w-4 h-4 mr-2" /> Generate All Launch Copy</>
                   }
                 </Button>
@@ -298,41 +334,59 @@ export function LaunchPadContent() {
         {view === "output" && currentOutput && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold">Launch Copy Ready</h1>
-                <p className="text-muted-foreground text-sm">5 platform-optimized formats generated.</p>
-              </div>
-              <Button variant="outline" size="sm" onClick={handleGenerate} disabled={loading}>
-                {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
-                Regenerate
-              </Button>
+            <div>
+              <h1 className="text-2xl font-bold">Launch Copy Ready</h1>
+              <p className="text-muted-foreground text-sm">6 platform-optimized formats generated.</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleGenerate} disabled={loading}>
+              {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
+              Regenerate all
+            </Button>
             </div>
 
             {/* Tone selector */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-muted-foreground">Tone:</span>
               {(Object.entries(TONES) as [ToneId, typeof TONES[ToneId]][]).map(([id, t]) => (
                 <button
                   key={id}
-                  onClick={() => { setForm((f) => ({ ...f, tone: id })) }}
+                  onClick={() => setForm((f) => ({ ...f, tone: id }))}
                   className={`px-2 py-1 rounded text-xs border transition-colors ${form.tone === id ? "bg-orange-500 text-white border-orange-500" : "border-border hover:bg-muted"}`}
                 >
                   {t.label}
                 </button>
               ))}
+              <Button size="sm" variant="outline" onClick={handleGenerate} disabled={loading}>
+                {loading ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
+                Regenerate with this tone
+              </Button>
             </div>
 
             {/* Output tabs */}
-            <div className="flex gap-1 border-b">
+            <div className="flex gap-1 border-b overflow-x-auto">
               {OUTPUT_TABS.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setOutputTab(t.id)}
-                  className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${outputTab === t.id ? "border-orange-500 text-orange-600" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                  className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${outputTab === t.id ? "border-orange-500 text-orange-600" : "border-transparent text-muted-foreground hover:text-foreground"}`}
                 >
                   {t.label}
                 </button>
               ))}
+            </div>
+
+            {/* Per-tab regenerate */}
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => regeneratePlatform(outputTab)}
+                disabled={regenLoading === outputTab}
+              >
+                {regenLoading === outputTab
+                  ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Regenerating...</>
+                  : <><RefreshCw className="w-3.5 h-3.5 mr-1" /> Regenerate {OUTPUT_TABS.find((t) => t.id === outputTab)?.label}</>}
+              </Button>
             </div>
 
             {outputTab === "ph" && (
@@ -402,6 +456,12 @@ export function LaunchPadContent() {
                 <OutputField label="Body" value={currentOutput.coldEmail.body} copyKey="email-body" copiedKey={copiedKey} onCopy={copyText} multiline />
               </OutputSection>
             )}
+
+            {outputTab === "linkedin" && (
+              <OutputSection title="LinkedIn Post">
+                <OutputField label={`Post (${currentOutput.linkedInPost?.body?.length ?? 0} chars)`} value={currentOutput.linkedInPost?.body ?? ""} copyKey="linkedin-body" copiedKey={copiedKey} onCopy={copyText} multiline />
+              </OutputSection>
+            )}
           </div>
         )}
 
@@ -416,30 +476,58 @@ export function LaunchPadContent() {
               <Card><CardContent className="py-12 text-center text-muted-foreground">No launches yet</CardContent></Card>
             ) : (
               records.map((r) => (
-                <Card key={r.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => loadRecord(r)}>
-                  <CardContent className="py-4 flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold">{r.input.productName}</p>
-                      <p className="text-sm text-muted-foreground">{r.input.tagline}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{new Date(r.createdAt).toLocaleDateString()}</p>
+                <Card key={r.id}>
+                  <CardContent className="py-4">
+                    <div
+                      className="flex items-center justify-between cursor-pointer"
+                      onClick={() => loadRecord(r)}
+                    >
+                      <div>
+                        <p className="font-semibold">{r.input.productName}</p>
+                        <p className="text-sm text-muted-foreground">{r.input.tagline}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{new Date(r.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">{r.input.tone}</Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setRecords((prev) => {
+                              const next = prev.filter((rec) => rec.id !== r.id)
+                              save(next)
+                              return next
+                            })
+                            toast.success("Deleted")
+                          }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">{r.input.tone}</Badge>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setRecords((prev) => {
-                            const next = prev.filter((rec) => rec.id !== r.id)
-                            save(next)
-                            return next
-                          })
-                          toast.success("Deleted")
-                        }}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                    {/* Notes */}
+                    <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+                      {editingNotes === r.id ? (
+                        <div className="space-y-2">
+                          <Textarea
+                            placeholder="Add notes about this launch..."
+                            value={r.notes}
+                            onChange={(e) => updateRecordNotes(r.id, e.target.value)}
+                            rows={2}
+                            className="text-sm"
+                            autoFocus
+                          />
+                          <Button size="sm" variant="outline" onClick={() => setEditingNotes(null)}>Done</Button>
+                        </div>
+                      ) : (
+                        <button
+                          className="text-xs text-muted-foreground hover:text-foreground transition-colors text-left w-full"
+                          onClick={() => setEditingNotes(r.id)}
+                        >
+                          {r.notes ? r.notes : "+ Add notes"}
+                        </button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -471,7 +559,7 @@ function OutputField({
     <div className="group">
       <div className="flex items-center justify-between mb-1.5">
         <label className={`text-xs font-medium ${warning ? "text-amber-600" : "text-muted-foreground"}`}>{label}</label>
-        <button onClick={() => onCopy(value, copyKey)} className="opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onClick={() => onCopy(value, copyKey)} className="shrink-0">
           {copiedKey === copyKey ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
         </button>
       </div>

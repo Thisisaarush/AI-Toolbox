@@ -164,9 +164,20 @@ export function InvoiceZeroContent() {
   function saveInvoice() {
     if (!form.client.name.trim()) { toast.error("Client name required"); return }
     if (form.lineItems.length === 0) { toast.error("Add at least one line item"); return }
+
+    // Strip empty line items (no description AND zero price)
+    const stripped = form.lineItems.filter((li) => li.description.trim() !== "" || li.unitPrice !== 0)
+    const removedCount = form.lineItems.length - stripped.length
+    if (stripped.length === 0) { toast.error("Add at least one line item with a description or price"); return }
+    if (removedCount > 0) {
+      toast.warning(`Removed ${removedCount} empty line item${removedCount > 1 ? "s" : ""}`)
+      setForm((p) => ({ ...p, lineItems: stripped }))
+    }
+    const finalLineItems = stripped
     const now = new Date().toISOString()
+    const finalForm = { ...form, lineItems: finalLineItems }
     if (editingInvoice) {
-      const updated = { ...editingInvoice, ...form, updatedAt: now }
+      const updated = { ...editingInvoice, ...finalForm, updatedAt: now }
       setInvoices((prev) => {
         const next = prev.map((inv) => inv.id === editingInvoice.id ? updated : inv)
         save(next)
@@ -174,7 +185,7 @@ export function InvoiceZeroContent() {
       })
       toast.success("Invoice updated")
     } else {
-      const inv: Invoice = { ...form, id: crypto.randomUUID(), createdAt: now, updatedAt: now }
+      const inv: Invoice = { ...finalForm, id: crypto.randomUUID(), createdAt: now, updatedAt: now }
       setInvoices((prev) => {
         const next = [inv, ...prev]
         save(next)
@@ -237,11 +248,12 @@ export function InvoiceZeroContent() {
   }
 
   function copyShareLink(inv: Invoice) {
-    const url = `${window.location.origin}/invoice/${inv.id}`
-    navigator.clipboard.writeText(url)
+    const totals = calculateInvoiceTotals(inv)
+    const summary = `Invoice ${inv.invoiceNumber} — ${inv.client.name}${inv.client.company ? ` (${inv.client.company})` : ""} — ${formatCurrency(totals.total, inv.currency)} — Due ${inv.dueDate}`
+    navigator.clipboard.writeText(summary)
     setCopiedId(inv.id)
     setTimeout(() => setCopiedId(null), 2000)
-    toast.success("Share link copied")
+    toast.success("Summary copied")
   }
 
   async function handleAiGenerate() {
@@ -435,7 +447,7 @@ export function InvoiceZeroContent() {
                       </div>
 
                       {/* Right — actions */}
-                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         {inv.status !== "paid" && (
                           <Button
                             variant="ghost"
@@ -452,7 +464,7 @@ export function InvoiceZeroContent() {
                         <Button variant="ghost" size="icon-sm" onClick={() => startEdit(inv)} title="Edit">
                           <Edit3 className="w-3.5 h-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon-sm" onClick={() => printInvoice(inv)} title="Download PDF">
+                        <Button variant="ghost" size="icon-sm" onClick={() => printInvoice(inv)} title="Print / Save PDF">
                           <Download className="w-3.5 h-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon-sm" onClick={() => duplicateInvoice(inv)} title="Duplicate">
@@ -462,7 +474,7 @@ export function InvoiceZeroContent() {
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => copyShareLink(inv)}
-                          title="Copy link"
+                          title="Copy summary"
                         >
                           {copiedId === inv.id
                             ? <CopyCheck className="w-3.5 h-3.5 text-green-500" />
@@ -745,20 +757,20 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
     <div>
       <div className="flex items-center gap-3 mb-6 no-print">
         <Button variant="outline" size="sm" onClick={onBack}>← Back</Button>
-        <Button size="sm" onClick={onPrint}><Download className="w-3.5 h-3.5 mr-1" /> Download PDF</Button>
+        <Button size="sm" onClick={onPrint}><Download className="w-3.5 h-3.5 mr-1" /> Print / Save PDF</Button>
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>{meta.label}</span>
       </div>
-      <div id="invoice-print-root" className="bg-white text-gray-900 p-10 rounded-xl shadow-lg max-w-3xl mx-auto print:shadow-none print:rounded-none print:p-8">
+      <div id="invoice-print-root" className="bg-background text-foreground print:bg-white print:text-gray-900 p-10 rounded-xl shadow-lg max-w-3xl mx-auto print:shadow-none print:rounded-none print:p-8">
         {/* Header */}
         <div className="flex justify-between items-start mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{invoice.businessName || "Your Business"}</h1>
-            <p className="text-sm text-gray-500 mt-1 whitespace-pre-line">{invoice.businessAddress}</p>
-            {invoice.businessEmail && <p className="text-sm text-gray-500">{invoice.businessEmail}</p>}
+            <h1 className="text-3xl font-bold text-foreground print:text-gray-900">{invoice.businessName || "Your Business"}</h1>
+            <p className="text-sm text-muted-foreground print:text-gray-500 mt-1 whitespace-pre-line">{invoice.businessAddress}</p>
+            {invoice.businessEmail && <p className="text-sm text-muted-foreground print:text-gray-500">{invoice.businessEmail}</p>}
           </div>
           <div className="text-right">
             <p className="text-3xl font-bold text-emerald-600">INVOICE</p>
-            <p className="text-lg font-semibold text-gray-700 mt-1">{invoice.invoiceNumber}</p>
+            <p className="text-lg font-semibold text-foreground print:text-gray-700 mt-1">{invoice.invoiceNumber}</p>
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>{meta.label}</span>
           </div>
         </div>
@@ -766,25 +778,25 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
         {/* Bill to + dates */}
         <div className="grid grid-cols-2 gap-8 mb-10">
           <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Bill To</p>
-            <p className="font-semibold text-gray-900">{invoice.client.name}</p>
-            {invoice.client.company && <p className="text-sm text-gray-600">{invoice.client.company}</p>}
-            {invoice.client.email && <p className="text-sm text-gray-600">{invoice.client.email}</p>}
-            {invoice.client.address && <p className="text-sm text-gray-500 whitespace-pre-line">{invoice.client.address}</p>}
+            <p className="text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider mb-2">Bill To</p>
+            <p className="font-semibold text-foreground print:text-gray-900">{invoice.client.name}</p>
+            {invoice.client.company && <p className="text-sm text-muted-foreground print:text-gray-600">{invoice.client.company}</p>}
+            {invoice.client.email && <p className="text-sm text-muted-foreground print:text-gray-600">{invoice.client.email}</p>}
+            {invoice.client.address && <p className="text-sm text-muted-foreground print:text-gray-500 whitespace-pre-line">{invoice.client.address}</p>}
           </div>
           <div className="text-right">
             <div className="space-y-1">
               <div className="flex justify-end gap-8 text-sm">
-                <span className="text-gray-400">Issue Date</span>
+                <span className="text-muted-foreground print:text-gray-400">Issue Date</span>
                 <span className="font-medium">{invoice.issueDate}</span>
               </div>
               <div className="flex justify-end gap-8 text-sm">
-                <span className="text-gray-400">Due Date</span>
+                <span className="text-muted-foreground print:text-gray-400">Due Date</span>
                 <span className="font-medium text-red-600">{invoice.dueDate}</span>
               </div>
               {invoice.paidDate && (
                 <div className="flex justify-end gap-8 text-sm">
-                  <span className="text-gray-400">Paid Date</span>
+                  <span className="text-muted-foreground print:text-gray-400">Paid Date</span>
                   <span className="font-medium text-green-600">{invoice.paidDate}</span>
                 </div>
               )}
@@ -795,19 +807,19 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
         {/* Line items */}
         <table className="w-full mb-8">
           <thead>
-            <tr className="border-b-2 border-gray-200">
-              <th className="text-left py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Description</th>
-              <th className="text-right py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider w-20">Qty</th>
-              <th className="text-right py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider w-32">Unit Price</th>
-              <th className="text-right py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider w-32">Amount</th>
+            <tr className="border-b-2 border-border print:border-gray-200">
+              <th className="text-left py-2 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider">Description</th>
+              <th className="text-right py-2 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-20">Qty</th>
+              <th className="text-right py-2 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-32">Unit Price</th>
+              <th className="text-right py-2 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-32">Amount</th>
             </tr>
           </thead>
           <tbody>
             {invoice.lineItems.map((li) => (
-              <tr key={li.id} className="border-b border-gray-100">
-                <td className="py-3 text-sm text-gray-700">{li.description}</td>
-                <td className="py-3 text-sm text-right text-gray-600">{li.quantity}</td>
-                <td className="py-3 text-sm text-right text-gray-600">{formatCurrency(li.unitPrice, invoice.currency)}</td>
+              <tr key={li.id} className="border-b border-border print:border-gray-100">
+                <td className="py-3 text-sm text-foreground print:text-gray-700">{li.description}</td>
+                <td className="py-3 text-sm text-right text-muted-foreground print:text-gray-600">{li.quantity}</td>
+                <td className="py-3 text-sm text-right text-muted-foreground print:text-gray-600">{formatCurrency(li.unitPrice, invoice.currency)}</td>
                 <td className="py-3 text-sm text-right font-medium">{formatCurrency(li.quantity * li.unitPrice, invoice.currency)}</td>
               </tr>
             ))}
@@ -817,20 +829,20 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
         {/* Totals */}
         <div className="flex justify-end mb-8">
           <div className="w-64 space-y-2">
-            <div className="flex justify-between text-sm text-gray-600">
+            <div className="flex justify-between text-sm text-muted-foreground print:text-gray-600">
               <span>Subtotal</span><span>{formatCurrency(totals.subtotal, invoice.currency)}</span>
             </div>
             {totals.discountAmount > 0 && (
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex justify-between text-sm text-muted-foreground print:text-gray-600">
                 <span>Discount</span><span>-{formatCurrency(totals.discountAmount, invoice.currency)}</span>
               </div>
             )}
             {totals.taxAmount > 0 && (
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex justify-between text-sm text-muted-foreground print:text-gray-600">
                 <span>Tax ({invoice.taxRate}%)</span><span>{formatCurrency(totals.taxAmount, invoice.currency)}</span>
               </div>
             )}
-            <div className="border-t-2 border-gray-900 pt-2 flex justify-between font-bold text-lg">
+            <div className="border-t-2 border-foreground print:border-gray-900 pt-2 flex justify-between font-bold text-lg">
               <span>Total</span><span>{formatCurrency(totals.total, invoice.currency)}</span>
             </div>
           </div>
@@ -838,17 +850,17 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
 
         {/* Notes & terms */}
         {(invoice.notes || invoice.paymentTerms) && (
-          <div className="border-t border-gray-200 pt-6 space-y-3">
+          <div className="border-t border-border print:border-gray-200 pt-6 space-y-3">
             {invoice.notes && (
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Notes</p>
-                <p className="text-sm text-gray-600">{invoice.notes}</p>
+                <p className="text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider mb-1">Notes</p>
+                <p className="text-sm text-muted-foreground print:text-gray-600">{invoice.notes}</p>
               </div>
             )}
             {invoice.paymentTerms && (
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Payment Terms</p>
-                <p className="text-sm text-gray-600">{invoice.paymentTerms}</p>
+                <p className="text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider mb-1">Payment Terms</p>
+                <p className="text-sm text-muted-foreground print:text-gray-600">{invoice.paymentTerms}</p>
               </div>
             )}
           </div>

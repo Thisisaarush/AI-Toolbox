@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   GitBranch, Sparkles, Copy, Check, Loader2, Plus, Trash2,
-  Download, Eye, EyeOff, History, ChevronDown, ChevronUp,
+  Download, Eye, EyeOff, History, ChevronDown, ChevronUp, Search,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -60,6 +60,12 @@ export function ChangelogAIContent() {
   // Editor state
   const [entries, setEntries] = useState<ChangelogEntry[]>([])
   const [showPreview, setShowPreview] = useState(true)
+
+  // History search
+  const [historySearch, setHistorySearch] = useState("")
+
+  // Collapsible history release previews
+  const [expandedReleases, setExpandedReleases] = useState<Set<string>>(new Set())
 
   useEffect(() => { setReleases(load()) }, [])
 
@@ -139,6 +145,15 @@ export function ChangelogAIContent() {
     })
   }
 
+  function toggleReleaseExpand(id: string) {
+    setExpandedReleases((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
   const releaseForExport: Release = useMemo(() => ({
     id: currentRelease?.id ?? "preview",
     version: version || "v1.0.0",
@@ -193,7 +208,10 @@ The Team`
     toast.success("CHANGELOG.md downloaded")
   }
 
-  const widgetSnippet = `<script src="https://yourapp.com/changelog-widget.js" data-changelog-id="YOUR_ID"></script>`
+  const filteredReleases = useMemo(() => {
+    if (!historySearch.trim()) return releases
+    return releases.filter((r) => r.version.toLowerCase().includes(historySearch.toLowerCase()))
+  }, [releases, historySearch])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -246,6 +264,23 @@ pqr1234 improvement: 40% faster load times via lazy loading`}
                         rows={12}
                         className="font-mono text-sm"
                       />
+                    </div>
+                    {/* Git log helper */}
+                    <div className="rounded-lg border bg-muted/30 p-3 space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground">Get your git log</p>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs font-mono bg-background border rounded px-2 py-1 flex-1">git log --oneline v1.0..HEAD</code>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText("git log --oneline v1.0..HEAD")
+                            toast.success("Copied!")
+                          }}
+                          className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Run this in your repo to get commits since your last tag.</p>
                     </div>
                     <Button className="w-full" onClick={handleGenerate} disabled={loading}>
                       {loading
@@ -308,12 +343,22 @@ pqr1234 improvement: 40% faster load times via lazy loading`}
         {/* ── EDITOR ───────────────────────────────────────────────────────── */}
         {view === "editor" && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
+            {/* Editor header with version + date fields */}
+            <div className="flex flex-col sm:flex-row sm:items-start gap-4 justify-between">
+              <div className="space-y-1">
                 <h1 className="text-2xl font-bold">Review & Edit</h1>
                 <p className="text-muted-foreground text-sm">{entries.length} entries generated. Edit and save.</p>
               </div>
-              <div className="flex gap-2">
+              {/* Version + date always visible in editor */}
+              <div className="flex flex-wrap items-end gap-2">
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Version</label>
+                  <Input placeholder="v2.3.0" value={version} onChange={(e) => setVersion(e.target.value)} className="w-32" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Date</label>
+                  <Input type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} className="w-36" />
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)}>
                   {showPreview ? <EyeOff className="w-3.5 h-3.5 mr-1" /> : <Eye className="w-3.5 h-3.5 mr-1" />}
                   {showPreview ? "Hide" : "Show"} preview
@@ -338,7 +383,7 @@ pqr1234 improvement: 40% faster load times via lazy loading`}
                         <select
                           value={entry.type}
                           onChange={(e) => updateEntry(entry.id, "type", e.target.value)}
-                          className="h-7 rounded border border-input bg-background px-2 text-xs"
+                          className="h-9 rounded border border-input bg-background px-2 text-xs"
                         >
                           {(Object.entries(CHANGE_TYPE_META) as [ChangeType, typeof CHANGE_TYPE_META[ChangeType]][]).map(([k, v]) => (
                             <option key={k} value={k}>{v.label}</option>
@@ -378,6 +423,11 @@ pqr1234 improvement: 40% faster load times via lazy loading`}
                     </CardContent>
                   </Card>
                 ))}
+
+                {/* Sticky bottom save button */}
+                <Button className="w-full" onClick={saveRelease}>
+                  <Check className="w-3.5 h-3.5 mr-1" /> Save Release
+                </Button>
               </div>
 
               {/* Preview */}
@@ -409,16 +459,10 @@ pqr1234 improvement: 40% faster load times via lazy loading`}
                     </pre>
                   </div>
 
-                  {/* Widget snippet */}
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-2">Embeddable widget snippet</p>
-                    <div className="group relative">
-                      <code className="text-xs bg-muted/50 p-3 rounded border block font-mono">{widgetSnippet}</code>
-                      <button onClick={() => copyText(widgetSnippet, "widget")} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {copiedKey === "widget" ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
-                      </button>
-                    </div>
-                  </div>
+                  {/* Public changelog coming soon note */}
+                  <p className="text-xs text-muted-foreground border rounded-lg p-3 bg-muted/20">
+                    Public changelog page — coming soon.
+                  </p>
                 </div>
               )}
             </div>
@@ -437,58 +481,77 @@ pqr1234 improvement: 40% faster load times via lazy loading`}
               )}
             </div>
 
-            {/* Full changelog preview */}
+            {/* History search */}
             {releases.length > 0 && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">Full Changelog Preview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <pre className="text-xs font-mono whitespace-pre-wrap bg-muted/30 p-4 rounded border max-h-64 overflow-auto">
-                    {releases.map((r) => generateMarkdown(r)).join("\n\n---\n\n")}
-                  </pre>
-                </CardContent>
-              </Card>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search releases by version..."
+                  value={historySearch}
+                  onChange={(e) => setHistorySearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
             )}
 
-            {releases.length === 0 ? (
-              <Card><CardContent className="py-12 text-center text-muted-foreground">No releases saved yet</CardContent></Card>
+            {filteredReleases.length === 0 ? (
+              <Card><CardContent className="py-12 text-center text-muted-foreground">
+                {releases.length === 0 ? "No releases saved yet" : "No releases match your search"}
+              </CardContent></Card>
             ) : (
-              releases.map((r) => (
-                <Card key={r.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => { setEntries(r.entries); setVersion(r.version); setReleaseDate(r.releaseDate); setTone(r.tone); setUseEmojis(r.useEmojis); setCurrentRelease(r); setView("editor") }}>
-                  <CardContent className="py-4 flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold">{r.version}</p>
-                        <Badge variant="secondary">{r.releaseDate}</Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">{r.entries.length} entries · {r.tone} tone</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-1">
-                        {(["feature", "fix", "improvement"] as ChangeType[]).map((type) => {
-                          const count = r.entries.filter((e) => e.type === type).length
-                          if (count === 0) return null
-                          const meta = CHANGE_TYPE_META[type]
-                          return (
-                            <span key={type} className={`text-xs px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
-                              {count} {type}
-                            </span>
-                          )
-                        })}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setReleases((prev) => { const next = prev.filter((rel) => rel.id !== r.id); save(next); return next })
-                          toast.success("Deleted")
-                        }}
+              filteredReleases.map((r) => (
+                <Card key={r.id}>
+                  <CardContent className="py-4">
+                    <div className="flex items-center justify-between">
+                      <button
+                        className="flex-1 text-left"
+                        onClick={() => { setEntries(r.entries); setVersion(r.version); setReleaseDate(r.releaseDate); setTone(r.tone); setUseEmojis(r.useEmojis); setCurrentRelease(r); setView("editor") }}
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold">{r.version}</p>
+                          <Badge variant="secondary">{r.releaseDate}</Badge>
+                          {(["feature", "fix", "improvement"] as ChangeType[]).map((type) => {
+                            const count = r.entries.filter((e) => e.type === type).length
+                            if (count === 0) return null
+                            const meta = CHANGE_TYPE_META[type]
+                            return (
+                              <span key={type} className={`text-xs px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+                                {count} {type}
+                              </span>
+                            )
+                          })}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{r.entries.length} entries · {r.tone} tone</p>
+                      </button>
+                      <div className="flex items-center gap-1 shrink-0 ml-2">
+                        <button
+                          onClick={() => toggleReleaseExpand(r.id)}
+                          className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+                          title={expandedReleases.has(r.id) ? "Collapse" : "Preview"}
+                        >
+                          {expandedReleases.has(r.id) ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        </button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => {
+                            setReleases((prev) => { const next = prev.filter((rel) => rel.id !== r.id); save(next); return next })
+                            toast.success("Deleted")
+                          }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
                     </div>
+
+                    {/* Collapsible preview — default closed */}
+                    {expandedReleases.has(r.id) && (
+                      <div className="mt-3 pt-3 border-t">
+                        <pre className="text-xs font-mono whitespace-pre-wrap bg-muted/30 p-3 rounded border max-h-48 overflow-auto">
+                          {generateMarkdown(r)}
+                        </pre>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))

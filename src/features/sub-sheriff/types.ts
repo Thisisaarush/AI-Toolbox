@@ -54,17 +54,17 @@ export interface SpendSummary {
   savingsIfCancelled: number
 }
 
-export const CATEGORY_META: Record<Category, { label: string; color: string; bg: string }> = {
-  "dev-tools":     { label: "Dev Tools",      color: "text-blue-600",   bg: "bg-blue-100 dark:bg-blue-900/30" },
-  "design":        { label: "Design",          color: "text-purple-600", bg: "bg-purple-100 dark:bg-purple-900/30" },
-  "productivity":  { label: "Productivity",    color: "text-green-600",  bg: "bg-green-100 dark:bg-green-900/30" },
-  "media":         { label: "Media",           color: "text-pink-600",   bg: "bg-pink-100 dark:bg-pink-900/30" },
-  "ai-llm":        { label: "AI / LLM",        color: "text-amber-600",  bg: "bg-amber-100 dark:bg-amber-900/30" },
-  "cloud-hosting": { label: "Cloud / Hosting", color: "text-cyan-600",   bg: "bg-cyan-100 dark:bg-cyan-900/30" },
-  "marketing":     { label: "Marketing",       color: "text-orange-600", bg: "bg-orange-100 dark:bg-orange-900/30" },
-  "security":      { label: "Security",        color: "text-red-600",    bg: "bg-red-100 dark:bg-red-900/30" },
-  "finance":       { label: "Finance",         color: "text-emerald-600",bg: "bg-emerald-100 dark:bg-emerald-900/30" },
-  "other":         { label: "Other",           color: "text-gray-600",   bg: "bg-gray-100 dark:bg-gray-800" },
+export const CATEGORY_META: Record<Category, { label: string; color: string; bg: string; barColor: string }> = {
+  "dev-tools":     { label: "Dev Tools",      color: "text-blue-600",   bg: "bg-blue-100 dark:bg-blue-900/30",    barColor: "bg-blue-500" },
+  "design":        { label: "Design",          color: "text-purple-600", bg: "bg-purple-100 dark:bg-purple-900/30", barColor: "bg-purple-500" },
+  "productivity":  { label: "Productivity",    color: "text-green-600",  bg: "bg-green-100 dark:bg-green-900/30",  barColor: "bg-green-500" },
+  "media":         { label: "Media",           color: "text-pink-600",   bg: "bg-pink-100 dark:bg-pink-900/30",    barColor: "bg-pink-500" },
+  "ai-llm":        { label: "AI / LLM",        color: "text-amber-600",  bg: "bg-amber-100 dark:bg-amber-900/30",  barColor: "bg-amber-500" },
+  "cloud-hosting": { label: "Cloud / Hosting", color: "text-cyan-600",   bg: "bg-cyan-100 dark:bg-cyan-900/30",    barColor: "bg-cyan-500" },
+  "marketing":     { label: "Marketing",       color: "text-orange-600", bg: "bg-orange-100 dark:bg-orange-900/30", barColor: "bg-orange-500" },
+  "security":      { label: "Security",        color: "text-red-600",    bg: "bg-red-100 dark:bg-red-900/30",      barColor: "bg-red-500" },
+  "finance":       { label: "Finance",         color: "text-emerald-600",bg: "bg-emerald-100 dark:bg-emerald-900/30", barColor: "bg-emerald-500" },
+  "other":         { label: "Other",           color: "text-gray-600",   bg: "bg-gray-100 dark:bg-gray-800",       barColor: "bg-gray-500" },
 }
 
 export const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = {

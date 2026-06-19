@@ -91,6 +91,37 @@ export async function POST(req: Request) {
       }
     }
 
+    if (action === "sync-fly") {
+      const { flyToken, flyAppName, envVars } = body
+      if (!flyToken) throw new ApiError("Fly.io token required", 400)
+      if (!flyAppName) throw new ApiError("Fly.io app name required", 400)
+      if (!Array.isArray(envVars)) throw new ApiError("envVars array required", 400)
+
+      const secrets: Record<string, string> = {}
+      for (const v of envVars) {
+        secrets[v.key] = v.value
+      }
+
+      try {
+        const res = await fetch(`https://api.machines.dev/v1/apps/${flyAppName}/secrets`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${flyToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ secrets }),
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new ApiError(err?.message ?? `Fly.io API error (${res.status})`, 422)
+        }
+        return NextResponse.json({ ok: true, summary: `${envVars.length} variables synced to Fly.io` })
+      } catch (err: unknown) {
+        if (err instanceof ApiError) throw err
+        throw new ApiError("Fly.io sync failed: " + (err instanceof Error ? err.message : "Unknown"), 422)
+      }
+    }
+
     throw new ApiError(`Unknown action: ${action}`, 400)
   } catch (err) {
     return handleApiError(err)

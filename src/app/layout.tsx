@@ -20,12 +20,12 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Toolbox — Dev Tools & Creative Apps",
-  description: "A growing collection of AI-powered dev tools and creative apps. One account, access to all.",
+  title: "Toolbox — 8 tools for developers who ship",
+  description: "Eight focused tools for developers and solo builders. Subscriptions, invoices, OG images, launch copy, idea validation, changelogs, DNS, and env secrets — all in one place.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   openGraph: {
-    title: "Toolbox — Dev Tools & Creative Apps",
-    description: "A growing collection of AI-powered dev tools and creative apps.",
+    title: "Toolbox — 8 tools for developers who ship",
+    description: "Eight focused tools for developers and solo builders. Each one slots into something you already do.",
     type: "website",
   },
 }

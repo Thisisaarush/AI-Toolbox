@@ -5,7 +5,7 @@ import { ToolHeader } from "@/components/shared/tool-header"
 import {
   Globe, Plus, Trash2, Copy, Check, Loader2, Search,
   AlertCircle, Shield, ChevronRight,
-  Download, Info, Zap, X,
+  Info, Zap, X, Pencil,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,6 +29,15 @@ function save(d: Domain[]) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)
 
 type View = "domains" | "domain-detail" | "propagation" | "cloudflare"
 
+// Inline edit state for a record
+interface EditingRecord {
+  id: string
+  type: RecordType
+  name: string
+  value: string
+  ttl: number
+}
+
 export function DNSDeskContent() {
   const [domains, setDomains] = useState<Domain[]>([])
   const [view, setView] = useState<View>("domains")
@@ -36,6 +45,9 @@ export function DNSDeskContent() {
   const [search, setSearch] = useState("")
   const [copiedKey, setCopiedKey] = useState("")
   const [expandedRecord, setExpandedRecord] = useState<string | null>(null)
+
+  // Inline record editing
+  const [editingRecord, setEditingRecord] = useState<EditingRecord | null>(null)
 
   // Add domain form
   const [showAddDomain, setShowAddDomain] = useState(false)
@@ -67,7 +79,18 @@ export function DNSDeskContent() {
   const [cfZoneId, setCfZoneId] = useState("")
   const [cfLoading, setCfLoading] = useState(false)
 
+  // Export dropdown state
+  const [showExportMenu, setShowExportMenu] = useState(false)
+
   useEffect(() => { setDomains(load()) }, [])
+
+  // Close export menu on outside click
+  useEffect(() => {
+    if (!showExportMenu) return
+    const handler = () => setShowExportMenu(false)
+    window.addEventListener("click", handler)
+    return () => window.removeEventListener("click", handler)
+  }, [showExportMenu])
 
   function copyText(text: string, key: string) {
     navigator.clipboard.writeText(text)
@@ -135,24 +158,61 @@ export function DNSDeskContent() {
     toast.success("Record deleted")
   }
 
+  function startEditRecord(record: DNSRecord) {
+    setEditingRecord({ id: record.id, type: record.type, name: record.name, value: record.value, ttl: record.ttl })
+    setExpandedRecord(null)
+  }
+
+  function saveEditRecord() {
+    if (!selectedDomain || !editingRecord) return
+    if (!editingRecord.value.trim()) { toast.error("Record value required"); return }
+    const updatedRecords = selectedDomain.records.map((r) =>
+      r.id === editingRecord.id
+        ? { ...r, type: editingRecord.type, name: editingRecord.name, value: editingRecord.value, ttl: editingRecord.ttl }
+        : r
+    )
+    updateDomain(selectedDomain.id, { records: updatedRecords })
+    setEditingRecord(null)
+    toast.success("Record updated")
+  }
+
   function applyTemplate(templateId: string) {
     if (!selectedDomain) return
     const template = DNS_TEMPLATES.find((t) => t.id === templateId)
     if (!template) return
-    const newRecords = template.records.map((r) => ({ ...r, id: crypto.randomUUID() }))
-    updateDomain(selectedDomain.id, { records: [...selectedDomain.records, ...newRecords] })
-    toast.success(`${template.label} template applied`)
+
+    // Duplicate guard: filter records that already match by type + name
+    const existingSet = new Set(selectedDomain.records.map((r) => `${r.type}:${r.name}:${r.value}`))
+    const toAdd: DNSRecord[] = []
+    let skipped = 0
+    for (const r of template.records) {
+      if (existingSet.has(`${r.type}:${r.name}:${r.value}`)) {
+        skipped++
+      } else {
+        toAdd.push({ ...r, id: crypto.randomUUID() })
+      }
+    }
+
+    if (toAdd.length > 0) {
+      updateDomain(selectedDomain.id, { records: [...selectedDomain.records, ...toAdd] })
+    }
+    if (skipped > 0) toast.warning(`Skipped ${skipped} duplicate record${skipped > 1 ? "s" : ""}`)
+    if (toAdd.length > 0) toast.success(`${template.label} template applied (${toAdd.length} records added)`)
+    else if (skipped === template.records.length) toast.info("All records from this template already exist")
   }
 
-  async function checkPropagation() {
-    if (!propDomain.trim()) { toast.error("Enter a domain"); return }
+  async function checkPropagation(domain?: string) {
+    const target = domain ?? propDomain
+    if (!target.trim()) { toast.error("Enter a domain"); return }
+    if (domain) setPropDomain(domain)
     setPropLoading(true)
     setPropResults([])
+    setView("propagation")
     try {
       const res = await fetch("/api/dns-desk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "check-propagation", domain: propDomain, type: propType }),
+        body: JSON.stringify({ action: "check-propagation", domain: target, type: propType }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Check failed")
@@ -286,13 +346,31 @@ export function DNSDeskContent() {
                 <Button variant="ghost" size="sm" onClick={() => setView("cloudflare")}>
                   <Zap className="w-3.5 h-3.5 mr-1" /> Cloudflare
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => setView("propagation")}>
+                <Button variant="ghost" size="sm" onClick={() => { setPropDomain(""); setView("propagation") }}>
                   <Search className="w-3.5 h-3.5 mr-1" /> Propagation
                 </Button>
                 {domains.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={exportData}>
-                    <Download className="w-3.5 h-3.5 mr-1" /> Export
-                  </Button>
+                  <div className="relative" onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="sm" onClick={() => setShowExportMenu((v) => !v)}>
+                      Export
+                    </Button>
+                    {showExportMenu && (
+                      <div className="absolute right-0 top-full mt-1 z-20 bg-popover border rounded-lg shadow-md p-1 flex flex-col min-w-[100px]">
+                        <button
+                          className="text-sm px-3 py-1.5 rounded hover:bg-muted text-left whitespace-nowrap"
+                          onClick={() => { exportData(); setShowExportMenu(false) }}
+                        >
+                          JSON
+                        </button>
+                        <button
+                          className="text-sm px-3 py-1.5 rounded hover:bg-muted text-left whitespace-nowrap"
+                          onClick={() => { exportCSV(); setShowExportMenu(false) }}
+                        >
+                          CSV
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </>
             )}
@@ -349,7 +427,6 @@ export function DNSDeskContent() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input placeholder="Search domains..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
                 </div>
-                <Button variant="outline" size="sm" onClick={exportCSV}><Download className="w-3.5 h-3.5 mr-1" /> CSV</Button>
               </div>
             )}
 
@@ -429,10 +506,13 @@ export function DNSDeskContent() {
                 </h1>
                 <p className="text-muted-foreground text-sm">{selectedDomain.records.length} DNS records</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap justify-end">
                 <Button variant="outline" size="sm" onClick={checkHealth} disabled={healthLoading}>
                   {healthLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Shield className="w-3.5 h-3.5 mr-1" />}
                   Health Check
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => checkPropagation(selectedDomain.name)}>
+                  <Search className="w-3.5 h-3.5 mr-1" /> Check Propagation
                 </Button>
               </div>
             </div>
@@ -493,19 +573,23 @@ export function DNSDeskContent() {
                 <CardHeader className="pb-3"><CardTitle className="text-sm">Subdomain Map</CardTitle></CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {subdomainMap.map(([sub, records]) => (
-                      <div key={sub} className="flex items-start gap-3 p-2 border rounded">
-                        <ChevronRight className="w-3.5 h-3.5 text-teal-500 mt-0.5 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-mono font-medium">{sub}.{selectedDomain.name}</p>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {records.map((r) => (
-                              <span key={r.id} className="text-xs bg-muted/50 px-2 py-0.5 rounded font-mono">{r.type}: {r.value.slice(0, 40)}{r.value.length > 40 ? "..." : ""}</span>
-                            ))}
+                    {subdomainMap.map(([sub, records]) => {
+                      // Fix: root entry should display just the domain name, not "(root).example.com"
+                      const displayLabel = sub === "(root)" ? selectedDomain.name : `${sub}.${selectedDomain.name}`
+                      return (
+                        <div key={sub} className="flex items-start gap-3 p-2 border rounded">
+                          <ChevronRight className="w-3.5 h-3.5 text-teal-500 mt-0.5 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-mono font-medium">{displayLabel}</p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {records.map((r) => (
+                                <span key={r.id} className="text-xs bg-muted/50 px-2 py-0.5 rounded font-mono">{r.type}: {r.value.slice(0, 40)}{r.value.length > 40 ? "..." : ""}</span>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </CardContent>
               </Card>
@@ -563,10 +647,11 @@ export function DNSDeskContent() {
                         <Input className="h-8 text-xs" value={newRecord.value} onChange={(e) => setNewRecord((r) => ({ ...r, value: e.target.value }))} placeholder="1.2.3.4" />
                       </div>
                       <div className="col-span-2">
-                        <label className="text-xs font-medium mb-1 block">TTL</label>
+                        <label className="text-xs font-medium mb-1 block">TTL (seconds)</label>
                         <Input type="number" className="h-8 text-xs" value={newRecord.ttl} onChange={(e) => setNewRecord((r) => ({ ...r, ttl: parseInt(e.target.value) || 3600 }))} />
                       </div>
                     </div>
+                    <p className="text-xs text-muted-foreground">Common: 3600 = 1 hour, 86400 = 1 day, 300 = 5 min</p>
                     <div className="flex gap-2">
                       <Button size="sm" onClick={addRecord}>Add</Button>
                       <Button variant="ghost" size="sm" onClick={() => setShowAddRecord(false)}>Cancel</Button>
@@ -578,37 +663,99 @@ export function DNSDeskContent() {
                   <p className="text-sm text-muted-foreground text-center py-4">No records yet. Add one or use a template above.</p>
                 ) : (
                   <div className="space-y-1">
-                    {selectedDomain.records.map((record) => (
-                      <div key={record.id} className="group border rounded-lg overflow-hidden">
-                        <div className="flex items-center gap-3 px-3 py-2">
-                          <Badge variant="secondary" className="font-mono text-[10px] w-12 justify-center shrink-0">{record.type}</Badge>
-                          <span className="font-mono text-xs text-muted-foreground w-24 shrink-0 truncate">{record.name}</span>
-                          <span className="font-mono text-xs flex-1 truncate">{record.value}</span>
-                          <span className="text-xs text-muted-foreground shrink-0">{record.ttl}s</span>
-                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                            <button
-                              onClick={() => setExpandedRecord(expandedRecord === record.id ? null : record.id)}
-                              className="p-1 text-muted-foreground hover:text-foreground"
-                            >
-                              <Info className="w-3 h-3" />
-                            </button>
-                            <button onClick={() => copyText(record.value, record.id)} className="p-1 text-muted-foreground hover:text-foreground">
-                              {copiedKey === record.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
-                            </button>
-                            <button onClick={() => deleteRecord(selectedDomain.id, record.id)} className="p-1 text-muted-foreground hover:text-destructive">
-                              <Trash2 className="w-3 h-3" />
-                            </button>
+                    {selectedDomain.records.map((record) => {
+                      // Inline edit mode
+                      if (editingRecord?.id === record.id) {
+                        return (
+                          <div key={record.id} className="border rounded-lg p-3 bg-muted/20 space-y-2">
+                            <div className="grid grid-cols-12 gap-2">
+                              <div className="col-span-2">
+                                <label className="text-xs font-medium mb-1 block">Type</label>
+                                <select
+                                  value={editingRecord.type}
+                                  onChange={(e) => setEditingRecord((r) => r ? { ...r, type: e.target.value as RecordType } : r)}
+                                  className="w-full h-8 rounded border border-input bg-background px-2 text-xs"
+                                >
+                                  {RECORD_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                              </div>
+                              <div className="col-span-3">
+                                <label className="text-xs font-medium mb-1 block">Name</label>
+                                <Input
+                                  className="h-8 text-xs"
+                                  value={editingRecord.name}
+                                  onChange={(e) => setEditingRecord((r) => r ? { ...r, name: e.target.value } : r)}
+                                />
+                              </div>
+                              <div className="col-span-5">
+                                <label className="text-xs font-medium mb-1 block">Value</label>
+                                <Input
+                                  className="h-8 text-xs"
+                                  value={editingRecord.value}
+                                  onChange={(e) => setEditingRecord((r) => r ? { ...r, value: e.target.value } : r)}
+                                />
+                              </div>
+                              <div className="col-span-2">
+                                <label className="text-xs font-medium mb-1 block">TTL (s)</label>
+                                <Input
+                                  type="number"
+                                  className="h-8 text-xs"
+                                  value={editingRecord.ttl}
+                                  onChange={(e) => setEditingRecord((r) => r ? { ...r, ttl: parseInt(e.target.value) || 3600 } : r)}
+                                />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={saveEditRecord}><Check className="w-3 h-3 mr-1" /> Save</Button>
+                              <Button variant="ghost" size="sm" onClick={() => setEditingRecord(null)}>Cancel</Button>
+                            </div>
                           </div>
+                        )
+                      }
+
+                      return (
+                        <div key={record.id} className="border rounded-lg overflow-hidden">
+                          <div className="flex items-center gap-3 px-3 py-2">
+                            <Badge variant="secondary" className="font-mono text-[10px] w-12 justify-center shrink-0">{record.type}</Badge>
+                            <span className="font-mono text-xs text-muted-foreground w-24 shrink-0 truncate">{record.name}</span>
+                            <span className="font-mono text-xs flex-1 truncate">{record.value}</span>
+                            <span className="text-xs text-muted-foreground shrink-0">{record.ttl}s</span>
+                            {/* Actions always visible */}
+                            <div className="flex gap-1 shrink-0">
+                              <button
+                                onClick={() => setExpandedRecord(expandedRecord === record.id ? null : record.id)}
+                                className="p-1 text-muted-foreground hover:text-foreground"
+                                title="Info"
+                              >
+                                <Info className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={() => startEditRecord(record)}
+                                className="p-1 text-muted-foreground hover:text-foreground"
+                                title="Edit"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </button>
+                              <button onClick={() => copyText(record.value, record.id)} className="p-1 text-muted-foreground hover:text-foreground">
+                                {copiedKey === record.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                              </button>
+                              <button onClick={() => deleteRecord(selectedDomain.id, record.id)} className="p-1 text-muted-foreground hover:text-destructive">
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                          {/* Mobile description — always visible */}
+                          <p className="px-3 pb-1 text-xs text-muted-foreground sm:hidden">{RECORD_TYPE_DESCRIPTIONS[record.type]}</p>
+                          {expandedRecord === record.id && (
+                            <div className="px-3 pb-3 border-t bg-muted/20">
+                              <p className="text-xs text-muted-foreground mt-2">
+                                <strong>What is a {record.type} record?</strong> {RECORD_TYPE_DESCRIPTIONS[record.type]}
+                              </p>
+                            </div>
+                          )}
                         </div>
-                        {expandedRecord === record.id && (
-                          <div className="px-3 pb-3 border-t bg-muted/20">
-                            <p className="text-xs text-muted-foreground mt-2">
-                              <strong>What is a {record.type} record?</strong> {RECORD_TYPE_DESCRIPTIONS[record.type]}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -640,7 +787,7 @@ export function DNSDeskContent() {
                   >
                     {["A", "AAAA", "CNAME", "MX", "TXT", "NS"].map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  <Button onClick={checkPropagation} disabled={propLoading}>
+                  <Button onClick={() => checkPropagation()} disabled={propLoading}>
                     {propLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                   </Button>
                 </div>
