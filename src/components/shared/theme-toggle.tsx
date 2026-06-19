@@ -13,7 +13,7 @@ export function ThemeToggle() {
 
   // Render same-size invisible placeholder to avoid layout shift during SSR
   if (!mounted) {
-    return <div className="w-8 h-8" />
+    return <div className="w-7 h-7 shrink-0" />
   }
 
   return (
