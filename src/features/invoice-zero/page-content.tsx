@@ -5,7 +5,7 @@ import { ToolHeader } from "@/components/shared/tool-header"
 import {
   FileText, Plus, Trash2, Download, Copy, Check, Loader2,
   Sparkles, Search, Eye, Edit3, X, DollarSign,
-  TrendingUp, Clock, AlertCircle, CopyCheck,
+  Clock, AlertCircle, CopyCheck, Files,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -401,57 +401,84 @@ export function InvoiceZeroContent() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-2">
+            <div className="rounded-xl border overflow-hidden divide-y">
                 {filtered.map((inv) => {
                   const totals = calculateInvoiceTotals(inv)
                   const meta = STATUS_META[inv.status]
                   return (
-                    <Card key={inv.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="py-4">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-4 min-w-0">
-                            <div>
-                              <p className="font-semibold text-sm">{inv.invoiceNumber}</p>
-                              <p className="text-xs text-muted-foreground">{inv.client.name}{inv.client.company ? ` · ${inv.client.company}` : ""}</p>
-                            </div>
-                            <div className="hidden sm:block">
-                              <p className="text-sm font-medium">{formatCurrency(totals.total, inv.currency)}</p>
-                              <p className="text-xs text-muted-foreground">Due {inv.dueDate}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
-                              {meta.label}
-                            </span>
-                            <Button variant="ghost" size="icon-sm" onClick={() => { setPreviewInvoice(inv); setView("preview") }} title="Preview">
-                              <Eye className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button variant="ghost" size="icon-sm" onClick={() => startEdit(inv)} title="Edit">
-                              <Edit3 className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button variant="ghost" size="icon-sm" onClick={() => copyShareLink(inv)} title="Copy link">
-                              {copiedId === inv.id ? <CopyCheck className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                            </Button>
-                            <Button variant="ghost" size="icon-sm" onClick={() => printInvoice(inv)} title="Download PDF">
-                              <Download className="w-3.5 h-3.5" />
-                            </Button>
-                            <div className="flex items-center gap-1 border-l pl-2 ml-1">
-                              {inv.status !== "paid" && (
-                                <Button variant="ghost" size="sm" className="text-green-600 text-xs" onClick={() => markPaid(inv.id)}>
-                                  Mark paid
-                                </Button>
-                              )}
-                              <Button variant="ghost" size="icon-sm" onClick={() => duplicateInvoice(inv)} title="Duplicate">
-                                <TrendingUp className="w-3.5 h-3.5" />
-                              </Button>
-                              <Button variant="ghost" size="icon-sm" onClick={() => deleteInvoice(inv.id)} className="text-muted-foreground hover:text-destructive">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            </div>
-                          </div>
+                    <div
+                      key={inv.id}
+                      className="flex items-center gap-4 px-4 py-3.5 hover:bg-muted/40 transition-colors group"
+                    >
+                      {/* Left — invoice # + client */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-sm font-semibold">{inv.invoiceNumber}</span>
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+                            {meta.label}
+                          </span>
                         </div>
-                      </CardContent>
-                    </Card>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {inv.client.name}
+                          {inv.client.company ? ` · ${inv.client.company}` : ""}
+                        </p>
+                      </div>
+
+                      {/* Center — amount + due date */}
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-semibold tabular-nums">
+                          {formatCurrency(totals.total, inv.currency)}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          Due {inv.dueDate}
+                        </p>
+                      </div>
+
+                      {/* Right — actions */}
+                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {inv.status !== "paid" && (
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/40"
+                            onClick={() => markPaid(inv.id)}
+                          >
+                            Mark paid
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon-sm" onClick={() => { setPreviewInvoice(inv); setView("preview") }} title="Preview">
+                          <Eye className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon-sm" onClick={() => startEdit(inv)} title="Edit">
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon-sm" onClick={() => printInvoice(inv)} title="Download PDF">
+                          <Download className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon-sm" onClick={() => duplicateInvoice(inv)} title="Duplicate">
+                          <Files className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => copyShareLink(inv)}
+                          title="Copy link"
+                        >
+                          {copiedId === inv.id
+                            ? <CopyCheck className="w-3.5 h-3.5 text-green-500" />
+                            : <Copy className="w-3.5 h-3.5" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => deleteInvoice(inv.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
                   )
                 })}
               </div>
@@ -679,7 +706,7 @@ export function InvoiceZeroContent() {
 function StatCard({ label, value, icon, color, highlight }: { label: string; value: string; icon: React.ReactNode; color: string; highlight?: boolean }) {
   return (
     <Card className={highlight ? "border-red-300 dark:border-red-800" : ""}>
-      <CardContent className="pt-4 pb-4">
+      <CardContent>
         <div className="flex items-center gap-2 mb-1">
           <span className={color}>{icon}</span>
           <span className="text-xs text-muted-foreground">{label}</span>

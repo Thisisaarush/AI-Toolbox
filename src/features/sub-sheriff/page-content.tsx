@@ -836,7 +836,7 @@ function SummaryCard({
 }) {
   return (
     <Card className={highlight ? "border-amber-300 dark:border-amber-700" : ""}>
-      <CardContent className="pt-4 pb-4">
+      <CardContent>
         <div className="flex items-center gap-2 mb-1">
           <span className={color}>{icon}</span>
           <span className="text-xs text-muted-foreground">{label}</span>

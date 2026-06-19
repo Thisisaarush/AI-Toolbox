@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Header } from "@/components/shared/header"
 import {
@@ -125,8 +125,8 @@ export default function Home() {
             {tools.map((tool) => (
               tool.status === "live" ? (
                 <Link key={tool.name} href={tool.href} className="group">
-                  <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-0.5">
-                    <CardHeader>
+                  <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col">
+                    <CardHeader className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <div className={`w-12 h-12 rounded-lg ${tool.bgColor} flex items-center justify-center`}>
                           <tool.icon className={`w-6 h-6 ${tool.color}`} />
@@ -136,15 +136,15 @@ export default function Home() {
                       <CardTitle className="text-lg">{tool.name}</CardTitle>
                       <CardDescription>{tool.description}</CardDescription>
                     </CardHeader>
-                    <CardFooter>
+                    <div className="px-(--card-spacing) pb-(--card-spacing)">
                       <Badge variant="secondary">{tool.badge}</Badge>
-                    </CardFooter>
+                    </div>
                   </Card>
                 </Link>
               ) : (
                 <div key={tool.name} className="opacity-60 cursor-not-allowed">
-                  <Card className="h-full">
-                    <CardHeader>
+                  <Card className="h-full flex flex-col">
+                    <CardHeader className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <div className={`w-12 h-12 rounded-lg ${tool.bgColor} flex items-center justify-center`}>
                           <tool.icon className={`w-6 h-6 ${tool.color}`} />
@@ -154,10 +154,10 @@ export default function Home() {
                       <CardTitle className="text-lg">{tool.name}</CardTitle>
                       <CardDescription>{tool.description}</CardDescription>
                     </CardHeader>
-                    <CardFooter className="gap-2">
+                    <div className="flex gap-2 px-(--card-spacing) pb-(--card-spacing)">
                       <Badge variant="secondary">{tool.badge}</Badge>
                       <Badge variant="outline" className="text-muted-foreground">Coming soon</Badge>
-                    </CardFooter>
+                    </div>
                   </Card>
                 </div>
               )
