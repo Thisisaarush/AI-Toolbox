@@ -326,30 +326,26 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative bg-[#0a0a0a] dark:bg-[#0a0a0a] overflow-hidden">
-          {/* Subtle grid background — adapts color per theme */}
+        <section className="relative bg-white dark:bg-[#0a0a0a] overflow-hidden border-b border-border">
+          {/* Subtle grid */}
           <div
-            className="absolute inset-0 opacity-[0.04] dark:opacity-[0.03]"
+            className="absolute inset-0 opacity-[0.04] dark:opacity-[0.04]"
             style={{
-              backgroundImage: `linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)`,
+              backgroundImage: `linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)`,
               backgroundSize: "72px 72px",
-              color: "oklch(0.145 0 0)",
             }}
           />
-          {/* Grid override for dark */}
           <div
-            className="absolute inset-0 hidden dark:block opacity-[0.03]"
+            className="absolute inset-0 hidden dark:block opacity-[0.04]"
             style={{
               backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
               backgroundSize: "72px 72px",
             }}
           />
-          {/* Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-black/[0.02] dark:bg-white/[0.03] rounded-full blur-3xl" />
 
           <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-40 text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-3 py-1 text-xs font-medium text-black/50 dark:text-white/50 mb-8">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-green-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               Tools that slot into your workflow
             </div>
 
@@ -362,12 +358,10 @@ export default function Home() {
               Purpose-built tools for developers, builders, and makers. Subscriptions, invoices, fitness, documents, learning, and more.
             </p>
 
-            {/* Single stat */}
             <p className="text-sm font-medium text-black/30 dark:text-white/30 mb-8 tracking-wider">
               {allToolCount}+ tools across {categories.length} categories
             </p>
 
-            {/* Category legend */}
             <div className="flex flex-wrap justify-center gap-2">
               {categories.map((cat) => (
                 <span
