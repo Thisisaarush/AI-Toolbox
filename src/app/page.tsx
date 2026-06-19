@@ -1,15 +1,16 @@
 import { Header } from "@/components/shared/header"
 import { ToolsSection } from "@/components/home/tools-section"
+import { HeroCategories } from "@/components/home/hero-categories"
 import { CATEGORY_META, ALL_TOOL_COUNT } from "@/lib/tools-meta"
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header sticky={false} />
 
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="relative bg-white dark:bg-[#0a0a0a] overflow-hidden border-b border-border">
+      <main className="flex-1 h-screen overflow-y-auto snap-y snap-mandatory">
+        {/* Hero — full viewport, snaps to top */}
+        <section className="relative h-screen snap-start shrink-0 bg-white dark:bg-[#0a0a0a] overflow-hidden border-b border-border">
           {/* Grid — light mode */}
           <div
             className="absolute inset-0 opacity-[0.04] dark:hidden"
@@ -27,7 +28,7 @@ export default function Home() {
             }}
           />
 
-          <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-40 text-center">
+          <div className="relative h-full max-w-6xl mx-auto px-4 flex flex-col items-center justify-center text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-3 py-1 text-xs font-medium text-black/50 dark:text-white/50 mb-8">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               Tools that slot into your workflow
@@ -46,34 +47,34 @@ export default function Home() {
               {ALL_TOOL_COUNT}+ tools across {CATEGORY_META.length} categories
             </p>
 
-            <div className="flex flex-wrap justify-center gap-2">
-              {CATEGORY_META.map((cat) => (
-                <span
-                  key={cat.id}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-3 py-1 text-xs font-medium text-black/50 dark:text-white/50"
-                >
-                  <span className={`w-2 h-2 rounded-full ${cat.legendColor}`} />
-                  {cat.label}
-                </span>
-              ))}
+            <HeroCategories />
+
+            {/* Scroll-down indicator */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-muted-foreground/40 animate-bounce">
+              <span className="text-[10px] font-medium tracking-wider uppercase">Scroll</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="rotate-180">
+                <path d="M8 3v10M8 13L4 9M8 13l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
           </div>
         </section>
 
-        {/* Tool grid with interactive category filter */}
-        <ToolsSection />
-      </main>
+        {/* Tools + footer — snaps below hero, scrolls naturally */}
+        <div className="min-h-screen snap-start bg-background">
+          <ToolsSection />
 
-      <footer className="border-t py-8 bg-background">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-foreground">Toolbox</span>
-            <span className="text-muted-foreground/40">·</span>
-            <span>Tools for everyone who builds</span>
-          </div>
-          <span className="text-xs">{ALL_TOOL_COUNT} tools · More coming</span>
+          <footer className="border-t py-8 bg-background">
+            <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-foreground">Toolbox</span>
+                <span className="text-muted-foreground/40">·</span>
+                <span>Tools for everyone who builds</span>
+              </div>
+              <span className="text-xs">{ALL_TOOL_COUNT} tools · More coming</span>
+            </div>
+          </footer>
         </div>
-      </footer>
+      </main>
     </div>
   )
 }

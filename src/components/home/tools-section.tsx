@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { ArrowRight,
+import { ArrowRight, Star, Search, X,
   CreditCard, FileText, Image, Rocket, Target, GitBranch, Globe, KeyRound,
   Dumbbell, CheckCircle2, TrendingUp, Shield, Users, Plane,
   BookOpen, List, MessageSquare, Briefcase, Calendar, FileSignature,
@@ -10,6 +10,7 @@ import { ArrowRight,
 } from "lucide-react"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 type Tool = {
   name: string
@@ -28,6 +29,8 @@ type Category = {
   legendColor: string
   tools: Tool[]
 }
+
+const FAVORITES_KEY = "toolbox-favorites"
 
 const categories: Category[] = [
   {
@@ -105,15 +108,123 @@ const categories: Category[] = [
 
 export function ToolsSection() {
   const [activeFilter, setActiveFilter] = useState<string>("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [favorites, setFavorites] = useState<string[]>([])
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
   const allToolCount = categories.reduce((sum, c) => sum + c.tools.length, 0)
 
-  const visibleCategories = activeFilter === "all"
+  // ── Favorites ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(FAVORITES_KEY) ?? "[]")
+      if (Array.isArray(saved)) setFavorites(saved)
+    } catch {}
+  }, [])
+
+  function toggleFavorite(href: string) {
+    setFavorites((prev) => {
+      const next = prev.includes(href) ? prev.filter((h) => h !== href) : [...prev, href]
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(next))
+      return next
+    })
+  }
+
+  // ── Hero category event listener ──────────────────────────────────────
+  useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      setActiveFilter(e.detail)
+      setSearchQuery("")
+    }
+    window.addEventListener("toolbox-filter", handler as EventListener)
+    return () => window.removeEventListener("toolbox-filter", handler as EventListener)
+  }, [])
+
+  // ── Scroll into view on filter change ─────────────────────────────────
+  useEffect(() => {
+    if (sectionRef.current && activeFilter !== "all") {
+      sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
+  }, [activeFilter])
+
+  // ── Search ────────────────────────────────────────────────────────────
+  const searchActive = searchQuery.trim().length > 0
+
+  function matchesSearch(t: Tool): boolean {
+    if (!searchActive) return true
+    const q = searchQuery.toLowerCase()
+    return t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q)
+  }
+
+  // Build a reverse-lookup from href → Tool
+  const toolByHref = new Map<string, Tool>()
+  for (const cat of categories) {
+    for (const t of cat.tools) {
+      toolByHref.set(t.href, t)
+    }
+  }
+
+  // Favorited tools (for the top section)
+  const favoriteTools = favorites
+    .map((href) => toolByHref.get(href))
+    .filter((t): t is Tool => t !== undefined && matchesSearch(t))
+
+  // Categories with tools filtered by search
+  const baseCategories = activeFilter === "all"
     ? categories
     : categories.filter((c) => c.id === activeFilter)
 
+  const visibleCategories = baseCategories
+    .map((c) => ({
+      ...c,
+      tools: c.tools.filter(matchesSearch),
+    }))
+    .filter((c) => c.tools.length > 0)
+
+  const showFavorites = activeFilter === "all" && favoriteTools.length > 0
+  const hasAnyResults = showFavorites || visibleCategories.length > 0
+
+  function clearSearch() {
+    setSearchQuery("")
+    searchInputRef.current?.focus()
+  }
+
+  function handleSearchKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") clearSearch()
+  }
+
   return (
-    <section className="bg-background">
+    <section
+      id="tools-section"
+      ref={sectionRef}
+      className="bg-background"
+    >
       <div className="max-w-7xl mx-auto px-4 pt-10 pb-16 md:pb-20">
+
+        {/* ── Search bar ─────────────────────────────────────────────── */}
+        <div className="relative mb-6 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search tools..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            className="w-full h-10 pl-9 pr-9 rounded-xl border border-input bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-all"
+            aria-label="Search tools"
+          />
+          {searchActive && (
+            <button
+              onClick={clearSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Clear search"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
 
         {/* ── Filter bar ──────────────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-2 mb-12">
@@ -150,47 +261,127 @@ export function ToolsSection() {
           ))}
         </div>
 
-        {/* ── Category sections ───────────────────────────────────────── */}
-        <div className="space-y-16">
-          {visibleCategories.map((cat) => (
-            <div key={cat.id}>
-              <div className="flex items-center gap-2.5 mb-7">
-                <span className={`w-2.5 h-2.5 rounded-full ${cat.legendColor}`} />
-                <h2 className="text-xl font-bold tracking-tight">{cat.label}</h2>
-                <span className="text-xs text-muted-foreground font-mono">
-                  {cat.tools.length} tool{cat.tools.length !== 1 ? "s" : ""}
-                </span>
-              </div>
+        {/* ── Empty state ────────────────────────────────────────────── */}
+        {!hasAnyResults && (
+          <div className="text-center py-20">
+            <Search className="w-10 h-10 text-muted-foreground/40 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-1">No tools found</h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              {searchActive
+                ? `Nothing matches "${searchQuery}". Try a different search term.`
+                : "No tools in this category yet."}
+            </p>
+            {searchActive && (
+              <Button variant="outline" size="sm" onClick={clearSearch}>
+                Clear search
+              </Button>
+            )}
+          </div>
+        )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {cat.tools.map((tool) => (
-                  <Link key={tool.name} href={tool.href} className="group">
-                    <Card className={`h-full transition-all duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col border-t-2 ${tool.borderColor}`}>
-                      <CardHeader className="flex-1">
-                        <div className="mb-4">
-                          <div className={`w-10 h-10 rounded-lg ${tool.bgColor} flex items-center justify-center`}>
-                            <tool.icon className={`w-5 h-5 ${tool.color}`} />
-                          </div>
-                        </div>
-                        <CardTitle className="text-base font-semibold flex items-center justify-between">
-                          {tool.name}
-                          <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-                        </CardTitle>
-                        <CardDescription className="text-sm leading-relaxed mt-1">
-                          {tool.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <div className="px-(--card-spacing) pb-(--card-spacing)">
-                        <Badge variant="secondary" className="text-xs">{tool.badge}</Badge>
-                      </div>
-                    </Card>
-                  </Link>
-                ))}
+        {/* ── Category sections ───────────────────────────────────────── */}
+        {hasAnyResults && (
+          <div className="space-y-16">
+
+            {/* ⭐ Favorites Section */}
+            {showFavorites && (
+              <div>
+                <div className="flex items-center gap-2.5 mb-7">
+                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <h2 className="text-xl font-bold tracking-tight">Favorites</h2>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {favoriteTools.length} tool{favoriteTools.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {favoriteTools.map((tool) => (
+                    <ToolCard
+                      key={tool.name}
+                      tool={tool}
+                      isFavorited={true}
+                      onToggleFavorite={toggleFavorite}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            )}
+
+            {/* Regular categories */}
+            {visibleCategories.map((cat) => (
+              <div key={cat.id}>
+                <div className="flex items-center gap-2.5 mb-7">
+                  <span className={`w-2.5 h-2.5 rounded-full ${cat.legendColor}`} />
+                  <h2 className="text-xl font-bold tracking-tight">{cat.label}</h2>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {cat.tools.length} tool{cat.tools.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {cat.tools.map((tool) => (
+                    <ToolCard
+                      key={tool.name}
+                      tool={tool}
+                      isFavorited={favorites.includes(tool.href)}
+                      onToggleFavorite={toggleFavorite}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
+  )
+}
+
+// ── Tool Card ────────────────────────────────────────────────────────────────
+function ToolCard({
+  tool,
+  isFavorited,
+  onToggleFavorite,
+}: {
+  tool: Tool
+  isFavorited: boolean
+  onToggleFavorite: (href: string) => void
+}) {
+  return (
+    <Link
+      href={tool.href}
+      className="group"
+    >
+      <Card className={`h-full flex flex-col border-t-2 ${tool.borderColor}`}>
+        <CardHeader className="flex-1">
+          <div className="mb-4 flex items-start justify-between">
+            <div className={`w-10 h-10 rounded-lg ${tool.bgColor} flex items-center justify-center`}>
+              <tool.icon className={`w-5 h-5 ${tool.color}`} />
+            </div>
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                onToggleFavorite(tool.href)
+              }}
+              className={`transition-colors ${isFavorited ? "text-yellow-500" : "text-muted-foreground/40 hover:text-muted-foreground/70"}`}
+              aria-label={isFavorited ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}
+            >
+              <Star className={`w-4 h-4 ${isFavorited ? "fill-yellow-500" : ""}`} />
+            </button>
+          </div>
+          <CardTitle className="text-base font-semibold flex items-center justify-between">
+            {tool.name}
+            <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+          </CardTitle>
+          <CardDescription className="text-sm leading-relaxed mt-1">
+            {tool.description}
+          </CardDescription>
+        </CardHeader>
+        <div className="px-(--card-spacing) pb-(--card-spacing)">
+          <Badge variant="secondary" className="text-xs">{tool.badge}</Badge>
+        </div>
+      </Card>
+    </Link>
   )
 }

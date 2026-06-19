@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { Settings } from "lucide-react"
 
-export function Header() {
+export function Header({ sticky = true }: { sticky?: boolean }) {
   const { isSignedIn } = useUser()
 
   return (
-    <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-50">
+    <header className={`border-b ${sticky ? "sticky top-0" : ""} bg-background/95 backdrop-blur z-50`}>
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="text-base font-bold tracking-tight shrink-0">
           Toolbox
