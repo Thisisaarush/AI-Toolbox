@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
+import { getGeminiKey } from "@/lib/ai-key"
 
 const limiter = rateLimit({ max: 15, windowMs: 60000 })
 
@@ -21,7 +22,8 @@ export async function POST(req: Request) {
       const { netWorth, totalAssets, totalLiabilities, breakdown } = body
       if (!breakdown) throw new ApiError("breakdown required", 400)
 
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+      const key = getGeminiKey(req)
+      const genAI = new GoogleGenerativeAI(key)
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
 
       const prompt = `You are a personal finance advisor. Analyze this net worth breakdown and provide 3 specific, actionable insights.

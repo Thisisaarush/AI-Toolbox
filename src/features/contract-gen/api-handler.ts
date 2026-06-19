@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
+import { getGeminiKey } from "@/lib/ai-key"
 import { getSystemPrompt } from "./templates"
 import { CONTRACT_META, JURISDICTION_META } from "./types"
 import type { ContractType, Jurisdiction } from "./types"
@@ -29,7 +30,8 @@ export async function POST(req: Request) {
 
       if (!contractType || !jurisdiction) throw new ApiError("contractType and jurisdiction required", 400)
 
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+      const key = getGeminiKey(req)
+      const genAI = new GoogleGenerativeAI(key)
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
 
       const systemPrompt = getSystemPrompt(CONTRACT_META[contractType]?.label ?? contractType, JURISDICTION_META[jurisdiction] ?? jurisdiction)

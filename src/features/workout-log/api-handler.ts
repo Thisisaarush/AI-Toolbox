@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
+import { getGeminiKey } from "@/lib/ai-key"
 import type { WorkoutProgram, Goal, Equipment, Experience } from "./types"
 
 const limiter = rateLimit({ max: 10, windowMs: 60000 })
@@ -27,7 +28,8 @@ export async function POST(req: Request) {
         throw new ApiError("goal, daysPerWeek, equipment, experience required", 400)
       }
 
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+      const key = getGeminiKey(req)
+      const genAI = new GoogleGenerativeAI(key)
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
 
       const prompt = `You are an expert personal trainer. Create a detailed ${daysPerWeek}-day per week workout program.

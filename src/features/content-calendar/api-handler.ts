@@ -3,21 +3,21 @@ import { auth } from "@clerk/nextjs/server"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { getGeminiKey } from "@/lib/ai-key"
 
 const limiter   = rateLimit({ max: 20, windowMs: 60000 })
 const aiLimiter = rateLimit({ max: 5,  windowMs: 60000 })
 
-async function geminiText(prompt: string): Promise<string> {
-  const key = process.env.GEMINI_API_KEY
-  if (!key) throw new ApiError("AI not configured", 503)
+async function geminiText(req: Request, prompt: string): Promise<string> {
+  const key = getGeminiKey(req)
   const genAI = new GoogleGenerativeAI(key)
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
   const result = await model.generateContent(prompt)
   return result.response.text()
 }
 
-async function geminiJSON(prompt: string): Promise<unknown> {
-  const text = await geminiText(prompt)
+async function geminiJSON(req: Request, prompt: string): Promise<unknown> {
+  const text = await geminiText(req, prompt)
   return JSON.parse(text.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim())
 }
 
@@ -83,7 +83,7 @@ Return JSON array:
 ]
 
 Make ideas specific, engaging, and actionable. JSON only.`
-      const data = await geminiJSON(prompt)
+      const data = await geminiJSON(req, prompt)
       return NextResponse.json({ ok: true, data })
     }
 
@@ -108,7 +108,7 @@ Return JSON:
 }
 
 Keep tweet threads at 3-7 tweets, each under 280 chars. JSON only.`
-      const data = await geminiJSON(prompt)
+      const data = await geminiJSON(req, prompt)
       return NextResponse.json({ ok: true, data })
     }
 

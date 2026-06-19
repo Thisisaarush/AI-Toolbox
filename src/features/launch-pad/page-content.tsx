@@ -20,6 +20,7 @@ import {
   type WaitlistFormData, type EmailSubjectLine,
   TONES, LAUNCH_CHECKLIST, BEST_TIMES, LAUNCH_PLATFORM_OPTIONS, PRE_LAUNCH_TIMELINE,
 } from "./types"
+import { aiFetch, AiKeyError } from "@/lib/ai-fetch"
 
 const STORAGE_KEY = "launch-pad-v1"
 
@@ -276,11 +277,7 @@ export function LaunchPadContent() {
     if (!form.description.trim()) { toast.error("Description required"); return }
     setLoading(true)
     try {
-      const res = await fetch("/api/launch-pad", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "generate", input: form }),
-      })
+      const res = await aiFetch("/api/launch-pad", { action: "generate", input: form })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Generation failed")
       setCurrentOutput(data.output)
@@ -301,6 +298,11 @@ export function LaunchPadContent() {
       setView("output")
       toast.success("All 6 formats generated!")
     } catch (err: unknown) {
+      if (err instanceof AiKeyError) {
+        toast.error("Add your Gemini API key in Settings to use AI features.")
+        setLoading(false)
+        return
+      }
       toast.error(err instanceof Error ? err.message : "Generation failed")
     }
     setLoading(false)
@@ -329,11 +331,7 @@ export function LaunchPadContent() {
     if (!currentOutput) return
     setRegenLoading(platform)
     try {
-      const res = await fetch("/api/launch-pad", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "regenerate-platform", input: form, platform }),
-      })
+      const res = await aiFetch("/api/launch-pad", { action: "regenerate-platform", input: form, platform })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Regeneration failed")
       if (data.partial && Object.keys(data.partial).length > 0) {
@@ -341,6 +339,11 @@ export function LaunchPadContent() {
         toast.success("Regenerated!")
       }
     } catch (err: unknown) {
+      if (err instanceof AiKeyError) {
+        toast.error("Add your Gemini API key in Settings to use AI features.")
+        setRegenLoading(null)
+        return
+      }
       toast.error(err instanceof Error ? err.message : "Regeneration failed")
     }
     setRegenLoading(null)
@@ -359,11 +362,7 @@ export function LaunchPadContent() {
     if (!researchCategory.trim()) { toast.error("Category required"); return }
     setResearchLoading(true)
     try {
-      const res = await fetch("/api/launch-pad", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "competitor-research", productName: researchProductName, category: researchCategory }),
-      })
+      const res = await aiFetch("/api/launch-pad", { action: "competitor-research", productName: researchProductName, category: researchCategory })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Research failed")
       setResearch(data.data)
@@ -377,6 +376,11 @@ export function LaunchPadContent() {
       }
       toast.success("Competitor research complete")
     } catch (err: unknown) {
+      if (err instanceof AiKeyError) {
+        toast.error("Add your Gemini API key in Settings to use AI features.")
+        setResearchLoading(false)
+        return
+      }
       toast.error(err instanceof Error ? err.message : "Research failed")
     }
     setResearchLoading(false)
@@ -385,21 +389,22 @@ export function LaunchPadContent() {
   async function handleGenerateSubjectLines() {
     setSubjectLoading(true)
     try {
-      const res = await fetch("/api/launch-pad", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "generate-subject-lines",
-          productName: form.productName,
-          targetAudience: form.targetAudience,
-          currentSubject: currentOutput?.coldEmail?.subject ?? "",
-        }),
+      const res = await aiFetch("/api/launch-pad", {
+        action: "generate-subject-lines",
+        productName: form.productName,
+        targetAudience: form.targetAudience,
+        currentSubject: currentOutput?.coldEmail?.subject ?? "",
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Failed")
       setAltSubjectLines(data.items)
       toast.success("Subject lines generated")
     } catch (err: unknown) {
+      if (err instanceof AiKeyError) {
+        toast.error("Add your Gemini API key in Settings to use AI features.")
+        setSubjectLoading(false)
+        return
+      }
       toast.error(err instanceof Error ? err.message : "Failed")
     }
     setSubjectLoading(false)

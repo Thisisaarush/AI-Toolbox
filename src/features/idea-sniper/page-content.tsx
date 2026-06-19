@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import type { IdeaAnalysis, IdeaRecord } from "./types"
+import { aiFetch, AiKeyError } from "@/lib/ai-fetch"
 
 type HNComment = { text: string; author: string; url: string; points: number; createdAt: string }
 type HNStory = { title: string; url: string; points: number; numComments: number }
@@ -502,11 +503,7 @@ export function IdeaSniperContent() {
     setRealSignals(null)
     try {
       const [res] = await Promise.all([
-        fetch("/api/idea-sniper", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "analyze", idea }),
-        }),
+        aiFetch("/api/idea-sniper", { action: "analyze", idea }),
         searchRealSignals(idea.split("\n")[0]?.slice(0, 120) ?? idea.slice(0, 120)),
       ])
       const data = await res.json()
@@ -529,6 +526,11 @@ export function IdeaSniperContent() {
       setEditingIdea(false)
       toast.success("Analysis complete!")
     } catch (err: unknown) {
+      if (err instanceof AiKeyError) {
+        toast.error("Add your Gemini API key in Settings to use AI features.")
+        setLoading(false)
+        return
+      }
       toast.error(err instanceof Error ? err.message : "Analysis failed")
     }
     setLoading(false)

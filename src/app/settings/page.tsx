@@ -3,10 +3,11 @@
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
-import { ArrowLeft, Sun, Moon, Globe, Shield, Trash2, Code2, Activity, BookOpen, CheckCircle2, Info, ExternalLink } from "lucide-react"
+import { ArrowLeft, Sun, Moon, Globe, Shield, Trash2, Code2, Activity, BookOpen, CheckCircle2, Info, ExternalLink, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import { ConnectButton, TokenConnect } from "@/components/shared/connect-button"
 import { useCurrency } from "@/lib/currency-context"
 import { CURRENCY_SYMBOLS } from "@/lib/currency"
@@ -37,9 +38,16 @@ export default function SettingsPage() {
   const [readwiseConnected, setReadwiseConnected] = useState(false)
   const [clearDialogOpen, setClearDialogOpen] = useState(false)
   const [localDataSize, setLocalDataSize] = useState("0 KB")
+  const [geminiKey, setGeminiKey] = useState<string | null>(null)
+  const [geminiDraft, setGeminiDraft] = useState("")
+  const [showGeminiInput, setShowGeminiInput] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+
+    // Load Gemini API key
+    const gk = localStorage.getItem("toolbox-gemini-key")
+    if (gk) setGeminiKey(gk)
 
     // Check existing connections
     const ghToken = localStorage.getItem("changelog-ai-github-token")
@@ -77,8 +85,25 @@ export default function SettingsPage() {
     setGithubUser(null)
     setStravaUser(null)
     setReadwiseConnected(false)
+    setGeminiKey(null)
+    setGeminiDraft("")
     setLocalDataSize("0 KB")
     toast.success("All local data cleared")
+  }
+
+  function handleSaveGeminiKey() {
+    if (!geminiDraft.trim()) { toast.error("Paste your API key first"); return }
+    localStorage.setItem("toolbox-gemini-key", geminiDraft.trim())
+    setGeminiKey(geminiDraft.trim())
+    setGeminiDraft("")
+    setShowGeminiInput(false)
+    toast.success("API key saved")
+  }
+
+  function handleRemoveGeminiKey() {
+    localStorage.removeItem("toolbox-gemini-key")
+    setGeminiKey(null)
+    toast.success("API key removed")
   }
 
   const onGithubConnect = useCallback((token: string) => {
@@ -115,6 +140,83 @@ export default function SettingsPage() {
             Manage your connected accounts, appearance, and preferences.
           </p>
         </div>
+
+        {/* ── AI Provider ─────────────────────────────────────────────────── */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-base font-semibold mb-0.5">AI Provider</h2>
+            <p className="text-xs text-muted-foreground">
+              Configure your Gemini API key to unlock AI features.
+            </p>
+          </div>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-violet-500" />
+                <CardTitle className="text-sm">AI Provider</CardTitle>
+              </div>
+              <CardDescription className="text-xs">
+                Add your Gemini API key to unlock all AI features. Your key is stored locally in your browser and sent directly to Google&apos;s API — never stored on our servers.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Status banner */}
+              {geminiKey ? (
+                <div className="flex items-center gap-2 rounded-lg bg-green-500/10 border border-green-500/20 px-3 py-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+                  <span className="text-xs font-medium text-green-700 dark:text-green-400">AI features active</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2">
+                  <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                    ⚠ AI features disabled — add your Gemini API key below
+                  </span>
+                </div>
+              )}
+
+              {/* Key configured state */}
+              {geminiKey ? (
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary" className="text-xs text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-950 border-green-200 dark:border-green-800">
+                    <CheckCircle2 className="w-3 h-3 mr-1" />
+                    Gemini API key configured
+                  </Badge>
+                  <Button variant="outline" size="sm" onClick={handleRemoveGeminiKey}>
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      type="password"
+                      placeholder="Paste your Gemini API key"
+                      value={geminiDraft}
+                      onChange={(e) => setGeminiDraft(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") handleSaveGeminiKey() }}
+                    />
+                    <Button onClick={handleSaveGeminiKey} disabled={!geminiDraft.trim()}>
+                      Save
+                    </Button>
+                  </div>
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                    ⚠ Without an API key, all AI features across Toolbox are disabled.
+                  </p>
+                  <a
+                    href="https://aistudio.google.com/app/apikey"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-blue-500 hover:underline"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Get a free Gemini API key at aistudio.google.com/app/apikey
+                  </a>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
 
         {/* ── Connected Accounts ──────────────────────────────────────────── */}
         <section className="space-y-4">

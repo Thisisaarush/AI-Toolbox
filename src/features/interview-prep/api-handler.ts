@@ -3,13 +3,13 @@ import { auth } from "@clerk/nextjs/server"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { getGeminiKey } from "@/lib/ai-key"
 
 const limiter   = rateLimit({ max: 20, windowMs: 60000 })
 const aiLimiter = rateLimit({ max: 5,  windowMs: 60000 })
 
-async function geminiJSON(prompt: string): Promise<unknown> {
-  const key = process.env.GEMINI_API_KEY
-  if (!key) throw new ApiError("AI not configured", 503)
+async function geminiJSON(req: Request, prompt: string): Promise<unknown> {
+  const key = getGeminiKey(req)
   const genAI = new GoogleGenerativeAI(key)
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
   const result = await model.generateContent(prompt)
@@ -58,7 +58,7 @@ Return JSON:
 }
 
 Score out of 10. Strengths/weaknesses/suggestions should be specific and actionable. JSON only.`
-      const data = await geminiJSON(prompt)
+      const data = await geminiJSON(req, prompt)
       return NextResponse.json({ ok: true, data })
     }
 
@@ -88,7 +88,7 @@ Return JSON:
 }
 
 Base on publicly known information about ${company}'s interview process. JSON only.`
-      const data = await geminiJSON(prompt)
+      const data = await geminiJSON(req, prompt)
       return NextResponse.json({ ok: true, data })
     }
 
@@ -114,7 +114,7 @@ Return JSON:
 }
 
 overallScore out of 10. JSON only.`
-      const data = await geminiJSON(prompt)
+      const data = await geminiJSON(req, prompt)
       return NextResponse.json({ ok: true, data })
     }
 

@@ -20,6 +20,7 @@ import {
   type PriceHistoryEntry,
 } from "./types"
 import { lookupService } from "./service-db"
+import { aiFetch, AiKeyError } from "@/lib/ai-fetch"
 
 const STORAGE_KEY = "sub-sheriff-v1"
 
@@ -403,11 +404,7 @@ export function SubSheriffContent() {
     setIsParsing(true)
     setParsedResults([])
     try {
-      const res = await fetch("/api/sub-sheriff/parse", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emailText }),
-      })
+      const res = await aiFetch("/api/sub-sheriff/parse", { emailText })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Parse failed")
       const results = (data.subscriptions ?? []).map((s: ParsedSubscription) => ({
@@ -418,6 +415,11 @@ export function SubSheriffContent() {
       if (results.length === 0) toast.info("No subscriptions detected in this email")
       else toast.success(`Found ${results.length} subscription${results.length !== 1 ? "s" : ""}`)
     } catch (err: unknown) {
+      if (err instanceof AiKeyError) {
+        toast.error("Add your Gemini API key in Settings to use AI features.")
+        setIsParsing(false)
+        return
+      }
       toast.error(err instanceof Error ? err.message : "Parse failed")
     }
     setIsParsing(false)

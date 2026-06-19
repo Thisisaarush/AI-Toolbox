@@ -19,6 +19,7 @@ import {
   bumpVersion, computeReleaseStats,
 } from "./types"
 import { ConnectButton } from "@/components/shared/connect-button"
+import { aiFetch, AiKeyError } from "@/lib/ai-fetch"
 
 const STORAGE_KEY = "changelog-ai-v1"
 const GH_TOKEN_STORAGE_KEY = "changelog-ai-github-token"
@@ -412,17 +413,18 @@ export function ChangelogAIContent() {
     if (!rawInput.trim()) { toast.error("Paste your git log or changes first"); return }
     setLoading(true)
     try {
-      const res = await fetch("/api/changelog-ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "generate", rawInput, tone, useEmojis }),
-      })
+      const res = await aiFetch("/api/changelog-ai", { action: "generate", rawInput, tone, useEmojis })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Generation failed")
       setEntries(data.entries)
       setView("editor")
       toast.success(`${data.entries.length} changelog entries generated`)
     } catch (err: unknown) {
+      if (err instanceof AiKeyError) {
+        toast.error("Add your Gemini API key in Settings to use AI features.")
+        setLoading(false)
+        return
+      }
       toast.error(err instanceof Error ? err.message : "Generation failed")
     }
     setLoading(false)

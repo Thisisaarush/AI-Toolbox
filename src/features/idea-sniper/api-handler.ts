@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { getGeminiKey } from "@/lib/ai-key"
 import type { IdeaAnalysis } from "./types"
 
 const aiLimiter = rateLimit({ max: 5, windowMs: 60000 })
@@ -84,8 +85,7 @@ export async function POST(req: Request) {
     if (action !== "analyze") throw new ApiError(`Unknown action: ${action}`, 400)
     if (!idea?.trim()) throw new ApiError("idea required", 400)
 
-    const key = process.env.GEMINI_API_KEY
-    if (!key) throw new ApiError("AI not configured", 503)
+    const key = getGeminiKey(req)
 
     const genAI = new GoogleGenerativeAI(key)
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })

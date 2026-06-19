@@ -22,6 +22,7 @@ import {
   STATUS_META, CURRENCY_SYMBOLS, avgDaysToPayment, daysOverdue, daysSince,
   EXPENSE_CATEGORIES,
 } from "./types"
+import { aiFetch, AiKeyError } from "@/lib/ai-fetch"
 
 const STORAGE_KEY = "invoice-zero-v1"
 const EXPENSES_KEY = "invoice-zero-expenses-v1"
@@ -423,11 +424,7 @@ export function InvoiceZeroContent() {
     if (!aiInput.trim()) { toast.error("Enter a description first"); return }
     setAiLoading(true)
     try {
-      const res = await fetch("/api/invoice-zero", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "ai-generate", description: aiInput }),
-      })
+      const res = await aiFetch("/api/invoice-zero", { action: "ai-generate", description: aiInput })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "AI failed")
       const d = data.data
@@ -458,6 +455,11 @@ export function InvoiceZeroContent() {
       setAiInput("")
       toast.success("Form filled from AI")
     } catch (err: unknown) {
+      if (err instanceof AiKeyError) {
+        toast.error("Add your Gemini API key in Settings to use AI features.")
+        setAiLoading(false)
+        return
+      }
       toast.error(err instanceof Error ? err.message : "AI failed")
     }
     setAiLoading(false)

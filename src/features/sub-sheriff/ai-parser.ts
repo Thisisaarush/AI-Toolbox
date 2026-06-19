@@ -3,21 +3,16 @@ import { auth } from "@clerk/nextjs/server"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { getGeminiKey } from "@/lib/ai-key"
 import { lookupService } from "./service-db"
 import type { ParsedSubscription, BillingCycle, Category } from "./types"
 import { toMonthly } from "./types"
 
 const limiter = rateLimit({ max: 10, windowMs: 60000 })
 
-function getGemini() {
-  const key = process.env.GEMINI_API_KEY
-  if (!key) return null
-  return new GoogleGenerativeAI(key)
-}
-
-async function parseWithAI(emailText: string): Promise<ParsedSubscription[]> {
-  const genAI = getGemini()
-  if (!genAI) return []
+async function parseWithAI(req: Request, emailText: string): Promise<ParsedSubscription[]> {
+  const key = getGeminiKey(req)
+  const genAI = new GoogleGenerativeAI(key)
 
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
@@ -100,7 +95,7 @@ export async function POST(req: Request) {
       throw new ApiError("Email text is too short", 400)
     }
 
-    const subscriptions = await parseWithAI(emailText)
+    const subscriptions = await parseWithAI(req, emailText)
 
     // Enrich with monthly amount
     const enriched = subscriptions
