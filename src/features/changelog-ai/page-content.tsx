@@ -5,7 +5,7 @@ import { ToolHeader } from "@/components/shared/tool-header"
 import {
   GitBranch, Sparkles, Copy, Check, Loader2, Plus, Trash2,
   Download, Eye, EyeOff, History, ChevronDown, ChevronUp, Search,
-  BarChart2, Mail, Globe, X,
+  BarChart2, Mail, Globe, X, GitFork,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,6 +20,7 @@ import {
 } from "./types"
 
 const STORAGE_KEY = "changelog-ai-v1"
+const GH_TOKEN_STORAGE_KEY = "changelog-ai-github-token"
 
 function load(): Release[] {
   if (typeof window === "undefined") return []
@@ -370,6 +371,24 @@ export function ChangelogAIContent() {
   const [tone, setTone] = useState<ToneId>("friendly")
   const [useEmojis, setUseEmojis] = useState(false)
 
+  // Input tab: "paste" | "github"
+  const [inputTab, setInputTab] = useState<"paste" | "github">("paste")
+
+  // GitHub fetch form
+  const [ghToken, setGhToken] = useState("")
+  const [ghRepo, setGhRepo] = useState("")
+  const [ghSince, setGhSince] = useState("")
+  const [ghUntil, setGhUntil] = useState("")
+  const [ghLoading, setGhLoading] = useState(false)
+
+  // Load stored GitHub token on mount
+  useEffect(() => {
+    const stored = typeof window !== "undefined"
+      ? localStorage.getItem(GH_TOKEN_STORAGE_KEY) ?? ""
+      : ""
+    if (stored) setGhToken(stored)
+  }, [])
+
   // Editor state
   const [entries, setEntries] = useState<ChangelogEntry[]>([])
   const [showPreview, setShowPreview] = useState(true)
@@ -467,6 +486,38 @@ export function ChangelogAIContent() {
   // Infer "current version" from latest saved release for semver bumper
   const latestVersion = releases[0]?.version ?? ""
 
+  async function handleFetchGithubCommits() {
+    if (!ghRepo.trim()) { toast.error("Enter a repository (owner/repo)"); return }
+    setGhLoading(true)
+    // Persist token (never sent to AI)
+    if (ghToken.trim()) localStorage.setItem(GH_TOKEN_STORAGE_KEY, ghToken.trim())
+    try {
+      const res = await fetch("/api/changelog-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "fetch-github-commits",
+          token: ghToken.trim() || undefined,
+          repo: ghRepo.trim(),
+          since: ghSince || undefined,
+          until: ghUntil || undefined,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? "Failed to fetch commits")
+      type FetchedCommit = { sha: string; message: string; author: string; date: string; url: string }
+      const lines = (data.commits as FetchedCommit[]).map(
+        (c) => `${c.sha.slice(0, 7)} ${c.message} (${c.author}, ${c.date})`
+      )
+      setRawInput(lines.join("\n"))
+      setInputTab("paste")
+      toast.success(`${data.commits.length} commits fetched — review and generate`)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to fetch commits")
+    }
+    setGhLoading(false)
+  }
+
   const releaseForExport: Release = useMemo(() => ({
     id: currentRelease?.id ?? "preview",
     version: version || "v1.0.0",
@@ -554,36 +605,117 @@ export function ChangelogAIContent() {
               <div className="lg:col-span-2 space-y-4">
                 <Card>
                   <CardContent className="pt-5 space-y-4">
-                    <div>
-                      <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2 block">
-                        Git log, PR descriptions, or manual changes
-                      </label>
-                      <Textarea
-                        placeholder={`abc1234 feat: add dark mode toggle
+                    {/* Input source tabs */}
+                    <div className="flex gap-0.5 border-b">
+                      <button
+                        onClick={() => setInputTab("paste")}
+                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 -mb-px transition-colors ${inputTab === "paste" ? "border-cyan-500 text-cyan-600 dark:text-cyan-400" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                      >
+                        <Copy className="w-3 h-3" /> Paste
+                      </button>
+                      <button
+                        onClick={() => setInputTab("github")}
+                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 -mb-px transition-colors ${inputTab === "github" ? "border-cyan-500 text-cyan-600 dark:text-cyan-400" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                      >
+                        <GitFork className="w-3 h-3" /> GitHub
+                      </button>
+                    </div>
+
+                    {/* ── Paste tab ── */}
+                    {inputTab === "paste" && (
+                      <div>
+                        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2 block">
+                          Git log, PR descriptions, or manual changes
+                        </label>
+                        <Textarea
+                          placeholder={`abc1234 feat: add dark mode toggle
 def5678 fix: resolve crash on mobile Safari
 ghi9012 chore: upgrade React to 19
 jkl3456 feat: add CSV export for reports
 mno7890 fix: typo in onboarding copy
 pqr1234 perf: 40% faster load times via lazy loading`}
-                        value={rawInput}
-                        onChange={(e) => setRawInput(e.target.value)}
-                        rows={12}
-                        className="font-mono text-sm"
-                      />
-                    </div>
-                    {/* Git log helper */}
-                    <div className="rounded-lg border bg-muted/30 p-3 space-y-1.5">
-                      <p className="text-xs font-medium text-muted-foreground">Get your git log</p>
-                      <div className="flex items-center gap-2">
-                        <code className="text-xs font-mono bg-background border rounded px-2 py-1 flex-1">git log --oneline v1.0..HEAD</code>
-                        <button
-                          onClick={() => { navigator.clipboard.writeText("git log --oneline v1.0..HEAD"); toast.success("Copied!") }}
-                          className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </button>
+                          value={rawInput}
+                          onChange={(e) => setRawInput(e.target.value)}
+                          rows={12}
+                          className="font-mono text-sm"
+                        />
                       </div>
-                    </div>
+                    )}
+
+                    {/* ── GitHub tab ── */}
+                    {inputTab === "github" && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-xs font-medium mb-1.5 block">
+                            GitHub PAT{" "}
+                            <span className="text-muted-foreground font-normal">— only <code className="text-[10px] bg-muted px-1 rounded">repo</code> or <code className="text-[10px] bg-muted px-1 rounded">public_repo</code> scope needed</span>
+                          </label>
+                          <Input
+                            type="password"
+                            placeholder="ghp_xxxxxxxxxxxx (leave empty for public repos)"
+                            value={ghToken}
+                            onChange={(e) => setGhToken(e.target.value)}
+                            className="font-mono text-sm"
+                          />
+                          <p className="text-[10px] text-muted-foreground mt-1">Stored in localStorage. Never sent to the AI — only to the GitHub API.</p>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium mb-1.5 block">Repository</label>
+                          <Input
+                            placeholder="owner/repo"
+                            value={ghRepo}
+                            onChange={(e) => setGhRepo(e.target.value)}
+                            className="font-mono text-sm"
+                          />
+                        </div>
+                        <div className="grid sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs font-medium mb-1.5 block">Since</label>
+                            <Input
+                              type="date"
+                              value={ghSince}
+                              onChange={(e) => setGhSince(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium mb-1.5 block">Until</label>
+                            <Input
+                              type="date"
+                              value={ghUntil}
+                              onChange={(e) => setGhUntil(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <Button
+                          className="w-full h-10"
+                          variant="outline"
+                          onClick={handleFetchGithubCommits}
+                          disabled={ghLoading}
+                        >
+                          {ghLoading
+                            ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Fetching commits...</>
+                            : <><GitFork className="w-4 h-4 mr-2" /> Fetch Commits</>
+                          }
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Git log helper — only on paste tab */}
+                    {inputTab === "paste" && (
+                      <div className="rounded-lg border bg-muted/30 p-3 space-y-1.5">
+                        <p className="text-xs font-medium text-muted-foreground">Get your git log</p>
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs font-mono bg-background border rounded px-2 py-1 flex-1">git log --oneline v1.0..HEAD</code>
+                          <button
+                            onClick={() => { navigator.clipboard.writeText("git log --oneline v1.0..HEAD"); toast.success("Copied!") }}
+                            className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     <Button className="w-full h-10" onClick={handleGenerate} disabled={loading}>
                       {loading
                         ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Transforming...</>

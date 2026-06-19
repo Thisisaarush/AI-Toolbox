@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
+import { ThemeProvider } from "next-themes"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "sonner"
 import "./globals.css"
@@ -20,12 +21,12 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Toolbox — 8 tools for developers who ship",
-  description: "Eight focused tools for developers and solo builders. Subscriptions, invoices, OG images, launch copy, idea validation, changelogs, DNS, and env secrets — all in one place.",
+  title: "Toolbox — Tools for developers who ship",
+  description: "A growing collection of focused tools for developers and solo builders. Subscriptions, invoices, OG images, launch copy, idea validation, changelogs, DNS, env secrets, fitness, documents, and more.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   openGraph: {
-    title: "Toolbox — 8 tools for developers who ship",
-    description: "Eight focused tools for developers and solo builders. Each one slots into something you already do.",
+    title: "Toolbox — Tools for developers who ship",
+    description: "Focused tools for developers and solo builders. Each one slots into something you already do.",
     type: "website",
   },
 }
@@ -46,10 +47,18 @@ export default function RootLayout({
           <link rel="preconnect" href={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_test_") ? "https://clerk.accounts.dev" : "https://clerk.toolbox.app"} />
         </head>
         <body className="min-h-full flex flex-col">
-          <TooltipProvider>
-            {children}
-            <Toaster position="bottom-right" richColors />
-          </TooltipProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            storageKey="toolbox-theme"
+            disableTransitionOnChange
+          >
+            <TooltipProvider>
+              {children}
+              <Toaster position="bottom-right" richColors />
+            </TooltipProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

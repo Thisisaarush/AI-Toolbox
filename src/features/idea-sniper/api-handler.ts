@@ -17,6 +17,70 @@ export async function POST(req: Request) {
 
     const body = await req.json()
     const { action, idea } = body
+
+    // ── search-real ───────────────────────────────────────────────────────────
+    if (action === "search-real") {
+      const { query } = body
+      if (!query?.trim()) throw new ApiError("query required", 400)
+
+      const encoded = encodeURIComponent(query as string)
+
+      const [commentsRes, storiesRes] = await Promise.all([
+        fetch(
+          `https://hn.algolia.com/api/v1/search?query=${encoded}&tags=comment&hitsPerPage=10`,
+          { headers: { Accept: "application/json" } }
+        ),
+        fetch(
+          `https://hn.algolia.com/api/v1/search?query=${encoded}&tags=story&hitsPerPage=5`,
+          { headers: { Accept: "application/json" } }
+        ),
+      ])
+
+      if (!commentsRes.ok || !storiesRes.ok) {
+        throw new ApiError("HN Algolia API error", 502)
+      }
+
+      type HNCommentHit = {
+        objectID: string
+        comment_text?: string
+        author?: string
+        story_url?: string
+        points?: number
+        created_at?: string
+      }
+      type HNStoryHit = {
+        objectID: string
+        title?: string
+        url?: string
+        story_url?: string
+        points?: number
+        num_comments?: number
+      }
+      type HNResponse<T> = { hits: T[] }
+
+      const commentsData: HNResponse<HNCommentHit> = await commentsRes.json()
+      const storiesData: HNResponse<HNStoryHit> = await storiesRes.json()
+
+      const hnComments = commentsData.hits
+        .filter((h) => h.comment_text)
+        .map((h) => ({
+          text: (h.comment_text ?? "").replace(/<[^>]*>/g, "").slice(0, 500),
+          author: h.author ?? "unknown",
+          url: `https://news.ycombinator.com/item?id=${h.objectID}`,
+          points: h.points ?? 0,
+          createdAt: h.created_at ?? "",
+        }))
+
+      const hnStories = storiesData.hits.map((h) => ({
+        title: h.title ?? "",
+        url: h.url ?? h.story_url ?? `https://news.ycombinator.com/item?id=${h.objectID}`,
+        points: h.points ?? 0,
+        numComments: h.num_comments ?? 0,
+      }))
+
+      return NextResponse.json({ ok: true, hnComments, hnStories })
+    }
+
     if (action !== "analyze") throw new ApiError(`Unknown action: ${action}`, 400)
     if (!idea?.trim()) throw new ApiError("idea required", 400)
 

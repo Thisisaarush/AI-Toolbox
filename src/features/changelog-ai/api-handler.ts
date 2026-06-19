@@ -33,6 +33,61 @@ export async function POST(req: Request) {
 
     const body = await req.json()
     const { action } = body
+
+    // ── fetch-github-commits ──────────────────────────────────────────────────
+    if (action === "fetch-github-commits") {
+      const { token, repo, since, until } = body
+      if (!repo?.trim()) throw new ApiError("repo required (owner/repo)", 400)
+
+      const [owner, repoName] = (repo as string).split("/")
+      if (!owner || !repoName) throw new ApiError("repo must be in owner/repo format", 400)
+
+      const params = new URLSearchParams({ per_page: "100" })
+      if (since) params.set("since", since)
+      if (until) params.set("until", until)
+
+      const headers: Record<string, string> = {
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      }
+      if (token?.trim()) headers["Authorization"] = `token ${token}`
+
+      const ghRes = await fetch(
+        `https://api.github.com/repos/${owner}/${repoName}/commits?${params.toString()}`,
+        { headers }
+      )
+
+      if (!ghRes.ok) {
+        const err = await ghRes.json().catch(() => ({}))
+        throw new ApiError(
+          (err as { message?: string }).message ?? `GitHub API error ${ghRes.status}`,
+          ghRes.status === 404 ? 404 : 502
+        )
+      }
+
+      type GHCommit = {
+        sha: string
+        commit: {
+          message: string
+          author: { name: string; date: string } | null
+        }
+        html_url: string
+      }
+      const raw: GHCommit[] = await ghRes.json()
+
+      const commits = raw.map((c) => ({
+        sha: c.sha,
+        message: c.commit.message.split("\n")[0], // first line only
+        author: c.commit.author?.name ?? "unknown",
+        date: c.commit.author?.date
+          ? new Date(c.commit.author.date).toISOString().slice(0, 10)
+          : "",
+        url: c.html_url,
+      }))
+
+      return NextResponse.json({ ok: true, commits })
+    }
+
     if (action !== "generate") throw new ApiError(`Unknown action: ${action}`, 400)
 
     const { rawInput, tone, useEmojis } = body

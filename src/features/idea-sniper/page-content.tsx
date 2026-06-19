@@ -16,6 +16,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import type { IdeaAnalysis, IdeaRecord } from "./types"
 
+type HNComment = { text: string; author: string; url: string; points: number; createdAt: string }
+type HNStory = { title: string; url: string; points: number; numComments: number }
+type RealSignals = { hnComments: HNComment[]; hnStories: HNStory[] }
+
 const STORAGE_KEY = "idea-sniper-v1"
 const CHECKLIST_STORAGE_KEY = "idea-sniper-checklist-v1"
 
@@ -461,6 +465,9 @@ export function IdeaSniperContent() {
   const [editingIdea, setEditingIdea] = useState(false)
   const [editDraft, setEditDraft] = useState("")
 
+  const [realSignals, setRealSignals] = useState<RealSignals | null>(null)
+  const [realSignalsLoading, setRealSignalsLoading] = useState(false)
+
   useEffect(() => { setRecords(load()) }, [])
 
   function copyText(text: string, key: string) {
@@ -470,18 +477,38 @@ export function IdeaSniperContent() {
     toast.success("Copied!")
   }
 
+  async function searchRealSignals(query: string) {
+    setRealSignalsLoading(true)
+    try {
+      const res = await fetch("/api/idea-sniper", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "search-real", query }),
+      })
+      const data = await res.json()
+      if (res.ok) setRealSignals({ hnComments: data.hnComments ?? [], hnStories: data.hnStories ?? [] })
+    } catch {
+      // non-fatal — real signals are supplementary
+    }
+    setRealSignalsLoading(false)
+  }
+
   async function handleAnalyze(overrideIdea?: string) {
     const idea = overrideIdea ?? ideaInput
     if (!idea.trim()) { toast.error("Describe your idea first"); return }
     if (overrideIdea) { setIdeaInput(overrideIdea) }
     setLoading(true)
     setView("input")
+    setRealSignals(null)
     try {
-      const res = await fetch("/api/idea-sniper", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "analyze", idea }),
-      })
+      const [res] = await Promise.all([
+        fetch("/api/idea-sniper", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "analyze", idea }),
+        }),
+        searchRealSignals(idea.split("\n")[0]?.slice(0, 120) ?? idea.slice(0, 120)),
+      ])
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Analysis failed")
       setAnalysis(data.analysis)
@@ -653,7 +680,7 @@ export function IdeaSniperContent() {
               </CardContent>
             </Card>
 
-            {/* Community signals */}
+            {/* Community signals — AI-synthesized */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
@@ -675,6 +702,105 @@ export function IdeaSniperContent() {
                     </div>
                   )
                 })}
+              </CardContent>
+            </Card>
+
+            {/* Real Community Signals — HN Algolia */}
+            <Card className="border-orange-200 dark:border-orange-800">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Search className="w-4 h-4 text-orange-500" /> Real Community Signals
+                    <Badge className="text-[10px] bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">Live Data</Badge>
+                  </CardTitle>
+                  <a
+                    href={`https://hn.algolia.com/?query=${encodeURIComponent((ideaInput.split("\n")[0] ?? "").slice(0, 80))}&type=comment`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-orange-500 hover:text-orange-600 flex items-center gap-1"
+                  >
+                    Search for more <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {realSignalsLoading && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching Hacker News...
+                  </div>
+                )}
+
+                {!realSignalsLoading && !realSignals && (
+                  <p className="text-xs text-muted-foreground italic">No real signals fetched yet.</p>
+                )}
+
+                {realSignals && (
+                  <>
+                    {/* HN Stories */}
+                    {realSignals.hnStories.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">HN Posts</p>
+                        <div className="space-y-2">
+                          {realSignals.hnStories.map((story, i) => (
+                            <a
+                              key={i}
+                              href={story.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-start gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors group"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium line-clamp-2 group-hover:text-orange-600 transition-colors">{story.title}</p>
+                                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                  <span>{story.points} pts</span>
+                                  <span>{story.numComments} comments</span>
+                                </div>
+                              </div>
+                              <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* HN Comments */}
+                    {realSignals.hnComments.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">HN Comments</p>
+                        <div className="space-y-2">
+                          {realSignals.hnComments.slice(0, 5).map((comment, i) => (
+                            <div key={i} className="bg-muted/30 rounded-lg p-3 border space-y-1.5">
+                              <p className="text-sm">
+                                {comment.text.length > 200
+                                  ? comment.text.slice(0, 200) + "…"
+                                  : comment.text}
+                              </p>
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-muted-foreground">{comment.author}</span>
+                                <a
+                                  href={comment.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-orange-500 hover:text-orange-600 flex items-center gap-1"
+                                >
+                                  View <ExternalLink className="w-3 h-3" />
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {realSignals.hnComments.length === 0 && realSignals.hnStories.length === 0 && (
+                      <p className="text-xs text-muted-foreground italic">No HN results found for this query.</p>
+                    )}
+
+                    <p className="text-[10px] text-muted-foreground pt-1 border-t">
+                      Source: Hacker News Algolia API · Real data
+                    </p>
+                  </>
+                )}
               </CardContent>
             </Card>
 
