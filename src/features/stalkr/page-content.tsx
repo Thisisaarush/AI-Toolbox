@@ -24,7 +24,7 @@ function ScoreBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? (value / max) * 100 : 0
   const color = pct >= 70 ? "bg-green-500" : pct >= 40 ? "bg-amber-500" : "bg-red-500"
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
       </div>
@@ -57,12 +57,12 @@ export function StalkrContent() {
   return (
     <>
       <ToolHeader title="Stalkr" icon={Eye} color="text-teal-500" badge="Research" />
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
 
         {/* Input */}
         <Card>
           <CardContent className="py-4">
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <Input
                 placeholder="Brand or company name"
                 value={brandName}
@@ -94,19 +94,22 @@ export function StalkrContent() {
         {/* Empty state */}
         {!result && !loading && (
           <div className="text-center py-16">
-            <Eye className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground text-sm">Enter a brand name to get a deep analysis.</p>
+            <Eye className="w-12 h-12 text-muted-foreground mx-auto mb-5" />
+            <h2 className="text-xl font-semibold mb-2">Analyze any brand</h2>
+            <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+              Enter a brand or company name to get sentiment analysis, SEO keywords, Hacker News mentions, and actionable strengths &amp; improvements.
+            </p>
           </div>
         )}
 
         {/* Results */}
         {result && !loading && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Overview */}
             <div className="grid grid-cols-2 gap-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-3">
                     <SentimentIcon sentiment={result.sentiment} />
                     Sentiment: <span className="capitalize">{result.sentiment}</span>
                   </CardTitle>
@@ -120,7 +123,7 @@ export function StalkrContent() {
                 <CardHeader>
                   <CardTitle>Name Score: {result.nameScore}/100</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-3">
                   {Object.entries(result.nameScoreBreakdown).map(([key, val]) => (
                     <div key={key}>
                       <span className="text-xs text-muted-foreground capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
@@ -136,20 +139,20 @@ export function StalkrContent() {
             {result.hnMentions.length > 0 && (
               <Card>
                 <CardHeader><CardTitle>Hacker News Mentions</CardTitle></CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-3">
                   {result.hnMentions.map((m) => (
                     <a
                       key={m.objectID}
                       href={m.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-muted transition-colors"
+                      className="flex items-center justify-between p-3 rounded-xl hover:bg-muted transition-colors"
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{m.title}</p>
                         <p className="text-xs text-muted-foreground">{m.points} points · {m.numComments} comments</p>
                       </div>
-                      <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0 ml-2" />
+                      <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0 ml-2" />
                     </a>
                   ))}
                 </CardContent>
@@ -160,7 +163,7 @@ export function StalkrContent() {
             <Card>
               <CardHeader><CardTitle>SEO Keywords</CardTitle></CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {result.seoKeywords.map((k) => <Badge key={k} variant="secondary" className="text-xs">{k}</Badge>)}
                 </div>
               </CardContent>
@@ -170,16 +173,16 @@ export function StalkrContent() {
             <Card>
               <CardHeader><CardTitle>Search Links</CardTitle></CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {result.searchLinks.map((l) => (
                     <a
                       key={l.label}
                       href={l.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium hover:bg-muted transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-xs font-medium hover:bg-muted transition-colors"
                     >
-                      <Link2 className="w-3 h-3" />
+                      <Link2 className="w-4 h-4" />
                       {l.label}
                     </a>
                   ))}
@@ -190,7 +193,7 @@ export function StalkrContent() {
             {/* Strengths + Improvements */}
             <div className="grid grid-cols-2 gap-4">
               <Card>
-                <CardHeader><CardTitle className="text-green-600 flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> Strengths</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-green-600 flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Strengths</CardTitle></CardHeader>
                 <CardContent>
                   <ul className="space-y-1">
                     {result.strengths.map((s, i) => <li key={i} className="text-xs">✓ {s}</li>)}
@@ -198,7 +201,7 @@ export function StalkrContent() {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-amber-600 flex items-center gap-1.5"><AlertCircle className="w-4 h-4" /> Improvements</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-amber-600 flex items-center gap-2"><AlertCircle className="w-4 h-4" /> Improvements</CardTitle></CardHeader>
                 <CardContent>
                   <ul className="space-y-1">
                     {result.improvements.map((s, i) => <li key={i} className="text-xs">✗ {s}</li>)}
@@ -213,7 +216,7 @@ export function StalkrContent() {
         {result && !loading && (
           <Card>
             <CardContent className="py-4">
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <Input placeholder="Analyze another brand..." value={brandName} onChange={(e) => setBrandName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && analyze()} />
                 <Input placeholder="URL (optional)" value={brandUrl} onChange={(e) => setBrandUrl(e.target.value)} className="w-48" />
                 <Button onClick={analyze} disabled={loading}>
@@ -222,6 +225,15 @@ export function StalkrContent() {
               </div>
             </CardContent>
           </Card>
+        )}
+        {/* Tip banner */}
+        {result && !loading && (
+          <div className="bg-muted/30 border border-border rounded-xl p-4 flex items-center gap-3">
+            <Eye className="w-5 h-5 text-muted-foreground shrink-0" />
+            <p className="text-xs text-muted-foreground">
+              <strong>Note:</strong> Analysis is based on publicly available data and AI inference. Results may not reflect the brand&apos;s current state. Re-run periodically for updated insights.
+            </p>
+          </div>
         )}
       </div>
     </>

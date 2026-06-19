@@ -54,15 +54,15 @@ function BoardingPassCard({ trip, onClick }: { trip: Trip; onClick: () => void }
       <div className="p-5 bg-card">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-3 mb-1">
               <Plane className="w-4 h-4 text-cyan-400 shrink-0" />
               <span className="text-xs text-muted-foreground uppercase tracking-widest">To</span>
             </div>
-            <h3 className="text-2xl font-black tracking-tight truncate">{trip.destination}</h3>
+            <h3 className="text-3xl font-black tracking-tight truncate">{trip.destination}</h3>
             <p className="text-sm text-muted-foreground mt-1">{PURPOSE_LABELS[trip.purpose]} · {dur} day{dur !== 1 ? "s" : ""}</p>
           </div>
           <div className="text-right shrink-0">
-            <Badge variant="secondary" className={`${statusCls} mb-2`}>{trip.status}</Badge>
+            <Badge variant="secondary" className={`${statusCls} mb-3`}>{trip.status}</Badge>
             <div>
               {isPast ? (
                 <p className="text-xs text-muted-foreground">Completed</p>
@@ -271,13 +271,13 @@ export function TravelDocsContent() {
           color="text-cyan-500"
           badge="Travel"
           actions={
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button variant="outline" size="sm" onClick={() => { setSelectedTrip(null); setTripTab("overview") }}>← Back</Button>
-              <Button variant="ghost" size="sm" onClick={() => deleteTrip(trip.id)} className="text-destructive"><Trash2 className="w-3.5 h-3.5" /></Button>
+              <Button variant="ghost" size="sm" onClick={() => deleteTrip(trip.id)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
             </div>
           }
         />
-        <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-6">
+        <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
           {/* Trip header */}
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
@@ -291,7 +291,7 @@ export function TravelDocsContent() {
           </div>
 
           {/* Tab bar */}
-          <div className="flex gap-1 p-1 bg-muted/50 rounded-lg flex-wrap">
+          <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl flex-wrap">
             {([
               { key: "overview" as TripTab, label: "Overview" },
               { key: "docs" as TripTab,     label: `Docs (${tripDocs.length})` },
@@ -300,7 +300,7 @@ export function TravelDocsContent() {
               { key: "expenses" as TripTab, label: `Expenses ($${totalExpenses.toFixed(0)})` },
             ]).map((t) => (
               <button key={t.key} onClick={() => setTripTab(t.key)}
-                className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${tripTab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                className={`px-4 py-2 text-sm rounded-md font-medium transition-colors ${tripTab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                 {t.label}
               </button>
             ))}
@@ -310,47 +310,47 @@ export function TravelDocsContent() {
           {tripTab === "overview" && (
             <div className="grid md:grid-cols-2 gap-4">
               <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><FileText className="w-4 h-4" />Documents</CardTitle></CardHeader>
+                <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-3"><FileText className="w-4 h-4" />Documents</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-4">
                     <p className="text-sm text-muted-foreground">{tripDocs.filter(d=>d.checked).length}/{tripDocs.length} ready</p>
                     <Button size="sm" variant="outline" onClick={() => generateDocChecklist(trip)} disabled={loadingDocs}>
-                      {loadingDocs ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
+                      {loadingDocs ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Sparkles className="w-4 h-4 mr-1" />}
                       {tripDocs.length > 0 ? "Regenerate" : "Generate AI Checklist"}
                     </Button>
                   </div>
                   {tripDocs.slice(0, 4).map((d) => (
-                    <div key={d.id} className="flex items-center gap-2 py-1">
+                    <div key={d.id} className="flex items-center gap-3 py-1.5">
                       <input type="checkbox" checked={d.checked} onChange={() => toggleDoc(d.id)} className="rounded" />
                       <span className={`text-sm ${d.checked ? "line-through text-muted-foreground" : ""}`}>{d.label}</span>
-                      {d.expiring && <AlertTriangle className="w-3 h-3 text-amber-400" />}
+                      {d.expiring && <AlertTriangle className="w-4 h-4 text-amber-400" />}
                     </div>
                   ))}
                   {tripDocs.length > 4 && <p className="text-xs text-muted-foreground mt-1">+{tripDocs.length-4} more → Docs tab</p>}
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Package className="w-4 h-4" />Packing</CardTitle></CardHeader>
+                <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-3"><Package className="w-4 h-4" />Packing</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-4">
                     <p className="text-sm text-muted-foreground">{tripPacking.filter(p=>p.checked).length}/{tripPacking.length} packed</p>
                     <Button size="sm" variant="outline" onClick={() => generatePackingList(trip)} disabled={loadingPacking}>
-                      {loadingPacking ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
+                      {loadingPacking ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Sparkles className="w-4 h-4 mr-1" />}
                       {tripPacking.length > 0 ? "Regenerate" : "Generate AI List"}
                     </Button>
                   </div>
                   {tripPacking.length > 0 && (
-                    <div className="h-2 rounded-full bg-muted overflow-hidden mb-3">
+                    <div className="h-2 rounded-full bg-muted overflow-hidden mb-4">
                       <div className="h-full rounded-full bg-cyan-500 transition-all" style={{ width: `${tripPacking.length > 0 ? (tripPacking.filter(p=>p.checked).length / tripPacking.length) * 100 : 0}%` }} />
                     </div>
                   )}
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Clock className="w-4 h-4" />Timeline</CardTitle></CardHeader>
-                <CardContent className="space-y-2">
+                <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-3"><Clock className="w-4 h-4" />Timeline</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
                   {tripBookings.length === 0 ? <p className="text-sm text-muted-foreground">No bookings yet</p> : tripBookings.map((b) => (
-                    <div key={b.id} className="flex items-center gap-2 text-sm">
+                    <div key={b.id} className="flex items-center gap-3 text-sm">
                       <div className="w-2 h-2 rounded-full bg-cyan-500 shrink-0" />
                       <span className="text-muted-foreground text-xs">{b.date}</span>
                       <span className="font-medium truncate">{b.title}</span>
@@ -360,7 +360,7 @@ export function TravelDocsContent() {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><DollarSign className="w-4 h-4" />Expenses</CardTitle></CardHeader>
+                <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-3"><DollarSign className="w-4 h-4" />Expenses</CardTitle></CardHeader>
                 <CardContent>
                   <p className="text-3xl font-bold text-cyan-400">${totalExpenses.toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">across {tripExpenses.length} transactions</p>
@@ -371,30 +371,30 @@ export function TravelDocsContent() {
 
           {/* ── Docs ── */}
           {tripTab === "docs" && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Document Checklist</h3>
                 <Button size="sm" variant="outline" onClick={() => generateDocChecklist(trip)} disabled={loadingDocs}>
-                  {loadingDocs ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
+                  {loadingDocs ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Sparkles className="w-4 h-4 mr-1" />}
                   {tripDocs.length > 0 ? "Regenerate" : "Generate AI Checklist"}
                 </Button>
               </div>
               {tripDocs.length === 0 ? (
-                <div className="py-10 text-center text-muted-foreground"><FileText className="w-10 h-10 mx-auto mb-2 opacity-20" /><p>Click Generate to get AI-powered document checklist</p></div>
+                <div className="py-10 text-center text-muted-foreground"><FileText className="w-10 h-10 mx-auto mb-3 opacity-20" /><p>Click Generate to get AI-powered document checklist</p></div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {tripDocs.map((d) => (
-                    <div key={d.id} className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${d.checked ? "border-transparent bg-green-500/10" : "border-border"}`}>
+                    <div key={d.id} className={`flex items-start gap-4 p-4 rounded-xl border transition-colors ${d.checked ? "border-transparent bg-green-500/10" : "border-border"}`}>
                       <input type="checkbox" checked={d.checked} onChange={() => toggleDoc(d.id)} className="rounded mt-0.5" />
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <span className={`text-sm font-medium ${d.checked ? "line-through text-muted-foreground" : ""}`}>{d.label}</span>
-                          {d.expiring && <Badge variant="secondary" className="bg-amber-500/20 text-amber-400 text-xs"><AlertTriangle className="w-3 h-3 mr-1" />Check expiry</Badge>}
+                          {d.expiring && <Badge variant="secondary" className="bg-amber-500/20 text-amber-400 text-xs"><AlertTriangle className="w-4 h-4 mr-1" />Check expiry</Badge>}
                         </div>
                         {d.notes && <p className="text-xs text-muted-foreground mt-0.5">{d.notes}</p>}
                       </div>
-                      <Button variant="ghost" size="icon-sm" onClick={() => update((s) => ({ ...s, checklists: s.checklists.filter((c) => c.id !== d.id) }))}>
-                        <X className="w-3.5 h-3.5 text-muted-foreground" />
+                      <Button variant="ghost" size="icon" onClick={() => update((s) => ({ ...s, checklists: s.checklists.filter((c) => c.id !== d.id) }))}>
+                        <X className="w-4 h-4 text-muted-foreground" />
                       </Button>
                     </div>
                   ))}
@@ -405,18 +405,18 @@ export function TravelDocsContent() {
 
           {/* ── Bookings ── */}
           {tripTab === "bookings" && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Bookings</h3>
-                <Button size="sm" variant="outline" onClick={() => setShowBookingForm(!showBookingForm)}><Plus className="w-3.5 h-3.5 mr-1" /> Add Booking</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowBookingForm(!showBookingForm)}><Plus className="w-4 h-4 mr-1" /> Add Booking</Button>
               </div>
               {showBookingForm && (
                 <Card>
-                  <CardContent className="pt-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
+                  <CardContent className="pt-4 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-medium block mb-1">Type</label>
-                        <select value={bkType} onChange={(e) => setBkType(e.target.value as Booking["type"])} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                        <select value={bkType} onChange={(e) => setBkType(e.target.value as Booking["type"])} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                           {["flight","hotel","car","activity","other"].map((t) => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
                         </select>
                       </div>
@@ -425,7 +425,7 @@ export function TravelDocsContent() {
                         <Input placeholder="Delta DL 123 / Hotel XYZ" value={bkTitle} onChange={(e) => setBkTitle(e.target.value)} />
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className="text-xs font-medium block mb-1">Date *</label>
                         <Input type="date" value={bkDate} onChange={(e) => setBkDate(e.target.value)} />
@@ -439,7 +439,7 @@ export function TravelDocsContent() {
                         <Input placeholder="ABC123" value={bkCode} onChange={(e) => setBkCode(e.target.value)} />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-medium block mb-1">Price</label>
                         <Input type="number" placeholder="0.00" value={bkPrice} onChange={(e) => setBkPrice(e.target.value)} />
@@ -449,22 +449,22 @@ export function TravelDocsContent() {
                         <Input placeholder="https://..." value={bkUrl} onChange={(e) => setBkUrl(e.target.value)} />
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={addBooking}><Check className="w-3.5 h-3.5 mr-1" /> Save</Button>
+                    <div className="flex gap-3">
+                      <Button size="sm" onClick={addBooking}><Check className="w-4 h-4 mr-1" /> Save</Button>
                       <Button size="sm" variant="ghost" onClick={() => setShowBookingForm(false)}>Cancel</Button>
                     </div>
                   </CardContent>
                 </Card>
               )}
               {tripBookings.length === 0 && !showBookingForm ? (
-                <div className="py-10 text-center text-muted-foreground"><Clock className="w-10 h-10 mx-auto mb-2 opacity-20" /><p>No bookings yet</p></div>
+                <div className="py-10 text-center text-muted-foreground"><Clock className="w-10 h-10 mx-auto mb-3 opacity-20" /><p>No bookings yet</p></div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {tripBookings.map((b) => (
                     <Card key={b.id}>
-                      <CardContent className="py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center shrink-0">
+                      <CardContent className="py-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center shrink-0">
                             {b.type === "flight" ? <Plane className="w-4 h-4 text-cyan-400" /> : <MapPin className="w-4 h-4 text-cyan-400" />}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -473,9 +473,9 @@ export function TravelDocsContent() {
                             {b.confirmationCode && <p className="text-xs font-mono text-cyan-400">{b.confirmationCode}</p>}
                           </div>
                           {b.price && <p className="text-sm font-bold shrink-0">${b.price}</p>}
-                          {b.url && <a href={b.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground shrink-0"><ExternalLink className="w-3.5 h-3.5" /></a>}
-                          <Button variant="ghost" size="icon-sm" onClick={() => update((s) => ({ ...s, bookings: s.bookings.filter((x) => x.id !== b.id) }))}>
-                            <X className="w-3.5 h-3.5 text-muted-foreground" />
+                          {b.url && <a href={b.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground shrink-0"><ExternalLink className="w-4 h-4" /></a>}
+                          <Button variant="ghost" size="icon" onClick={() => update((s) => ({ ...s, bookings: s.bookings.filter((x) => x.id !== b.id) }))}>
+                            <X className="w-4 h-4 text-muted-foreground" />
                           </Button>
                         </div>
                       </CardContent>
@@ -488,16 +488,16 @@ export function TravelDocsContent() {
 
           {/* ── Packing ── */}
           {tripTab === "packing" && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Packing List</h3>
                 <Button size="sm" variant="outline" onClick={() => generatePackingList(trip)} disabled={loadingPacking}>
-                  {loadingPacking ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
+                  {loadingPacking ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Sparkles className="w-4 h-4 mr-1" />}
                   {tripPacking.length > 0 ? "Regenerate" : "Generate AI List"}
                 </Button>
               </div>
               {tripPacking.length > 0 && (
-                <div className="flex items-center gap-3 p-3 rounded-lg border border-cyan-500/30 bg-cyan-500/10">
+                <div className="flex items-center gap-4 p-4 rounded-xl border border-cyan-500/30 bg-cyan-500/10">
                   <Package className="w-4 h-4 text-cyan-400" />
                   <div className="flex-1">
                     <div className="flex justify-between mb-1">
@@ -511,18 +511,18 @@ export function TravelDocsContent() {
                 </div>
               )}
               {packingGroups.length === 0 ? (
-                <div className="py-10 text-center text-muted-foreground"><Package className="w-10 h-10 mx-auto mb-2 opacity-20" /><p>Click Generate for AI-powered packing list</p></div>
+                <div className="py-10 text-center text-muted-foreground"><Package className="w-10 h-10 mx-auto mb-3 opacity-20" /><p>Click Generate for AI-powered packing list</p></div>
               ) : (
                 packingGroups.map(([cat, items]) => (
                   <div key={cat} className="space-y-1">
                     <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{cat}</h4>
                     {items.map((p) => (
-                      <div key={p.id} className={`flex items-center gap-2 p-2 rounded-lg ${p.checked ? "opacity-50" : ""}`}>
+                      <div key={p.id} className={`flex items-center gap-3 p-3 rounded-xl ${p.checked ? "opacity-50" : ""}`}>
                         <input type="checkbox" checked={p.checked} onChange={() => togglePacking(p.id)} className="rounded shrink-0" />
                         <span className={`text-sm flex-1 ${p.checked ? "line-through text-muted-foreground" : ""}`}>{p.label}</span>
                         {p.qty && <span className="text-xs text-muted-foreground">×{p.qty}</span>}
-                        <Button variant="ghost" size="icon-sm" onClick={() => update((s) => ({ ...s, packingItems: s.packingItems.filter((x) => x.id !== p.id) }))}>
-                          <X className="w-3 h-3 text-muted-foreground" />
+                        <Button variant="ghost" size="icon" onClick={() => update((s) => ({ ...s, packingItems: s.packingItems.filter((x) => x.id !== p.id) }))}>
+                          <X className="w-4 h-4 text-muted-foreground" />
                         </Button>
                       </div>
                     ))}
@@ -534,15 +534,15 @@ export function TravelDocsContent() {
 
           {/* ── Expenses ── */}
           {tripTab === "expenses" && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Trip Expenses</h3>
-                <Button size="sm" variant="outline" onClick={() => setShowExpenseForm(!showExpenseForm)}><Plus className="w-3.5 h-3.5 mr-1" /> Log Expense</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowExpenseForm(!showExpenseForm)}><Plus className="w-4 h-4 mr-1" /> Log Expense</Button>
               </div>
               {showExpenseForm && (
                 <Card>
-                  <CardContent className="pt-4 space-y-3">
-                    <div className="grid grid-cols-3 gap-3">
+                  <CardContent className="pt-4 space-y-4">
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className="text-xs font-medium block mb-1">Amount *</label>
                         <Input type="number" placeholder="0.00" value={exAmount} onChange={(e) => setExAmount(e.target.value)} />
@@ -556,10 +556,10 @@ export function TravelDocsContent() {
                         <Input type="date" value={exDate} onChange={(e) => setExDate(e.target.value)} />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-medium block mb-1">Category</label>
-                        <select value={exCat} onChange={(e) => setExCat(e.target.value as ExpenseCat)} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                        <select value={exCat} onChange={(e) => setExCat(e.target.value as ExpenseCat)} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                           {EXPENSE_CATS.map((c) => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                         </select>
                       </div>
@@ -568,8 +568,8 @@ export function TravelDocsContent() {
                         <Input placeholder="Dinner at..." value={exNotes} onChange={(e) => setExNotes(e.target.value)} />
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={addExpense}><Check className="w-3.5 h-3.5 mr-1" /> Save</Button>
+                    <div className="flex gap-3">
+                      <Button size="sm" onClick={addExpense}><Check className="w-4 h-4 mr-1" /> Save</Button>
                       <Button size="sm" variant="ghost" onClick={() => setShowExpenseForm(false)}>Cancel</Button>
                     </div>
                   </CardContent>
@@ -582,18 +582,18 @@ export function TravelDocsContent() {
                 </CardContent>
               </Card>
               {tripExpenses.length === 0 ? (
-                <div className="py-8 text-center text-muted-foreground"><DollarSign className="w-10 h-10 mx-auto mb-2 opacity-20" /><p>No expenses yet</p></div>
+                <div className="py-8 text-center text-muted-foreground"><DollarSign className="w-10 h-10 mx-auto mb-3 opacity-20" /><p>No expenses yet</p></div>
               ) : (
                 <div className="space-y-1 rounded-xl border overflow-hidden divide-y">
                   {tripExpenses.sort((a,b) => b.date.localeCompare(a.date)).map((e) => (
-                    <div key={e.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 group">
+                    <div key={e.id} className="flex items-center gap-4 px-4 py-4 hover:bg-muted/30 group">
                       <div className="flex-1">
                         <p className={`text-sm font-medium ${CAT_COLORS[e.category]}`}>{e.category.charAt(0).toUpperCase() + e.category.slice(1)}</p>
                         <p className="text-xs text-muted-foreground">{e.date}{e.notes ? ` · ${e.notes}` : ""}</p>
                       </div>
                       <p className="text-sm font-bold">{e.currency} {e.amount.toFixed(2)}</p>
-                      <Button variant="ghost" size="icon-sm" onClick={() => update((s) => ({ ...s, expenses: s.expenses.filter((x) => x.id !== e.id) }))} className="opacity-0 group-hover:opacity-100">
-                        <X className="w-3.5 h-3.5 text-muted-foreground" />
+                      <Button variant="ghost" size="icon" onClick={() => update((s) => ({ ...s, expenses: s.expenses.filter((x) => x.id !== e.id) }))} className="opacity-0 group-hover:opacity-100">
+                        <X className="w-4 h-4 text-muted-foreground" />
                       </Button>
                     </div>
                   ))}
@@ -604,9 +604,9 @@ export function TravelDocsContent() {
 
           {/* Emergency Info */}
           <Card className="border-red-500/30">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2 text-red-400"><AlertTriangle className="w-4 h-4" />Emergency Info Card</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              <div className="grid grid-cols-2 gap-3">
+            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-3 text-red-400"><AlertTriangle className="w-4 h-4" />Emergency Info Card</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-4">
                 {[
                   { label: "Emergency Number", key: "emergencyNumber" as const, placeholder: "112 / 911" },
                   { label: "Embassy Contact", key: "embassyContact" as const, placeholder: "+1 202-xxx-xxxx" },
@@ -637,7 +637,7 @@ export function TravelDocsContent() {
           {/* Gmail parsing teaser */}
           <Card className="border-dashed opacity-60">
             <CardContent className="py-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <Badge variant="secondary" className="bg-amber-500/20 text-amber-400 text-xs">Coming Soon</Badge>
                 <div>
                   <p className="text-sm font-medium">Gmail Auto-Import</p>
@@ -661,11 +661,11 @@ export function TravelDocsContent() {
         badge="Travel"
         actions={
           <Button size="sm" onClick={() => setShowNewTrip(!showNewTrip)}>
-            <Plus className="w-3.5 h-3.5 mr-1" /> New Trip
+            <Plus className="w-4 h-4 mr-1" /> New Trip
           </Button>
         }
       />
-      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-6">
+      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-bold">Travel Docs</h1>
@@ -677,8 +677,8 @@ export function TravelDocsContent() {
         {showNewTrip && (
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-sm">New Trip</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium block mb-1">Destination *</label>
                   <Input placeholder="Tokyo, Japan" value={ntDest} onChange={(e) => setNtDest(e.target.value)} />
@@ -688,7 +688,7 @@ export function TravelDocsContent() {
                   <Input placeholder="USA" value={ntOrigin} onChange={(e) => setNtOrigin(e.target.value)} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium block mb-1">Departure *</label>
                   <Input type="date" value={ntDepart} onChange={(e) => setNtDepart(e.target.value)} />
@@ -698,22 +698,22 @@ export function TravelDocsContent() {
                   <Input type="date" value={ntReturn} onChange={(e) => setNtReturn(e.target.value)} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium block mb-1">Purpose</label>
-                  <select value={ntPurpose} onChange={(e) => setNtPurpose(e.target.value as TripPurpose)} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                  <select value={ntPurpose} onChange={(e) => setNtPurpose(e.target.value as TripPurpose)} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                     {(["leisure","business","backpacking"] as TripPurpose[]).map((p) => <option key={p} value={p}>{PURPOSE_LABELS[p]}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-medium block mb-1">Status</label>
-                  <select value={ntStatus} onChange={(e) => setNtStatus(e.target.value as TripStatus)} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                  <select value={ntStatus} onChange={(e) => setNtStatus(e.target.value as TripStatus)} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                     {(["planning","booked","completed"] as TripStatus[]).map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
                   </select>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button size="sm" onClick={createTrip}><Plane className="w-3.5 h-3.5 mr-1" /> Create Trip</Button>
+              <div className="flex gap-3">
+                <Button size="sm" onClick={createTrip}><Plane className="w-4 h-4 mr-1" /> Create Trip</Button>
                 <Button size="sm" variant="ghost" onClick={() => setShowNewTrip(false)}>Cancel</Button>
               </div>
             </CardContent>
@@ -721,13 +721,13 @@ export function TravelDocsContent() {
         )}
 
         {/* Tab bar */}
-        <div className="flex gap-1 p-1 bg-muted/50 rounded-lg w-fit">
+        <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl w-fit">
           {([
             { key: "trips" as MainTab, label: "My Trips" },
             { key: "packing" as MainTab, label: "Packing Templates" },
           ]).map((t) => (
             <button key={t.key} onClick={() => setMainTab(t.key)}
-              className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${mainTab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              className={`px-4 py-2 text-sm rounded-md font-medium transition-colors ${mainTab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
               {t.label}
             </button>
           ))}
@@ -737,10 +737,10 @@ export function TravelDocsContent() {
           <>
             {store.trips.length === 0 ? (
               <div className="py-16 text-center text-muted-foreground">
-                <Plane className="w-14 h-14 mx-auto mb-4 opacity-20" />
-                <p className="font-medium text-foreground text-lg">No trips yet</p>
+                <Plane className="w-14 h-14 mx-auto mb-5 opacity-20" />
+                <p className="font-medium text-foreground text-xl">No trips yet</p>
                 <p className="text-sm mt-1">Create your first trip to start organizing your travel documents</p>
-                <Button className="mt-4" size="sm" onClick={() => setShowNewTrip(true)}><Plus className="w-3.5 h-3.5 mr-1" /> New Trip</Button>
+                <Button className="mt-4" size="sm" onClick={() => setShowNewTrip(true)}><Plus className="w-4 h-4 mr-1" /> New Trip</Button>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-4">
@@ -754,12 +754,12 @@ export function TravelDocsContent() {
 
         {mainTab === "packing" && (
           <div className="py-10 text-center text-muted-foreground">
-            <Package className="w-10 h-10 mx-auto mb-2 opacity-20" />
+            <Package className="w-10 h-10 mx-auto mb-3 opacity-20" />
             <p>Packing templates are auto-saved when you generate AI lists for a trip.</p>
             {store.packingTemplates.length === 0 ? <p className="text-sm mt-1">No templates yet</p> : (
-              <div className="mt-4 text-left space-y-2 max-w-sm mx-auto">
+              <div className="mt-4 text-left space-y-3 max-w-sm mx-auto">
                 {store.packingTemplates.map((t) => (
-                  <div key={t.id} className="flex items-center justify-between p-3 rounded-lg border">
+                  <div key={t.id} className="flex items-center justify-between p-4 rounded-xl border">
                     <span className="text-sm font-medium text-foreground">{t.name}</span>
                     <span className="text-xs text-muted-foreground">{t.items.length} items</span>
                   </div>
@@ -778,7 +778,7 @@ function _CollapsibleSection({ title, children }: { title: string; children: Rea
   const [open, setOpen] = useState(true)
   return (
     <div>
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-2 text-sm font-semibold w-full text-left py-1">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-3 text-sm font-semibold w-full text-left py-1.5">
         {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         {title}
       </button>

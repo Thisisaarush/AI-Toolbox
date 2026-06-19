@@ -313,12 +313,12 @@ export function WorkoutLogContent() {
         color="text-orange-500"
         badge="Personal"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {view !== "sessions" && view !== "log" && view !== "programs" && view !== "progress" ? (
               <Button variant="outline" size="sm" onClick={() => setView("sessions")}>← Back</Button>
             ) : null}
             <Button variant="outline" size="sm" onClick={() => setView("add-session")}>
-              <Plus className="w-3.5 h-3.5 mr-1" /> Log Workout
+              <Plus className="w-4 h-4 mr-1" /> Log Workout
             </Button>
           </div>
         }
@@ -326,12 +326,12 @@ export function WorkoutLogContent() {
 
       {/* Nav tabs */}
       <div className="border-b bg-background/95 sticky top-14 z-40 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 flex gap-1 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-4 flex gap-1.5 overflow-x-auto">
           {(["sessions", "programs", "progress"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setView(tab)}
-              className={`px-4 py-3 text-sm font-medium capitalize whitespace-nowrap border-b-2 transition-colors ${
+              className={`px-4 py-4 text-sm font-medium capitalize whitespace-nowrap border-b-2 transition-colors ${
                 view === tab
                   ? "border-orange-500 text-orange-500"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -347,11 +347,11 @@ export function WorkoutLogContent() {
 
         {/* ── Add Session ── */}
         {view === "add-session" && (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <h1 className="text-2xl font-bold">Log Workout</h1>
+          <div className="max-w-2xl mx-auto space-y-8">
+            <h1 className="text-3xl font-bold">Log Workout</h1>
             <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+              <CardContent className="pt-6 space-y-5">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Date</label>
                     <Input type="date" value={sessionDate} onChange={(e) => setSessionDate(e.target.value)} />
@@ -371,25 +371,25 @@ export function WorkoutLogContent() {
             {/* Exercise picker */}
             <Card>
               <CardHeader><CardTitle className="text-sm">Add Exercises</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
                 <Input
                   placeholder="Search exercises (e.g. Bench, Legs)..."
                   value={exerciseSearch}
                   onChange={(e) => setExerciseSearch(e.target.value)}
                 />
-                <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
                   {filteredExercises.map((ex) => (
                     <button
                       key={ex.id}
                       onClick={() => addExerciseToSession(ex)}
-                      className="flex items-center gap-2 p-2 rounded-lg border hover:bg-muted/50 text-left text-sm transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-xl border hover:bg-muted/50 text-left text-sm transition-colors"
                     >
-                      <Plus className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                      <Plus className="w-4 h-4 text-orange-500 shrink-0" />
                       <span className="truncate">{ex.name}</span>
                     </button>
                   ))}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   {showAddExercise ? (
                     <>
                       <Input
@@ -400,12 +400,12 @@ export function WorkoutLogContent() {
                       />
                       <Button size="sm" onClick={addCustomExercise}>Add</Button>
                       <Button size="sm" variant="ghost" onClick={() => setShowAddExercise(false)}>
-                        <X className="w-3.5 h-3.5" />
+                        <X className="w-4 h-4" />
                       </Button>
                     </>
                   ) : (
                     <Button size="sm" variant="ghost" onClick={() => setShowAddExercise(true)}>
-                      <Plus className="w-3.5 h-3.5 mr-1" /> Custom Exercise
+                      <Plus className="w-4 h-4 mr-1" /> Custom Exercise
                     </Button>
                   )}
                 </div>
@@ -424,7 +424,7 @@ export function WorkoutLogContent() {
                         <CardTitle className="text-sm">{ex?.name ?? se.exerciseId}</CardTitle>
                         <div className="flex gap-1 mt-1 flex-wrap">
                           {ex?.muscleGroups.map((mg) => (
-                            <span key={mg} className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${MUSCLE_GROUP_COLORS[mg as MuscleGroup]}`}>
+                            <span key={mg} className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${MUSCLE_GROUP_COLORS[mg as MuscleGroup]}`}>
                               {mg}
                             </span>
                           ))}
@@ -435,9 +435,9 @@ export function WorkoutLogContent() {
                       </button>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-2">
+                  <CardContent className="space-y-3">
                     {se.sets.map((set, i) => (
-                      <div key={set.id} className="flex items-center gap-2">
+                      <div key={set.id} className="flex items-center gap-3">
                         <span className="text-xs text-muted-foreground w-8">Set {i + 1}</span>
                         {isCardio ? (
                           <>
@@ -478,7 +478,7 @@ export function WorkoutLogContent() {
                       </div>
                     ))}
                     <Button size="sm" variant="ghost" onClick={() => addSet(se.exerciseId)}>
-                      <Plus className="w-3.5 h-3.5 mr-1" /> Add Set
+                      <Plus className="w-4 h-4 mr-1" /> Add Set
                     </Button>
                   </CardContent>
                 </Card>
@@ -506,10 +506,10 @@ export function WorkoutLogContent() {
             {/* Strava Import */}
             <Card>
               <CardContent className="pt-5">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-medium">Connect Strava</p>
                   <Button size="sm" variant="outline" onClick={() => setShowStravaForm((v) => !v)}>
-                    <ExternalLink className="w-3.5 h-3.5 mr-1" /> Import Activities
+                    <ExternalLink className="w-4 h-4 mr-1" /> Import Activities
                   </Button>
                 </div>
                 {showStravaForm && (
@@ -523,7 +523,7 @@ export function WorkoutLogContent() {
                       description="Allows read access to your Strava activities (runs, rides, swims, etc.)."
                     />
                     <Button size="sm" onClick={importStrava} disabled={stravaLoading}>
-                      {stravaLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : null}
+                      {stravaLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
                       Import from Strava
                     </Button>
                   </div>
@@ -535,21 +535,21 @@ export function WorkoutLogContent() {
 
         {/* ── Sessions ── */}
         {view === "sessions" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <h1 className="text-2xl font-bold">Workout Log</h1>
+              <h1 className="text-3xl font-bold">Workout Log</h1>
               <p className="text-muted-foreground text-sm">{sessions.length} sessions tracked</p>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {[
                 { label: "Weekly Volume", value: `${Math.round(volumeStats.weekly).toLocaleString()} kg`, icon: TrendingUp, color: "text-orange-500" },
                 { label: "Total Sessions", value: String(volumeStats.totalSessions), icon: Calendar, color: "text-blue-500" },
                 { label: "PRs Set", value: String(prs.length), icon: Trophy, color: "text-amber-500" },
               ].map((s) => (
                 <Card key={s.label} size="sm">
-                  <CardContent className="py-3 flex items-center gap-3">
+                  <CardContent className="py-4 flex items-center gap-4">
                     <s.icon className={`w-4 h-4 ${s.color} shrink-0`} />
                     <div>
                       <p className="text-lg font-bold leading-none">{s.value}</p>
@@ -563,16 +563,16 @@ export function WorkoutLogContent() {
             {sessions.length === 0 ? (
               <Card className="max-w-md mx-auto mt-12">
                 <CardContent className="py-16 text-center">
-                  <Dumbbell className="w-14 h-14 mx-auto mb-4 text-muted-foreground opacity-40" />
-                  <h2 className="text-xl font-semibold mb-2">No workouts yet</h2>
-                  <p className="text-muted-foreground text-sm mb-6">Start tracking your training sessions.</p>
+                  <Dumbbell className="w-14 h-14 mx-auto mb-5 text-muted-foreground opacity-40" />
+                  <h2 className="text-2xl font-semibold mb-3">No workouts yet</h2>
+                  <p className="text-muted-foreground text-sm mb-8">Start tracking your training sessions.</p>
                   <Button onClick={() => setView("add-session")}>
                     <Plus className="w-4 h-4 mr-1" /> Log First Workout
                   </Button>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {sessions.map((session) => {
                   const muscleGroupsHit = new Set(
                     session.exercises.flatMap((se) => {
@@ -588,23 +588,23 @@ export function WorkoutLogContent() {
                       className="cursor-pointer hover:shadow-md transition-shadow"
                       onClick={() => { setSelectedSessionId(session.id); setView("session-detail") }}
                     >
-                      <CardContent className="py-4 flex items-center gap-4">
+                      <CardContent className="py-5 flex items-center gap-5">
                         <div className="shrink-0 text-center w-12">
                           <p className="text-xs font-medium text-orange-500">{new Date(session.date + "T00:00:00").toLocaleDateString("en-US", { month: "short" })}</p>
                           <p className="text-xl font-bold leading-none">{new Date(session.date + "T00:00:00").getDate()}</p>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             <p className="font-medium text-sm">{session.name ?? `${session.exercises.length} exercises`}</p>
                             {session.prsAchieved && session.prsAchieved.length > 0 && (
-                              <Badge className="text-[10px] bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
+                              <Badge className="text-xs bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
                                 <Trophy className="w-2.5 h-2.5 mr-0.5" /> PR
                               </Badge>
                             )}
                           </div>
                           <div className="flex flex-wrap gap-1 mt-1.5">
                             {Array.from(muscleGroupsHit).slice(0, 4).map((mg) => (
-                              <span key={mg} className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${MUSCLE_GROUP_COLORS[mg as MuscleGroup]}`}>
+                              <span key={mg} className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${MUSCLE_GROUP_COLORS[mg as MuscleGroup]}`}>
                                 {mg}
                               </span>
                             ))}
@@ -613,8 +613,8 @@ export function WorkoutLogContent() {
                         <div className="text-right shrink-0">
                           {totalVol > 0 && <p className="text-sm font-semibold">{Math.round(totalVol).toLocaleString()} kg</p>}
                           {session.durationMinutes && (
-                            <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
-                              <Clock className="w-3 h-3" /> {session.durationMinutes}m
+                            <p className="text-xs text-muted-foreground flex items-center gap-1.5 justify-end">
+                              <Clock className="w-4 h-4" /> {session.durationMinutes}m
                             </p>
                           )}
                         </div>
@@ -630,10 +630,10 @@ export function WorkoutLogContent() {
 
         {/* ── Session Detail ── */}
         {view === "session-detail" && selectedSession && (
-          <div className="max-w-2xl mx-auto space-y-4">
+          <div className="max-w-2xl mx-auto space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">{selectedSession.name ?? "Workout"}</h1>
+                <h1 className="text-3xl font-bold">{selectedSession.name ?? "Workout"}</h1>
                 <p className="text-muted-foreground text-sm">{new Date(selectedSession.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
               </div>
               <Button
@@ -644,12 +644,12 @@ export function WorkoutLogContent() {
                   setView("sessions"); toast.success("Session deleted")
                 }}
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </Button>
             </div>
 
             {selectedSession.prsAchieved && selectedSession.prsAchieved.length > 0 && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
                 <Trophy className="w-4 h-4 text-amber-500" />
                 <p className="text-sm text-amber-700 dark:text-amber-300 font-medium">
                   New PR! {selectedSession.prsAchieved.map((id) => allExercises.find((e) => e.id === id)?.name).join(", ")}
@@ -674,9 +674,9 @@ export function WorkoutLogContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       {se.sets.map((set, i) => (
-                        <div key={set.id} className="flex gap-4 text-sm py-0.5">
+                        <div key={set.id} className="flex gap-5 text-sm py-0.5">
                           <span className="text-muted-foreground w-12">Set {i + 1}</span>
                           {isCardio ? (
                             <>
@@ -697,25 +697,25 @@ export function WorkoutLogContent() {
               )
             })}
             {selectedSession.notes && (
-              <Card><CardContent className="py-3 text-sm text-muted-foreground">{selectedSession.notes}</CardContent></Card>
+              <Card><CardContent className="py-4 text-sm text-muted-foreground">{selectedSession.notes}</CardContent></Card>
             )}
           </div>
         )}
 
         {/* ── Programs ── */}
         {view === "programs" && (
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Workout Programs</h1>
+          <div className="space-y-8">
+            <h1 className="text-3xl font-bold">Workout Programs</h1>
 
             {/* AI Generator */}
             <Card>
-              <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Sparkles className="w-4 h-4 text-orange-500" /> AI Program Generator</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+              <CardHeader><CardTitle className="text-sm flex items-center gap-3"><Sparkles className="w-4 h-4 text-orange-500" /> AI Program Generator</CardTitle></CardHeader>
+              <CardContent className="space-y-5">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Goal</label>
                     <select value={genGoal} onChange={(e) => setGenGoal(e.target.value as Goal)}
-                      className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+                      className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm">
                       <option value="strength">Strength</option>
                       <option value="muscle">Muscle</option>
                       <option value="endurance">Endurance</option>
@@ -729,7 +729,7 @@ export function WorkoutLogContent() {
                   <div>
                     <label className="text-xs font-medium mb-1 block">Equipment</label>
                     <select value={genEquipment} onChange={(e) => setGenEquipment(e.target.value as Equipment)}
-                      className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+                      className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm">
                       <option value="gym">Full Gym</option>
                       <option value="home">Home (Dumbbells)</option>
                       <option value="minimal">Minimal</option>
@@ -738,7 +738,7 @@ export function WorkoutLogContent() {
                   <div>
                     <label className="text-xs font-medium mb-1 block">Experience</label>
                     <select value={genExperience} onChange={(e) => setGenExperience(e.target.value as Experience)}
-                      className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+                      className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm">
                       <option value="beginner">Beginner</option>
                       <option value="intermediate">Intermediate</option>
                       <option value="advanced">Advanced</option>
@@ -746,25 +746,25 @@ export function WorkoutLogContent() {
                   </div>
                 </div>
                 <Button onClick={generateProgram} disabled={genLoading}>
-                  {genLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Sparkles className="w-3.5 h-3.5 mr-2" />}
+                  {genLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
                   Generate Program
                 </Button>
               </CardContent>
             </Card>
 
             {programs.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {programs.map((p) => (
                   <Card
                     key={p.id}
                     className="cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => { setSelectedProgramId(p.id); setView("program-detail") }}
                   >
-                    <CardContent className="py-4 flex items-center gap-4">
+                    <CardContent className="py-5 flex items-center gap-5">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <p className="font-medium text-sm">{p.name}</p>
-                          {p.isAiGenerated && <Badge variant="secondary" className="text-[10px]"><Sparkles className="w-2.5 h-2.5 mr-0.5" /> AI</Badge>}
+                          {p.isAiGenerated && <Badge variant="secondary" className="text-xs"><Sparkles className="w-2.5 h-2.5 mr-0.5" /> AI</Badge>}
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5 capitalize">
                           {p.goal} · {p.daysPerWeek} days/week · {p.days.length} training days
@@ -781,26 +781,26 @@ export function WorkoutLogContent() {
 
         {/* ── Program Detail ── */}
         {view === "program-detail" && selectedProgram && (
-          <div className="max-w-2xl mx-auto space-y-4">
+          <div className="max-w-2xl mx-auto space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">{selectedProgram.name}</h1>
+                <h1 className="text-3xl font-bold">{selectedProgram.name}</h1>
                 <p className="text-muted-foreground text-sm capitalize">{selectedProgram.goal} · {selectedProgram.daysPerWeek} days/week</p>
               </div>
               <Button variant="destructive" size="sm" onClick={() => {
                 setPrograms((prev) => prev.filter((p) => p.id !== selectedProgram.id))
                 setView("programs"); toast.success("Program deleted")
               }}>
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </Button>
             </div>
             {selectedProgram.days.map((day, i) => (
               <Card key={i}>
                 <CardHeader><CardTitle className="text-sm">{day.name}</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {day.exercises.map((ex, j) => (
-                      <div key={j} className="flex items-center justify-between text-sm py-1 border-b last:border-0">
+                      <div key={j} className="flex items-center justify-between text-sm py-1.5 border-b last:border-0">
                         <span>{allExercises.find((e) => e.id === ex.exerciseId)?.name ?? ex.exerciseId}</span>
                         <span className="text-muted-foreground">{ex.targetSets} × {ex.targetReps} · {ex.restSeconds}s rest</span>
                       </div>
@@ -814,19 +814,19 @@ export function WorkoutLogContent() {
 
         {/* ── Progress ── */}
         {view === "progress" && (
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Progress</h1>
+          <div className="space-y-8">
+            <h1 className="text-3xl font-bold">Progress</h1>
 
             {/* PRs */}
             {prs.length > 0 && (
               <Card>
-                <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Trophy className="w-4 h-4 text-amber-500" /> Personal Records</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-sm flex items-center gap-3"><Trophy className="w-4 h-4 text-amber-500" /> Personal Records</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {prs.sort((a, b) => b.weight1RM - a.weight1RM).map((pr) => {
                       const ex = allExercises.find((e) => e.id === pr.exerciseId)
                       return (
-                        <div key={pr.exerciseId} className="flex items-center justify-between py-1.5 text-sm border-b last:border-0">
+                        <div key={pr.exerciseId} className="flex items-center justify-between py-2 text-sm border-b last:border-0">
                           <span>{ex?.name ?? pr.exerciseId}</span>
                           <div className="text-right">
                             <span className="font-semibold">{pr.maxWeight} kg × {pr.maxReps}</span>
@@ -849,12 +849,12 @@ export function WorkoutLogContent() {
               return (
                 <Card key={pr.exerciseId}>
                   <CardHeader>
-                    <CardTitle className="text-sm flex items-center gap-2">
+                    <CardTitle className="text-sm flex items-center gap-3">
                       <BarChart3 className="w-4 h-4 text-orange-500" /> {ex?.name ?? pr.exerciseId} — Weight Progress
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-end gap-1 h-24">
+                    <div className="flex items-end gap-1.5 h-24">
                       {data.map((d, i) => (
                         <div key={i} className="flex-1 flex flex-col items-center gap-0.5 group">
                           <div
@@ -862,7 +862,7 @@ export function WorkoutLogContent() {
                             style={{ height: `${(d.weight / maxW) * 88}px` }}
                           />
                           {i === 0 || i === data.length - 1 ? (
-                            <span className="text-[9px] text-muted-foreground hidden group-first:block group-last:block">
+                            <span className="text-[10px] text-muted-foreground hidden group-first:block group-last:block">
                               {d.date.slice(5)}
                             </span>
                           ) : null}
@@ -886,9 +886,9 @@ export function WorkoutLogContent() {
               ))
               return (
                 <Card>
-                  <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Flame className="w-4 h-4 text-orange-500" /> Volume per Session (last 8)</CardTitle></CardHeader>
+                  <CardHeader><CardTitle className="text-sm flex items-center gap-3"><Flame className="w-4 h-4 text-orange-500" /> Volume per Session (last 8)</CardTitle></CardHeader>
                   <CardContent>
-                    <div className="flex items-end gap-2 h-24">
+                    <div className="flex items-end gap-3 h-24">
                       {last8.map((s, i) => {
                         const vol = s.exercises.reduce((acc, e) =>
                           acc + e.sets.reduce((b, st) => b + ((st.weight ?? 0) * (st.reps ?? 0)), 0), 0)
@@ -898,7 +898,7 @@ export function WorkoutLogContent() {
                               className="w-full bg-blue-500/70 rounded-t hover:bg-blue-500 transition-colors"
                               style={{ height: maxVol > 0 ? `${(vol / maxVol) * 88}px` : "4px" }}
                             />
-                            <span className="text-[9px] text-muted-foreground">{s.date.slice(5)}</span>
+                            <span className="text-[10px] text-muted-foreground">{s.date.slice(5)}</span>
                           </div>
                         )
                       })}

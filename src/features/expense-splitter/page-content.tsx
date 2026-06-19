@@ -210,19 +210,19 @@ export function ExpenseSplitterContent() {
           color="text-lime-500"
           badge="Finance"
           actions={
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button variant="outline" size="sm" onClick={() => { setSelectedGroup(null); setTab("expenses") }}>← Back</Button>
-              <Button variant="outline" size="sm" onClick={exportCSV}><Download className="w-3.5 h-3.5 mr-1" /> CSV</Button>
+              <Button variant="outline" size="sm" onClick={exportCSV}><Download className="w-4 h-4 mr-1" /> CSV</Button>
               <Button variant="outline" size="sm" onClick={exportPrint}>Print</Button>
             </div>
           }
         />
-        <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-6">
+        <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
           {/* Group info */}
-          <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-start justify-between gap-5 flex-wrap">
             <div>
               <h1 className="text-3xl font-bold">{selectedGroup.name}</h1>
-              <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <div className="flex items-center gap-3 mt-1 flex-wrap">
                 {selectedGroup.members.map((m) => <Badge key={m.id} variant="secondary" className="text-xs">{m.name}</Badge>)}
               </div>
             </div>
@@ -235,10 +235,10 @@ export function ExpenseSplitterContent() {
           {/* Settlements summary card */}
           {settlementsNeeded.length > 0 && (
             <Card className="border-lime-500/30 bg-lime-500/5">
-              <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2 text-lime-400">💸 Who Owes What</CardTitle></CardHeader>
-              <CardContent className="space-y-2">
+              <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-3 text-lime-400">💸 Who Owes What</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
                 {settlementsNeeded.map((s, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-background border">
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-background border">
                     <div className="flex-1">
                       <span className="font-bold">{s.from.name}</span>
                       <span className="text-muted-foreground mx-2">pays</span>
@@ -246,24 +246,24 @@ export function ExpenseSplitterContent() {
                     </div>
                     <span className="text-xl font-black text-lime-400">{selectedGroup.currency} {s.amount.toFixed(2)}</span>
                     <Button size="sm" variant="outline" onClick={() => markSettlement(s.from.id, s.to.id)}>
-                      <Check className="w-3.5 h-3.5 mr-1" /> Mark Paid
+                      <Check className="w-4 h-4 mr-1" /> Mark Paid
                     </Button>
                   </div>
                 ))}
                 <Button size="sm" variant="ghost" onClick={settleGroup} className="text-muted-foreground mt-2">
-                  <Archive className="w-3.5 h-3.5 mr-1" /> Archive Group (all settled)
+                  <Archive className="w-4 h-4 mr-1" /> Archive Group (all settled)
                 </Button>
               </CardContent>
             </Card>
           )}
           {settlementsNeeded.length === 0 && groupExpenses.length > 0 && (
             <Card className="border-green-500/30 bg-green-500/5">
-              <CardContent className="py-3">
-                <div className="flex items-center gap-2">
+              <CardContent className="py-4">
+                <div className="flex items-center gap-3">
                   <Check className="w-4 h-4 text-green-400" />
                   <p className="text-sm font-medium text-green-400">All settled up!</p>
                   <Button size="sm" variant="ghost" onClick={settleGroup} className="ml-auto">
-                    <Archive className="w-3.5 h-3.5 mr-1" /> Archive Group
+                    <Archive className="w-4 h-4 mr-1" /> Archive Group
                   </Button>
                 </div>
               </CardContent>
@@ -271,14 +271,14 @@ export function ExpenseSplitterContent() {
           )}
 
           {/* Tab bar */}
-          <div className="flex gap-1 p-1 bg-muted/50 rounded-lg">
+          <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl">
             {([
               { key: "expenses" as Tab, label: `Expenses (${groupExpenses.length})` },
               { key: "settlements" as Tab, label: `Settle (${settlementsNeeded.length})` },
               { key: "summary" as Tab, label: "Summary" },
             ]).map((t) => (
               <button key={t.key} onClick={() => setTab(t.key)}
-                className={`flex-1 py-1.5 text-sm rounded-md font-medium transition-colors ${tab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                className={`flex-1 py-2 text-sm rounded-md font-medium transition-colors ${tab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                 {t.label}
               </button>
             ))}
@@ -286,21 +286,21 @@ export function ExpenseSplitterContent() {
 
           {/* ── Expenses ── */}
           {tab === "expenses" && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">{groupExpenses.length} expenses</p>
-                <Button size="sm" onClick={() => setShowExpenseForm(!showExpenseForm)}><Plus className="w-3.5 h-3.5 mr-1" /> Add Expense</Button>
+                <Button size="sm" onClick={() => setShowExpenseForm(!showExpenseForm)}><Plus className="w-4 h-4 mr-1" /> Add Expense</Button>
               </div>
 
               {showExpenseForm && (
                 <Card className="border-lime-500/30">
-                  <CardContent className="pt-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
+                  <CardContent className="pt-4 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-medium block mb-1">Description *</label>
                         <Input value={exDesc} onChange={(e) => setExDesc(e.target.value)} placeholder="Dinner, Uber, Hotel..." />
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="text-xs font-medium block mb-1">Amount *</label>
                           <Input type="number" value={exAmount} onChange={(e) => setExAmount(e.target.value)} placeholder="0.00" />
@@ -311,10 +311,10 @@ export function ExpenseSplitterContent() {
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className="text-xs font-medium block mb-1">Paid by</label>
-                        <select value={exPaidBy} onChange={(e) => setExPaidBy(e.target.value)} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                        <select value={exPaidBy} onChange={(e) => setExPaidBy(e.target.value)} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                           {selectedGroup.members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                         </select>
                       </div>
@@ -325,7 +325,7 @@ export function ExpenseSplitterContent() {
                           setExSplitType(st)
                           if (st === "percentage") setExAllocations(selectedGroup.members.map((m) => ({ memberId: m.id, value: Math.floor(100 / selectedGroup.members.length) })))
                           if (st === "fixed") setExAllocations(selectedGroup.members.map((m) => ({ memberId: m.id, value: 0 })))
-                        }} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                        }} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                           <option value="equal">Equal split</option>
                           <option value="percentage">Percentage split</option>
                           <option value="fixed">Fixed amounts</option>
@@ -334,7 +334,7 @@ export function ExpenseSplitterContent() {
                       </div>
                       <div>
                         <label className="text-xs font-medium block mb-1">Category</label>
-                        <select value={exCategory} onChange={(e) => setExCategory(e.target.value as ExpenseCategory)} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                        <select value={exCategory} onChange={(e) => setExCategory(e.target.value as ExpenseCategory)} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                           {CATEGORIES.map((c) => <option key={c} value={c}>{CAT_EMOJI[c]} {c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                         </select>
                       </div>
@@ -342,12 +342,12 @@ export function ExpenseSplitterContent() {
 
                     {/* Allocation fields */}
                     {(exSplitType === "percentage" || exSplitType === "fixed") && (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <p className="text-xs font-medium">{exSplitType === "percentage" ? "Percentages (must sum to 100%)" : `Fixed amounts (must sum to ${parseFloat(exAmount || "0").toFixed(2)})`}</p>
                         {selectedGroup.members.map((m) => {
                           const alloc = exAllocations.find((a) => a.memberId === m.id)
                           return (
-                            <div key={m.id} className="flex items-center gap-2">
+                            <div key={m.id} className="flex items-center gap-3">
                               <span className="text-sm w-24">{m.name}</span>
                               <Input type="number" className="w-24" value={alloc?.value ?? 0} onChange={(e) => {
                                 setExAllocations((prev) => prev.map((a) => a.memberId === m.id ? { ...a, value: parseFloat(e.target.value) || 0 } : a))
@@ -360,8 +360,8 @@ export function ExpenseSplitterContent() {
                     )}
 
                     <Input type="date" value={exDate} onChange={(e) => setExDate(e.target.value)} className="w-48" />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={addExpense}><Check className="w-3.5 h-3.5 mr-1" /> Add</Button>
+                    <div className="flex gap-3">
+                      <Button size="sm" onClick={addExpense}><Check className="w-4 h-4 mr-1" /> Add</Button>
                       <Button size="sm" variant="ghost" onClick={() => setShowExpenseForm(false)}>Cancel</Button>
                     </div>
                   </CardContent>
@@ -370,7 +370,7 @@ export function ExpenseSplitterContent() {
 
               {groupExpenses.length === 0 && !showExpenseForm ? (
                 <div className="py-12 text-center text-muted-foreground">
-                  <DollarSign className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                  <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-20" />
                   <p className="font-medium text-foreground">No expenses yet</p>
                   <p className="text-sm">Add your first expense to start splitting</p>
                 </div>
@@ -379,15 +379,15 @@ export function ExpenseSplitterContent() {
                   {groupExpenses.map((e) => {
                     const payer = selectedGroup.members.find((m) => m.id === e.paidById)
                     return (
-                      <div key={e.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 group">
+                      <div key={e.id} className="flex items-center gap-4 px-4 py-4 hover:bg-muted/30 group">
                         <span className="text-xl">{CAT_EMOJI[e.category]}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium">{e.description}</p>
                           <p className="text-xs text-muted-foreground">{e.date} · Paid by <span className="font-medium">{payer?.name}</span> · {e.splitType}</p>
                         </div>
                         <p className="text-sm font-bold shrink-0">{e.currency} {e.amount.toFixed(2)}</p>
-                        <Button variant="ghost" size="icon-sm" onClick={() => deleteExpense(e.id)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Trash2 className="w-3.5 h-3.5" />
+                        <Button variant="ghost" size="icon" onClick={() => deleteExpense(e.id)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     )
@@ -399,19 +399,19 @@ export function ExpenseSplitterContent() {
 
           {/* ── Settlements ── */}
           {tab === "settlements" && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <h3 className="font-semibold">Settlement Summary</h3>
               {settlementsNeeded.length === 0 ? (
                 <div className="py-10 text-center text-muted-foreground">
-                  <Check className="w-12 h-12 mx-auto mb-3 text-green-500 opacity-50" />
+                  <Check className="w-12 h-12 mx-auto mb-4 text-green-500 opacity-50" />
                   <p className="font-medium text-foreground">All settled up!</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {settlementsNeeded.map((s, i) => (
                     <div key={i} className="flex items-center gap-4 p-4 rounded-xl border bg-card">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <span className="font-bold text-base">{s.from.name}</span>
                           <ChevronRight className="w-4 h-4 text-muted-foreground" />
                           <span className="font-bold text-base">{s.to.name}</span>
@@ -420,7 +420,7 @@ export function ExpenseSplitterContent() {
                       </div>
                       <p className="text-2xl font-black text-lime-400 shrink-0">{selectedGroup.currency} {s.amount.toFixed(2)}</p>
                       <Button size="sm" onClick={() => markSettlement(s.from.id, s.to.id)}>
-                        <Check className="w-3.5 h-3.5 mr-1" /> Paid
+                        <Check className="w-4 h-4 mr-1" /> Paid
                       </Button>
                     </div>
                   ))}
@@ -431,8 +431,8 @@ export function ExpenseSplitterContent() {
 
           {/* ── Summary ── */}
           {tab === "summary" && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-5">
                 <Card>
                   <CardContent className="py-4">
                     <p className="text-3xl font-bold text-lime-400">{selectedGroup.currency} {totalSpend.toFixed(2)}</p>
@@ -459,13 +459,13 @@ export function ExpenseSplitterContent() {
               </div>
               {pieData.length > 0 && (
                 <Card>
-                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><PieChart className="w-4 h-4" />Category Breakdown</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-3"><PieChart className="w-4 h-4" />Category Breakdown</CardTitle></CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-6">
                       <PieChartSVG data={pieData.map((d) => ({ pct: d.pct, label: d.category }))} />
-                      <div className="space-y-1 flex-1">
+                      <div className="space-y-1.5 flex-1">
                         {pieData.map((d, i) => (
-                          <div key={d.category} className="flex items-center gap-2">
+                          <div key={d.category} className="flex items-center gap-3">
                             <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
                             <span className={`text-sm flex-1 ${CAT_COLORS[d.category]}`}>{CAT_EMOJI[d.category]} {d.category.charAt(0).toUpperCase() + d.category.slice(1)}</span>
                             <span className="text-sm font-mono">{selectedGroup.currency} {d.amount.toFixed(2)}</span>
@@ -494,11 +494,11 @@ export function ExpenseSplitterContent() {
         badge="Finance"
         actions={
           <Button size="sm" onClick={() => setShowNewGroup(!showNewGroup)}>
-            <Plus className="w-3.5 h-3.5 mr-1" /> New Group
+            <Plus className="w-4 h-4 mr-1" /> New Group
           </Button>
         }
       />
-      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-6">
+      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-bold">Expense Splitter</h1>
@@ -510,8 +510,8 @@ export function ExpenseSplitterContent() {
         {showNewGroup && (
           <Card className="border-lime-500/30">
             <CardHeader className="pb-2"><CardTitle className="text-sm">New Group</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium block mb-1">Group name *</label>
                   <Input value={ngName} onChange={(e) => setNgName(e.target.value)} placeholder="Road Trip 2026, Roommates..." />
@@ -526,29 +526,29 @@ export function ExpenseSplitterContent() {
                 <Input value={ngDesc} onChange={(e) => setNgDesc(e.target.value)} placeholder="Optional description" />
               </div>
               <div>
-                <label className="text-xs font-medium block mb-2">Members (at least 2) *</label>
-                <div className="space-y-2">
+                <label className="text-xs font-medium block mb-3">Members (at least 2) *</label>
+                <div className="space-y-3">
                   {ngMembers.map((name, i) => (
-                    <div key={i} className="flex gap-2">
+                    <div key={i} className="flex gap-3">
                       <Input
                         value={name}
                         onChange={(e) => setNgMembers((prev) => prev.map((n, idx) => idx === i ? e.target.value : n))}
                         placeholder={`Person ${i+1}`}
                       />
                       {ngMembers.length > 2 && (
-                        <Button size="icon-sm" variant="ghost" onClick={() => setNgMembers((prev) => prev.filter((_,idx) => idx !== i))}>
-                          <X className="w-3.5 h-3.5" />
+                        <Button size="icon" variant="ghost" onClick={() => setNgMembers((prev) => prev.filter((_,idx) => idx !== i))}>
+                          <X className="w-4 h-4" />
                         </Button>
                       )}
                     </div>
                   ))}
                   <Button size="sm" variant="outline" onClick={() => setNgMembers((prev) => [...prev, ""])}>
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Add member
+                    <Plus className="w-4 h-4 mr-1" /> Add member
                   </Button>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button size="sm" onClick={createGroup}><Users className="w-3.5 h-3.5 mr-1" /> Create Group</Button>
+              <div className="flex gap-3">
+                <Button size="sm" onClick={createGroup}><Users className="w-4 h-4 mr-1" /> Create Group</Button>
                 <Button size="sm" variant="ghost" onClick={() => setShowNewGroup(false)}>Cancel</Button>
               </div>
             </CardContent>
@@ -557,27 +557,27 @@ export function ExpenseSplitterContent() {
 
         {activeGroups.length === 0 && !showNewGroup ? (
           <div className="py-16 text-center text-muted-foreground">
-            <Users className="w-14 h-14 mx-auto mb-4 opacity-20" />
+            <Users className="w-14 h-14 mx-auto mb-5 opacity-20" />
             <p className="font-medium text-foreground text-lg">No groups yet</p>
             <p className="text-sm mt-1">Create a group for your trip, roommates, or event</p>
-            <Button className="mt-4" size="sm" onClick={() => setShowNewGroup(true)}><Plus className="w-3.5 h-3.5 mr-1" /> New Group</Button>
+            <Button className="mt-4" size="sm" onClick={() => setShowNewGroup(true)}><Plus className="w-4 h-4 mr-1" /> New Group</Button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {activeGroups.map((g) => {
               const exps = store.expenses.filter((e) => e.groupId === g.id)
               const total = exps.reduce((s, e) => s + e.amount, 0)
               const needed = calculateSettlements(g, exps)
               return (
                 <Card key={g.id} className="cursor-pointer hover:shadow-lg transition-shadow hover:border-lime-500/30" onClick={() => setSelectedGroup(g)}>
-                  <CardContent className="py-4">
-                    <div className="flex items-center gap-4">
+                  <CardContent className="py-5">
+                    <div className="flex items-center gap-5">
                       <div className="w-12 h-12 rounded-xl bg-lime-500/20 flex items-center justify-center shrink-0">
                         <Users className="w-5 h-5 text-lime-400" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold">{g.name}</p>
-                        <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                        <div className="flex items-center gap-3 flex-wrap mt-0.5">
                           {g.members.map((m) => <span key={m.id} className="text-xs text-muted-foreground">{m.name}</span>)}
                         </div>
                       </div>
@@ -601,18 +601,18 @@ export function ExpenseSplitterContent() {
           <div className="pt-4 border-t">
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <Archive className="w-4 h-4" />
               Archived groups ({settledGroups.length})
             </button>
             {showHistory && (
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 space-y-3">
                 {settledGroups.map((g) => {
                   const exps = store.expenses.filter((e) => e.groupId === g.id)
                   const total = exps.reduce((s, e) => s + e.amount, 0)
                   return (
-                    <button key={g.id} onClick={() => setSelectedGroup(g)} className="w-full text-left p-3 rounded-lg border border-dashed opacity-60 hover:opacity-100 transition-opacity">
+                    <button key={g.id} onClick={() => setSelectedGroup(g)} className="w-full text-left p-4 rounded-xl border border-dashed opacity-60 hover:opacity-100 transition-opacity">
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-sm">{g.name}</span>
                         <span className="text-sm font-mono">{g.currency} {total.toFixed(2)}</span>
@@ -628,5 +628,3 @@ export function ExpenseSplitterContent() {
     </div>
   )
 }
-
-

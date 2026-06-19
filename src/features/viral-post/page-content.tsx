@@ -32,10 +32,10 @@ const FORMATS: ViralFormat[] = ["hot-take", "contrarian", "listicle", "story", "
 const PLATFORMS: Platform[] = ["twitter", "linkedin", "reddit", "hn"]
 
 const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
-  twitter: <MessageSquare className="w-3.5 h-3.5" />,
-  linkedin: <Briefcase className="w-3.5 h-3.5" />,
-  reddit: <MessageSquare className="w-3.5 h-3.5" />,
-  hn: <Globe className="w-3.5 h-3.5" />,
+  twitter: <MessageSquare className="w-4 h-4" />,
+  linkedin: <Briefcase className="w-4 h-4" />,
+  reddit: <MessageSquare className="w-4 h-4" />,
+  hn: <Globe className="w-4 h-4" />,
 }
 
 function initInput(): ViralPostInput {
@@ -87,16 +87,16 @@ export function ViralPostContent() {
   return (
     <>
       <ToolHeader title="Viral Post Studio" icon={Sparkles} color="text-yellow-500" badge="Creator" />
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+      <div className="max-w-3xl mx-auto px-5 py-6 space-y-5">
 
         {/* Format picker */}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {FORMATS.map((f) => (
             <button
               key={f}
               onClick={() => setInput({ ...input, format: f })}
               title={FORMAT_DESCRIPTIONS[f]}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+              className={`px-4 py-2 text-xs font-medium rounded-xl border transition-all ${
                 input.format === f
                   ? "bg-foreground text-background border-foreground"
                   : "border-border text-muted-foreground hover:border-foreground/30"
@@ -108,18 +108,18 @@ export function ViralPostContent() {
         </div>
 
         {/* Form */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Input placeholder="Topic / subject line" value={input.topic} onChange={(e) => setInput({ ...input, topic: e.target.value })} />
           <Textarea placeholder="Context or details (optional)" value={input.context} onChange={(e) => setInput({ ...input, context: e.target.value })} rows={3} />
           <Input placeholder="Angle or unique spin (optional)" value={input.angle ?? ""} onChange={(e) => setInput({ ...input, angle: e.target.value })} />
 
           {/* Platform selector */}
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             {PLATFORMS.map((p) => (
               <button
                 key={p}
                 onClick={() => setInput({ ...input, platform: p })}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-xl border transition-all ${
                   input.platform === p
                     ? "bg-foreground text-background border-foreground"
                     : "border-border text-muted-foreground hover:border-foreground/30"
@@ -131,7 +131,7 @@ export function ViralPostContent() {
             ))}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <Button onClick={generate} disabled={loading || !input.topic.trim()}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               Generate
@@ -149,22 +149,22 @@ export function ViralPostContent() {
           <Card key={pi}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                   {PLATFORM_ICONS[post.platform]}
                   {PLATFORM_LABELS[post.platform]} Post
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <span className="text-xs text-muted-foreground">
                     Engagement Score: <strong className={post.engagementScore >= 70 ? "text-green-500" : post.engagementScore >= 40 ? "text-amber-500" : "text-red-500"}>{post.engagementScore}</strong>
                   </span>
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-3">
               <div className="relative">
                 <Textarea value={post.content} readOnly rows={Math.max(3, post.content.split("\n").length)} className="text-sm font-mono bg-muted/30" />
-                <Button variant="ghost" size="icon-xs" className="absolute top-1 right-1" onClick={() => copyText(post.content, `post-${pi}`)}>
-                  {copiedKey === `post-${pi}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                <Button variant="ghost" size="icon" className="absolute top-1 right-1" onClick={() => copyText(post.content, `post-${pi}`)}>
+                  {copiedKey === `post-${pi}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -172,8 +172,8 @@ export function ViralPostContent() {
                 <span>Best time: {post.bestTimeToPost}</span>
               </div>
               {post.hashtags.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {post.hashtags.map((h) => <Badge key={h} variant="secondary" className="text-[10px]">{h}</Badge>)}
+                <div className="flex flex-wrap gap-1.5">
+                  {post.hashtags.map((h) => <Badge key={h} variant="secondary" className="text-xs">{h}</Badge>)}
                 </div>
               )}
             </CardContent>
@@ -184,12 +184,12 @@ export function ViralPostContent() {
         {result && result.hookAlternatives.length > 0 && (
           <Card>
             <CardHeader><CardTitle>Hook Alternatives</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-3">
               {result.hookAlternatives.map((h, i) => (
-                <div key={i} className="flex items-start justify-between gap-2 p-2 rounded-lg hover:bg-muted transition-colors">
+                <div key={i} className="flex items-start justify-between gap-4 p-3 rounded-xl hover:bg-muted transition-colors">
                   <p className="text-sm flex-1">{h}</p>
-                  <Button variant="ghost" size="icon-xs" onClick={() => copyText(h, `hook-${i}`)}>
-                    {copiedKey === `hook-${i}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  <Button variant="ghost" size="icon" onClick={() => copyText(h, `hook-${i}`)}>
+                    {copiedKey === `hook-${i}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
                 </div>
               ))}
@@ -203,13 +203,13 @@ export function ViralPostContent() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 Thread Version
-                <Button variant="ghost" size="xs" onClick={() => copyText(result.threadVersion!, "thread")}>
-                  {copiedKey === "thread" ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                <Button variant="ghost" size="sm" onClick={() => copyText(result.threadVersion!, "thread")}>
+                  {copiedKey === "thread" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Textarea value={result.threadVersion} readOnly rows={8} className="text-sm" />
+              <Textarea value={result.threadVersion} readOnly rows={8} className="text-sm leading-relaxed" />
             </CardContent>
           </Card>
         )}
@@ -218,12 +218,12 @@ export function ViralPostContent() {
         {showHistory && records.length > 0 && (
           <Card>
             <CardHeader><CardTitle>History</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-3">
               {records.map((r) => (
                 <button
                   key={r.id}
                   onClick={() => loadRecord(r)}
-                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-muted transition-colors text-left"
+                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted transition-colors text-left"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">{r.input.topic}</p>

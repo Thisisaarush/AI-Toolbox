@@ -487,7 +487,7 @@ export function SubSheriffContent() {
 
   const SortIcon = useCallback(({ k }: { k: SortKey }) => {
     if (sortKey !== k) return null
-    return sortDesc ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />
+    return sortDesc ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />
   }, [sortKey, sortDesc])
 
   function clearFilters() {
@@ -509,7 +509,7 @@ export function SubSheriffContent() {
         color="text-red-500"
         badge="Finance"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {view !== "dashboard" ? (
               <Button variant="outline" size="sm" onClick={() => {
                 if (view === "edit-sub") { setView("detail"); return }
@@ -520,14 +520,14 @@ export function SubSheriffContent() {
             ) : (
               <>
                 <Button variant="outline" size="sm" onClick={() => setView("import")}>
-                  <Mail className="w-3.5 h-3.5 mr-1" /> Scan Email
+                  <Mail className="w-4 h-4 mr-1" /> Scan Email
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setView("add")}>
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Add
+                  <Plus className="w-4 h-4 mr-1" /> Add
                 </Button>
                 {subs.length > 0 && (
                   <Button variant="ghost" size="sm" onClick={exportCsv}>
-                    <Download className="w-3.5 h-3.5 mr-1" /> Export
+                    <Download className="w-4 h-4 mr-1" /> Export
                   </Button>
                 )}
               </>
@@ -541,20 +541,20 @@ export function SubSheriffContent() {
         {/* ── Dashboard ──────────────────────────────────────────────────── */}
         {view === "dashboard" && (
           <>
-            <div className="mb-6">
+            <div className="mb-8">
               <h1 className="text-3xl font-bold mb-1">Sub Sheriff</h1>
-              <p className="text-muted-foreground">Every subscription you&apos;re paying for, on one screen.</p>
+              <p className="text-muted-foreground leading-relaxed">Every subscription you&apos;re paying for, on one screen.</p>
             </div>
 
             {subs.length === 0 ? (
               <Card className="max-w-lg mx-auto mt-16">
                 <CardContent className="py-16 text-center">
-                  <CreditCard className="w-14 h-14 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <h2 className="text-xl font-semibold mb-2">No subscriptions yet</h2>
-                  <p className="text-muted-foreground text-sm mb-6">
+                  <CreditCard className="w-14 h-14 mx-auto mb-5 text-muted-foreground opacity-50" />
+                  <h2 className="text-2xl font-semibold mb-3">No subscriptions yet</h2>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-8">
                     Scan your inbox to find them automatically, or add them manually.
                   </p>
-                  <div className="flex gap-3 justify-center">
+                  <div className="flex gap-4 justify-center">
                     <Button onClick={() => setView("import")}>
                       <Mail className="w-4 h-4 mr-1" /> Scan Email
                     </Button>
@@ -565,7 +565,7 @@ export function SubSheriffContent() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {/* Summary cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                   <SummaryCard
@@ -618,7 +618,7 @@ export function SubSheriffContent() {
 
                 {/* Alerts */}
                 {(summary.unusedMonthly > 0 || summary.rarelyMonthly > 0 || summary.duplicates.length > 0) && (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {summary.unusedMonthly > 0 && (
                       <Alert
                         icon={<AlertTriangle className="w-4 h-4 text-red-500" />}
@@ -650,21 +650,21 @@ export function SubSheriffContent() {
                 {summary.upcomingRenewals.length > 0 && (
                   <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center gap-2">
+                      <CardTitle className="text-sm flex items-center gap-3">
                         <Calendar className="w-4 h-4 text-amber-500" /> Upcoming renewals (30 days)
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-3">
                         {summary.upcomingRenewals.map((s) => (
                           <button
                             key={s.id}
                             onClick={() => { setSelectedSub(s); setView("detail") }}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border hover:bg-muted/50 transition-colors text-sm"
+                            className="flex items-center gap-3 px-4 py-2 rounded-lg border hover:bg-muted/50 transition-colors text-sm"
                           >
                             <span className="font-medium">{s.name}</span>
                             <span className="text-muted-foreground">{formatCurrency(s.amount)}/mo</span>
-                            <Badge variant="outline" className="text-[10px]">
+                            <Badge variant="outline" className="text-xs">
                               {daysUntilRenewal(s.renewalDate!) === 0
                                 ? "Today"
                                 : `${daysUntilRenewal(s.renewalDate!)}d`}
@@ -679,7 +679,7 @@ export function SubSheriffContent() {
                 {/* Spending trends chart */}
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center gap-2">
+                    <CardTitle className="text-sm flex items-center gap-3">
                       <TrendingUp className="w-4 h-4 text-blue-500" /> Spending by month (last 6 months)
                     </CardTitle>
                   </CardHeader>
@@ -694,7 +694,7 @@ export function SubSheriffContent() {
                     <CardTitle className="text-sm">Spend by category</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {(Object.entries(summary.byCategory) as [Category, number][])
                         .sort((a, b) => b[1] - a[1])
                         .map(([cat, amount]) => {
@@ -706,7 +706,7 @@ export function SubSheriffContent() {
                               className="w-full text-left"
                               onClick={() => setFilterCategory(filterCategory === cat ? "all" : cat)}
                             >
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-4">
                                 <span className={`text-xs font-medium w-28 shrink-0 ${meta.color}`}>{meta.label}</span>
                                 <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
                                   <div
@@ -726,7 +726,7 @@ export function SubSheriffContent() {
                 </Card>
 
                 {/* Tab bar */}
-                <div className="flex gap-1 p-1 bg-muted/50 rounded-lg w-fit">
+                <div className="flex gap-1.5 p-1 bg-muted/50 rounded-lg w-fit">
                   {([
                     { key: "all" as DashTab, label: "All Subscriptions" },
                     { key: "cancel-queue" as DashTab, label: `Cancel Queue${summary.cancelQueue.length > 0 ? ` (${summary.cancelQueue.length})` : ""}` },
@@ -735,7 +735,7 @@ export function SubSheriffContent() {
                     <button
                       key={tab.key}
                       onClick={() => setDashTab(tab.key)}
-                      className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
+                      className={`px-4 py-2 text-sm rounded-md font-medium transition-colors ${
                         dashTab === tab.key
                           ? "bg-background shadow-sm text-foreground"
                           : "text-muted-foreground hover:text-foreground"
@@ -750,7 +750,7 @@ export function SubSheriffContent() {
                 {dashTab === "all" && (
                   <>
                     {/* Quick filter pills */}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                       {([
                         { key: "all" as QuickFilter, label: "All" },
                         { key: "active" as QuickFilter, label: "Active" },
@@ -761,7 +761,7 @@ export function SubSheriffContent() {
                         <button
                           key={f.key}
                           onClick={() => setQuickFilter(f.key)}
-                          className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                          className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                             quickFilter === f.key
                               ? "bg-foreground text-background border-foreground"
                               : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
@@ -774,7 +774,7 @@ export function SubSheriffContent() {
                         <button
                           key={tag}
                           onClick={() => setFilterTag(filterTag === tag ? "all" : tag)}
-                          className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                          className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                             filterTag === tag
                               ? "bg-blue-600 text-white border-blue-600"
                               : "border-blue-300 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30"
@@ -786,7 +786,7 @@ export function SubSheriffContent() {
                     </div>
 
                     {/* Filters */}
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-3">
                       <div className="relative flex-1 min-w-48">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
@@ -799,7 +799,7 @@ export function SubSheriffContent() {
                       <select
                         value={filterCategory}
                         onChange={(e) => setFilterCategory(e.target.value as Category | "all")}
-                        className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                        className="h-11 rounded-md border border-input bg-background px-4 text-sm"
                       >
                         <option value="all">All categories</option>
                         {Object.entries(CATEGORY_META).map(([k, v]) => (
@@ -808,23 +808,23 @@ export function SubSheriffContent() {
                       </select>
                       {hasActiveFilters && (
                         <Button variant="ghost" size="sm" onClick={clearFilters}>
-                          <X className="w-3.5 h-3.5 mr-1" /> Clear
+                          <X className="w-4 h-4 mr-1" /> Clear
                         </Button>
                       )}
                     </div>
 
                     {/* Table header */}
                     <div className="rounded-xl border overflow-hidden">
-                      <div className="grid grid-cols-12 gap-4 px-4 py-2 bg-muted/50 text-xs font-medium text-muted-foreground border-b">
-                        <button className="col-span-4 flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("name")}>
+                      <div className="grid grid-cols-12 gap-4 px-4 py-2.5 bg-muted/50 text-xs font-medium text-muted-foreground border-b">
+                        <button className="col-span-4 flex items-center gap-1.5 hover:text-foreground" onClick={() => toggleSort("name")}>
                           Service <SortIcon k="name" />
                         </button>
-                        <button className="col-span-2 flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("amount")}>
+                        <button className="col-span-2 flex items-center gap-1.5 hover:text-foreground" onClick={() => toggleSort("amount")}>
                           Cost/mo <SortIcon k="amount" />
                         </button>
                         <span className="col-span-2">Category</span>
                         <span className="col-span-2">Usage</span>
-                        <button className="col-span-2 flex items-center gap-1 hover:text-foreground" onClick={() => toggleSort("renewal")}>
+                        <button className="col-span-2 flex items-center gap-1.5 hover:text-foreground" onClick={() => toggleSort("renewal")}>
                           Renewal <SortIcon k="renewal" />
                         </button>
                       </div>
@@ -855,8 +855,8 @@ export function SubSheriffContent() {
 
                 {/* ── Cancel queue tab ── */}
                 {dashTab === "cancel-queue" && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 p-4 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-4 p-5 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
                       <Ban className="w-5 h-5 text-red-500 shrink-0" />
                       <div>
                         <p className="text-sm font-medium text-red-700 dark:text-red-300">Auto-populated cancel queue</p>
@@ -868,12 +868,12 @@ export function SubSheriffContent() {
 
                     {summary.cancelQueue.length === 0 ? (
                       <div className="py-12 text-center text-muted-foreground text-sm">
-                        <Check className="w-10 h-10 mx-auto mb-3 text-green-500" />
+                        <Check className="w-10 h-10 mx-auto mb-4 text-green-500" />
                         <p className="font-medium text-foreground">Your cancel queue is empty!</p>
                         <p className="text-xs mt-1">No subscriptions flagged for cancellation.</p>
                       </div>
                     ) : (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <p className="text-sm text-muted-foreground">
                           Potential annual savings: <span className="font-bold text-green-600">{formatCurrency(summary.cancelQueue.reduce((acc, s) => acc + s.amount * 12, 0))}</span>
                         </p>
@@ -887,11 +887,11 @@ export function SubSheriffContent() {
                               : "Rarely used & over $10/mo"
 
                           return (
-                            <div key={s.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-muted/30 transition-colors">
+                            <div key={s.id} className="flex items-center gap-4 p-5 rounded-xl border bg-card hover:bg-muted/30 transition-colors">
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
+                                <div className="flex items-center gap-3 mb-1">
                                   <p className="font-medium text-sm">{s.name}</p>
-                                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+                                  <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
                                     {meta.label}
                                   </span>
                                 </div>
@@ -901,7 +901,7 @@ export function SubSheriffContent() {
                                 <p className="text-sm font-semibold">{formatCurrency(s.amount)}/mo</p>
                                 <p className="text-xs text-green-600 font-medium">Save {formatCurrency(s.amount * 12)}/yr</p>
                               </div>
-                              <div className="flex gap-2 shrink-0">
+                              <div className="flex gap-3 shrink-0">
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -914,9 +914,9 @@ export function SubSheriffContent() {
                                     href={s.cancelUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 rounded-md bg-destructive/10 text-destructive text-xs font-medium px-3 py-1.5 hover:bg-destructive/20 transition-colors border border-destructive/20"
+                                    className="inline-flex items-center gap-1.5 rounded-md bg-destructive/10 text-destructive text-xs font-medium px-4 py-2 hover:bg-destructive/20 transition-colors border border-destructive/20"
                                   >
-                                    Cancel <ExternalLink className="w-3 h-3" />
+                                    Cancel <ExternalLink className="w-4 h-4" />
                                   </a>
                                 )}
                               </div>
@@ -930,13 +930,13 @@ export function SubSheriffContent() {
 
                 {/* ── Groups tab ── */}
                 {dashTab === "groups" && (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     <p className="text-sm text-muted-foreground">
                       Add tags to subscriptions (e.g. "work-reimbursed", "side-project") to group them here.
                     </p>
                     {summary.groups.length === 0 ? (
                       <div className="py-12 text-center text-muted-foreground text-sm">
-                        <Tag className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                        <Tag className="w-10 h-10 mx-auto mb-4 opacity-30" />
                         <p className="font-medium text-foreground">No tags yet</p>
                         <p className="text-xs mt-1">Edit subscriptions and add tags to group them.</p>
                       </div>
@@ -945,8 +945,8 @@ export function SubSheriffContent() {
                         <Card key={group.name}>
                           <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
-                              <CardTitle className="text-sm flex items-center gap-2">
-                                <Tag className="w-3.5 h-3.5 text-blue-500" />
+                              <CardTitle className="text-sm flex items-center gap-3">
+                                <Tag className="w-4 h-4 text-blue-500" />
                                 {group.name}
                               </CardTitle>
                               <div className="text-right">
@@ -961,7 +961,7 @@ export function SubSheriffContent() {
                                 <button
                                   key={s.id}
                                   onClick={() => { setSelectedSub(s); setView("detail") }}
-                                  className="w-full flex items-center justify-between py-1.5 text-sm hover:text-foreground transition-colors"
+                                  className="w-full flex items-center justify-between py-2 text-sm hover:text-foreground transition-colors"
                                 >
                                   <span className="text-muted-foreground hover:text-foreground">{s.name}</span>
                                   <span className="font-medium">{formatCurrency(s.amount)}/mo</span>
@@ -981,10 +981,10 @@ export function SubSheriffContent() {
 
         {/* ── Import ─────────────────────────────────────────────────────── */}
         {view === "import" && (
-          <div className="max-w-2xl mx-auto space-y-6">
+          <div className="max-w-2xl mx-auto space-y-8">
             <div>
-              <h1 className="text-2xl font-bold mb-1">Scan Email</h1>
-              <p className="text-muted-foreground text-sm">
+              <h1 className="text-3xl font-bold mb-1">Scan Email</h1>
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Paste the text of a billing receipt, renewal email, or subscription confirmation.
                 AI will extract the subscription details automatically.
               </p>
@@ -992,7 +992,7 @@ export function SubSheriffContent() {
 
             {parsedResults.length === 0 ? (
               <Card>
-                <CardContent className="pt-6 space-y-4">
+                <CardContent className="pt-6 space-y-5">
                   <div>
                     <label className="text-xs font-medium mb-1.5 block">
                       Email content <span className="text-muted-foreground">(paste the full email text)</span>
@@ -1011,26 +1011,26 @@ export function SubSheriffContent() {
                     </p>
                     <Button onClick={handleParse} disabled={isParsing || !emailText.trim()}>
                       {isParsing ? (
-                        <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Scanning...</>
+                        <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Scanning...</>
                       ) : (
-                        <><Sparkles className="w-3.5 h-3.5 mr-1" /> Scan with AI</>
+                        <><Sparkles className="w-4 h-4 mr-1" /> Scan with AI</>
                       )}
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="flex items-center justify-between">
                   <p className="font-medium">
                     Found {parsedResults.length} subscription{parsedResults.length !== 1 ? "s" : ""}
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Button variant="outline" size="sm" onClick={() => setParsedResults([])}>
                       ← Rescan
                     </Button>
                     <Button size="sm" onClick={importSelected}>
-                      <Check className="w-3.5 h-3.5 mr-1" />
+                      <Check className="w-4 h-4 mr-1" />
                       Import {parsedResults.filter((r) => r.selected).length} selected
                     </Button>
                   </div>
@@ -1050,9 +1050,9 @@ export function SubSheriffContent() {
                     >
                       <CardContent className="py-4">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-4">
                             <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors ${r.selected ? "bg-primary border-primary" : "border-muted-foreground"}`}>
-                              {r.selected && <Check className="w-3 h-3 text-primary-foreground" />}
+                              {r.selected && <Check className="w-4 h-4 text-primary-foreground" />}
                             </div>
                             <div>
                               <p className="font-medium text-sm">{r.name}</p>
@@ -1062,13 +1062,13 @@ export function SubSheriffContent() {
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             {r.renewalDate && (
                               <span className="text-xs text-muted-foreground">
                                 Renews {new Date(r.renewalDate).toLocaleDateString()}
                               </span>
                             )}
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+                            <span className={`text-xs font-medium px-3 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
                               {meta.label}
                             </span>
                             <span className="text-xs text-muted-foreground">
@@ -1087,13 +1087,13 @@ export function SubSheriffContent() {
 
         {/* ── Add manually ───────────────────────────────────────────────── */}
         {view === "add" && (
-          <div className="max-w-lg mx-auto space-y-6">
+          <div className="max-w-lg mx-auto space-y-8">
             <div>
-              <h1 className="text-2xl font-bold mb-1">Add Subscription</h1>
-              <p className="text-muted-foreground text-sm">Add a subscription manually.</p>
+              <h1 className="text-3xl font-bold mb-1">Add Subscription</h1>
+              <p className="text-muted-foreground text-sm leading-relaxed">Add a subscription manually.</p>
             </div>
             <Card>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="pt-6 space-y-5">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Service name *</label>
                   <Input
@@ -1107,7 +1107,7 @@ export function SubSheriffContent() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Amount *</label>
                     <Input
@@ -1122,7 +1122,7 @@ export function SubSheriffContent() {
                     <select
                       value={addCycle}
                       onChange={(e) => setAddCycle(e.target.value as BillingCycle)}
-                      className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
                     >
                       {Object.entries(BILLING_CYCLE_LABELS).map(([k, v]) => (
                         <option key={k} value={k}>{v}</option>
@@ -1136,7 +1136,7 @@ export function SubSheriffContent() {
                   <select
                     value={addCategory}
                     onChange={(e) => setAddCategory(e.target.value as Category)}
-                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                    className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
                   >
                     {Object.entries(CATEGORY_META).map(([k, v]) => (
                       <option key={k} value={k}>{v.label}</option>
@@ -1191,9 +1191,9 @@ export function SubSheriffContent() {
                   />
                 </div>
 
-                <div className="flex gap-2 pt-1">
+                <div className="flex gap-3 pt-1">
                   <Button className="flex-1" onClick={addSub}>
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Add subscription
+                    <Plus className="w-4 h-4 mr-1" /> Add subscription
                   </Button>
                 </div>
               </CardContent>
@@ -1203,13 +1203,13 @@ export function SubSheriffContent() {
 
         {/* ── Edit Subscription ──────────────────────────────────────────── */}
         {view === "edit-sub" && editingSubId && (
-          <div className="max-w-lg mx-auto space-y-6">
+          <div className="max-w-lg mx-auto space-y-8">
             <div>
-              <h1 className="text-2xl font-bold mb-1">Edit Subscription</h1>
-              <p className="text-muted-foreground text-sm">Update the subscription details. Price changes are tracked automatically.</p>
+              <h1 className="text-3xl font-bold mb-1">Edit Subscription</h1>
+              <p className="text-muted-foreground text-sm leading-relaxed">Update the subscription details. Price changes are tracked automatically.</p>
             </div>
             <Card>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="pt-6 space-y-5">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Service name *</label>
                   <Input
@@ -1219,7 +1219,7 @@ export function SubSheriffContent() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Amount *</label>
                     <Input
@@ -1234,7 +1234,7 @@ export function SubSheriffContent() {
                     <select
                       value={addCycle}
                       onChange={(e) => setAddCycle(e.target.value as BillingCycle)}
-                      className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
                     >
                       {Object.entries(BILLING_CYCLE_LABELS).map(([k, v]) => (
                         <option key={k} value={k}>{v}</option>
@@ -1248,7 +1248,7 @@ export function SubSheriffContent() {
                   <select
                     value={addCategory}
                     onChange={(e) => setAddCategory(e.target.value as Category)}
-                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                    className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
                   >
                     {Object.entries(CATEGORY_META).map(([k, v]) => (
                       <option key={k} value={k}>{v.label}</option>
@@ -1303,9 +1303,9 @@ export function SubSheriffContent() {
                   />
                 </div>
 
-                <div className="flex gap-2 pt-1">
+                <div className="flex gap-3 pt-1">
                   <Button className="flex-1" onClick={saveEdit}>
-                    <Check className="w-3.5 h-3.5 mr-1" /> Save changes
+                    <Check className="w-4 h-4 mr-1" /> Save changes
                   </Button>
                   <Button variant="outline" onClick={() => setView("detail")}>Cancel</Button>
                 </div>
@@ -1316,11 +1316,11 @@ export function SubSheriffContent() {
 
         {/* ── Detail ─────────────────────────────────────────────────────── */}
         {view === "detail" && selectedSub && (
-          <div className="max-w-lg mx-auto space-y-4">
+          <div className="max-w-lg mx-auto space-y-5">
             <div className="flex items-start justify-between">
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold">{selectedSub.name}</h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold">{selectedSub.name}</h1>
                   {selectedSub.roiNote && (
                     <span title="Has ROI note"><Star className="w-4 h-4 text-amber-500 fill-amber-400" /></span>
                   )}
@@ -1330,11 +1330,11 @@ export function SubSheriffContent() {
                   {formatCurrency(selectedSub.amount)}/mo
                 </p>
                 {selectedSub.tags && selectedSub.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
+                  <div className="flex flex-wrap gap-1.5 mt-2">
                     {selectedSub.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                       >
                         <Tag className="w-2.5 h-2.5" />{tag}
                       </span>
@@ -1342,7 +1342,7 @@ export function SubSheriffContent() {
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <Button
                   variant="outline" size="sm"
                   onClick={() => openEdit(selectedSub)}
@@ -1360,9 +1360,9 @@ export function SubSheriffContent() {
             </div>
 
             <Card>
-              <CardContent className="pt-5 space-y-4">
+              <CardContent className="pt-5 space-y-5">
                 <Row label="Category" value={
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${CATEGORY_META[selectedSub.category].bg} ${CATEGORY_META[selectedSub.category].color}`}>
+                  <span className={`text-xs font-medium px-3 py-0.5 rounded-full ${CATEGORY_META[selectedSub.category].bg} ${CATEGORY_META[selectedSub.category].color}`}>
                     {CATEGORY_META[selectedSub.category].label}
                   </span>
                 } />
@@ -1394,8 +1394,8 @@ export function SubSheriffContent() {
             {selectedSub.roiNote && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Star className="w-3.5 h-3.5 text-amber-500" /> Value / ROI
+                  <CardTitle className="text-sm flex items-center gap-3">
+                    <Star className="w-4 h-4 text-amber-500" /> Value / ROI
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1408,14 +1408,14 @@ export function SubSheriffContent() {
             {selectedSub.priceHistory && selectedSub.priceHistory.length > 0 && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 text-muted-foreground" /> Price history
+                  <CardTitle className="text-sm flex items-center gap-3">
+                    <Clock className="w-4 h-4 text-muted-foreground" /> Price history
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {selectedSub.priceHistory.map((entry, i) => (
-                      <div key={i} className="flex items-center gap-3 text-sm">
+                      <div key={i} className="flex items-center gap-4 text-sm">
                         <div className="w-2 h-2 rounded-full bg-muted-foreground/40 shrink-0" />
                         <span className="text-muted-foreground text-xs">{entry.date}</span>
                         <span className="font-medium">{formatCurrency(entry.amount)}</span>
@@ -1424,7 +1424,7 @@ export function SubSheriffContent() {
                         )}
                       </div>
                     ))}
-                    <div className="flex items-center gap-3 text-sm">
+                    <div className="flex items-center gap-4 text-sm">
                       <div className="w-2 h-2 rounded-full bg-foreground shrink-0" />
                       <span className="text-muted-foreground text-xs">now</span>
                       <span className="font-medium">{formatCurrency(selectedSub.rawAmount)}</span>
@@ -1440,12 +1440,12 @@ export function SubSheriffContent() {
                 <CardTitle className="text-sm">Usage status</CardTitle>
                 <CardDescription>How often are you actually using this?</CardDescription>
               </CardHeader>
-              <CardContent className="flex gap-2">
+              <CardContent className="flex gap-3">
                 {USAGE_OPTIONS.map((o) => (
                   <button
                     key={o.value}
                     onClick={() => updateUsage(selectedSub.id, o.value)}
-                    className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
                       selectedSub.usageStatus === o.value
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border hover:bg-muted"
@@ -1468,9 +1468,9 @@ export function SubSheriffContent() {
                     href={selectedSub.cancelUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 rounded-md bg-destructive text-destructive-foreground text-sm font-medium px-3 py-1.5 hover:bg-destructive/90 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-md bg-destructive text-destructive-foreground text-sm font-medium px-4 py-2 hover:bg-destructive/90 transition-colors"
                   >
-                    Cancel <ExternalLink className="w-3 h-3" />
+                    Cancel <ExternalLink className="w-4 h-4" />
                   </a>
                 </CardContent>
               </Card>
@@ -1493,11 +1493,11 @@ function SummaryCard({
   return (
     <Card className={highlight ? "border-amber-300 dark:border-amber-700" : ""}>
       <CardContent className={`relative overflow-hidden ${gradient ? `bg-gradient-to-br ${gradient}` : ""}`}>
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-3 mb-1">
           <span className={color}>{icon}</span>
           <span className="text-xs text-muted-foreground">{label}</span>
         </div>
-        <p className={`text-2xl font-bold ${color}`}>{value}</p>
+        <p className={`text-3xl font-bold ${color}`}>{value}</p>
         <p className="text-xs text-muted-foreground">{sub}</p>
       </CardContent>
     </Card>
@@ -1510,7 +1510,7 @@ function Alert({
   icon: React.ReactNode; message: string; action: string; onAction: () => void
 }) {
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
+    <div className="flex items-center gap-4 p-4 rounded-lg border bg-muted/30">
       {icon}
       <p className="text-sm flex-1">{message}</p>
       <Button variant="outline" size="sm" onClick={onAction}>{action}</Button>
@@ -1521,12 +1521,12 @@ function Alert({
 function SpendingChart({ data }: { data: { label: string; amount: number }[] }) {
   const max = Math.max(...data.map((d) => d.amount), 1)
   return (
-    <div className="flex items-end gap-2 h-24">
+    <div className="flex items-end gap-3 h-24">
       {data.map((d, i) => {
         const pct = (d.amount / max) * 100
         const isLast = i === data.length - 1
         return (
-          <div key={d.label} className="flex-1 flex flex-col items-center gap-1">
+          <div key={d.label} className="flex-1 flex flex-col items-center gap-1.5">
             <div className="w-full flex items-end justify-center" style={{ height: "72px" }}>
               <div
                 className={`w-full rounded-t-sm transition-all ${isLast ? "bg-red-500" : "bg-muted-foreground/30"}`}
@@ -1534,7 +1534,7 @@ function SpendingChart({ data }: { data: { label: string; amount: number }[] }) 
                 title={`${d.label}: ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(d.amount)}/mo`}
               />
             </div>
-            <span className="text-[9px] text-muted-foreground">{d.label}</span>
+            <span className="text-xs text-muted-foreground">{d.label}</span>
           </div>
         )
       })}
@@ -1554,21 +1554,21 @@ function SubscriptionRow({
   const usageOption = USAGE_OPTIONS.find((o) => o.value === sub.usageStatus)!
 
   return (
-    <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b last:border-b-0 hover:bg-muted/30 transition-colors group items-center">
-      <button className="col-span-4 flex items-center gap-2 text-left min-w-0" onClick={onSelect}>
+    <div className="grid grid-cols-12 gap-4 px-4 py-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors group items-center">
+      <button className="col-span-4 flex items-center gap-3 text-left min-w-0" onClick={onSelect}>
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <p className="text-sm font-medium truncate">{sub.name}</p>
             {sub.roiNote && (
-              <span title="Has ROI note"><Star className="w-3 h-3 text-amber-400 fill-amber-400 shrink-0" /></span>
+              <span title="Has ROI note"><Star className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" /></span>
             )}
           </div>
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             {sub.url && (
-              <p className="text-[10px] text-muted-foreground truncate">{sub.url.replace(/^https?:\/\//, "")}</p>
+              <p className="text-xs text-muted-foreground truncate">{sub.url.replace(/^https?:\/\//, "")}</p>
             )}
             {sub.tags && sub.tags.slice(0, 2).map((tag) => (
-              <span key={tag} className="text-[9px] px-1 py-0 rounded bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+              <span key={tag} className="text-xs px-1 py-0 rounded bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
                 {tag}
               </span>
             ))}
@@ -1581,14 +1581,14 @@ function SubscriptionRow({
           {sub.billingCycle === "one-time" ? formatCurrency(sub.rawAmount) : formatCurrency(sub.amount)}
         </p>
         {sub.billingCycle === "one-time" ? (
-          <p className="text-[10px] text-muted-foreground">One-time</p>
+          <p className="text-xs text-muted-foreground">One-time</p>
         ) : sub.billingCycle !== "monthly" ? (
-          <p className="text-[10px] text-muted-foreground">{formatCurrency(sub.rawAmount)}/{sub.billingCycle.slice(0, 3)}</p>
+          <p className="text-xs text-muted-foreground">{formatCurrency(sub.rawAmount)}/{sub.billingCycle.slice(0, 3)}</p>
         ) : null}
       </div>
 
       <div className="col-span-2">
-        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+        <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
           {meta.label}
         </span>
       </div>
@@ -1598,7 +1598,7 @@ function SubscriptionRow({
           value={sub.usageStatus}
           onChange={(e) => onUsageChange(e.target.value as UsageStatus)}
           onClick={(e) => e.stopPropagation()}
-          className={`text-[11px] font-medium bg-transparent border-none outline-none cursor-pointer ${usageOption.color}`}
+          className={`text-xs font-medium bg-transparent border-none outline-none cursor-pointer ${usageOption.color}`}
         >
           {USAGE_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -1614,7 +1614,7 @@ function SubscriptionRow({
               : `${daysUntilRenewal(sub.renewalDate)}d`
             : "—"}
         </span>
-        <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-1.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           {sub.cancelUrl && (
             <a
               href={sub.cancelUrl}
@@ -1624,14 +1624,14 @@ function SubscriptionRow({
               className="p-1 text-muted-foreground hover:text-foreground transition-colors"
               title="Open cancel page"
             >
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-4 h-4" />
             </a>
           )}
           <button
             onClick={(e) => { e.stopPropagation(); onDelete() }}
             className="p-1 text-muted-foreground hover:text-destructive transition-colors"
           >
-            <Trash2 className="w-3 h-3" />
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>

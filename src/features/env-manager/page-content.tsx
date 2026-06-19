@@ -160,7 +160,7 @@ const AUDIT_ICON_CLASSES: Record<AuditEntry["action"], string> = {
 }
 
 function AuditIcon({ action }: { action: AuditEntry["action"] }) {
-  const cls = `w-3 h-3 ${AUDIT_ICON_CLASSES[action]}`
+  const cls = `w-4 h-4 ${AUDIT_ICON_CLASSES[action]}`
   if (action === "created") return <Plus className={cls} />
   if (action === "updated") return <Pencil className={cls} />
   if (action === "deleted") return <Trash2 className={cls} />
@@ -172,8 +172,8 @@ function ValidationIndicator({ v }: { v: EnvVar }) {
   const result = validateVarValue(v.value, v.validation)
   if (result === null) return null
   return result
-    ? <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
-    : <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+    ? <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+    : <XCircle className="w-4 h-4 text-red-500 shrink-0" />
 }
 
 export function EnvManagerContent() {
@@ -706,11 +706,11 @@ export function EnvManagerContent() {
       <Dialog open={showShareWarning} onOpenChange={(open) => { if (!open) { setShowShareWarning(false); setPendingShareEnv(null) } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-3">
               <AlertTriangle className="w-4 h-4 text-amber-500" /> Security Warning
             </DialogTitle>
           </DialogHeader>
-          <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-700 p-4 text-sm text-amber-800 dark:text-amber-200">
+          <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-700 p-5 text-sm text-amber-800 dark:text-amber-200">
             This URL contains your secret values in encoded form. Anyone with this link can decode them. Consider using the encrypted HTML export instead.
           </div>
           <DialogFooter>
@@ -726,7 +726,7 @@ export function EnvManagerContent() {
       <Dialog open={showEncryptExport} onOpenChange={(open) => { if (!open) { setShowEncryptExport(false); setEncryptPassphrase(""); setEncryptEnv(null) } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-3">
               <Shield className="w-4 h-4 text-indigo-500" /> Encrypted Export
             </DialogTitle>
           </DialogHeader>
@@ -751,7 +751,7 @@ export function EnvManagerContent() {
       <Dialog open={!!rotateVarId} onOpenChange={(open) => { if (!open) { setRotateVarId(null); setRotateNewValue("") } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-3">
               <RotateCcw className="w-4 h-4 text-amber-500" /> Rotate Secret
             </DialogTitle>
           </DialogHeader>
@@ -777,12 +777,12 @@ export function EnvManagerContent() {
         color="text-indigo-500"
         badge="Dev Tools"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {view !== "projects" && <Button variant="outline" size="sm" onClick={() => { setView("projects"); setSelectedProject(null) }}>← Projects</Button>}
             {view === "project" && selectedProject && (
               <>
-                <Button variant="ghost" size="sm" onClick={() => setView("diff")}><GitCompare className="w-3.5 h-3.5 mr-1" /> Diff</Button>
-                <Button variant="ghost" size="sm" onClick={() => setView("sync")}><Zap className="w-3.5 h-3.5 mr-1" /> Sync</Button>
+                <Button variant="ghost" size="sm" onClick={() => setView("diff")}><GitCompare className="w-4 h-4 mr-1" /> Diff</Button>
+                <Button variant="ghost" size="sm" onClick={() => setView("sync")}><Zap className="w-4 h-4 mr-1" /> Sync</Button>
               </>
             )}
           </div>
@@ -792,16 +792,16 @@ export function EnvManagerContent() {
       <div className="flex flex-1">
         {/* ── Sidebar (project + env selector) ──────────────────────────── */}
         {view === "project" && selectedProject && (
-          <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r bg-muted/20 py-4 px-3 gap-1 sticky top-14 self-start max-h-[calc(100vh-3.5rem)] overflow-y-auto">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">{selectedProject.name}</p>
+          <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r bg-muted/20 py-4 px-4 gap-1.5 sticky top-14 self-start max-h-[calc(100vh-3.5rem)] overflow-y-auto">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-1">{selectedProject.name}</p>
             {selectedProject.environments.map((env) => (
               <button
                 key={env.id}
                 onClick={() => setSelectedEnvId(env.id)}
-                className={`flex items-center justify-between px-2 py-1.5 rounded-lg text-sm transition-colors ${selectedEnvId === env.id ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
+                className={`flex items-center justify-between px-4 py-2.5 rounded-lg text-sm transition-colors ${selectedEnvId === env.id ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
               >
                 <span>{env.name}</span>
-                <Badge variant="secondary" className="text-[10px] ml-1">{env.vars.length}</Badge>
+                <Badge variant="secondary" className="text-xs ml-1">{env.vars.length}</Badge>
               </button>
             ))}
           </aside>
@@ -814,7 +814,7 @@ export function EnvManagerContent() {
             <div className="space-y-5">
               <div>
                 <h1 className="text-3xl font-bold mb-1">Env Manager</h1>
-                <p className="text-muted-foreground text-sm">Visual .env editor across all your projects. Sync to Vercel, Railway, and Fly.io.</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">Visual .env editor across all your projects. Sync to Vercel, Railway, and Fly.io.</p>
               </div>
 
               {projects.length > 0 && (
@@ -832,11 +832,11 @@ export function EnvManagerContent() {
                       <button
                         key={i}
                         onClick={() => { setSelectedProject(r.project); setSelectedEnvId(r.env.id); setGlobalSearch(""); setView("project") }}
-                        className="w-full flex items-center gap-3 p-2 rounded border hover:bg-muted/50 text-left"
+                        className="w-full flex items-center gap-4 p-3 rounded border hover:bg-muted/50 text-left"
                       >
                         <code className="text-xs font-mono font-semibold">{r.var.key}</code>
                         <span className="text-xs text-muted-foreground">{r.project.name} / {r.env.name}</span>
-                        <Badge variant="secondary" className="text-[10px] ml-auto">{r.var.type}</Badge>
+                        <Badge variant="secondary" className="text-xs ml-auto">{r.var.type}</Badge>
                       </button>
                     ))}
                   </CardContent>
@@ -845,12 +845,12 @@ export function EnvManagerContent() {
 
               {showNewProject && (
                 <Card className="border-indigo-200 dark:border-indigo-800">
-                  <CardContent className="pt-4 space-y-3">
+                  <CardContent className="pt-4 space-y-4">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium">New Project</p>
                       <button onClick={() => setShowNewProject(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
                     </div>
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-medium mb-1 block">Project name *</label>
                         <Input placeholder="my-saas-app" value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && createProject()} />
@@ -860,8 +860,8 @@ export function EnvManagerContent() {
                         <Input placeholder="Optional description" value={newProjectDesc} onChange={(e) => setNewProjectDesc(e.target.value)} />
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={createProject}><Plus className="w-3 h-3 mr-1" /> Create</Button>
+                    <div className="flex gap-3">
+                      <Button size="sm" onClick={createProject}><Plus className="w-4 h-4 mr-1" /> Create</Button>
                       <Button variant="ghost" size="sm" onClick={() => setShowNewProject(false)}>Cancel</Button>
                     </div>
                   </CardContent>
@@ -871,16 +871,16 @@ export function EnvManagerContent() {
               {projects.length === 0 && !showNewProject ? (
                 <Card className="max-w-lg mx-auto mt-16">
                   <CardContent className="py-16 text-center">
-                    <Lock className="w-14 h-14 mx-auto mb-4 text-muted-foreground opacity-40" />
-                    <h2 className="text-xl font-semibold mb-2">No projects yet</h2>
-                    <p className="text-muted-foreground text-sm mb-6">Create a project to start managing your environment variables.</p>
+                    <Lock className="w-14 h-14 mx-auto mb-5 text-muted-foreground opacity-40" />
+                    <h2 className="text-2xl font-semibold mb-3">No projects yet</h2>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-8">Create a project to start managing your environment variables.</p>
                     <Button onClick={() => setShowNewProject(true)}><Plus className="w-4 h-4 mr-1" /> Create Project</Button>
                   </CardContent>
                 </Card>
               ) : (
                 <>
                   <Button onClick={() => setShowNewProject(true)} variant="outline"><Plus className="w-4 h-4 mr-1" /> New Project</Button>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {projects.map((p) => {
                       const totalVars = p.environments.reduce((sum, env) => sum + env.vars.length, 0)
                       return (
@@ -892,16 +892,16 @@ export function EnvManagerContent() {
                                 {p.description || `${p.environments.length} envs · ${totalVars} vars`}
                               </p>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <div className="hidden sm:flex gap-1">
+                            <div className="flex items-center gap-3">
+                              <div className="hidden sm:flex gap-1.5">
                                 {p.environments.slice(0, 4).map((env) => (
-                                  <Badge key={env.id} variant="secondary" className="text-[10px]">
+                                  <Badge key={env.id} variant="secondary" className="text-xs">
                                     {env.name} ({env.vars.length})
                                   </Badge>
                                 ))}
                               </div>
-                              <Button variant="ghost" size="icon-sm" onClick={(e) => { e.stopPropagation(); confirmDeleteProject(p) }}>
-                                <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); confirmDeleteProject(p) }}>
+                                <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
                               </Button>
                             </div>
                           </CardContent>
@@ -918,17 +918,17 @@ export function EnvManagerContent() {
           {view === "project" && selectedProject && (
             <div className="space-y-5">
               <div>
-                <h1 className="text-2xl font-bold">{selectedProject.name}</h1>
-                {selectedProject.description && <p className="text-muted-foreground text-sm">{selectedProject.description}</p>}
+                <h1 className="text-3xl font-bold">{selectedProject.name}</h1>
+                {selectedProject.description && <p className="text-muted-foreground text-sm leading-relaxed">{selectedProject.description}</p>}
               </div>
 
               {/* Environment tabs (mobile — sidebar handles desktop) */}
-              <div className="flex gap-1 border-b overflow-x-auto lg:hidden">
+              <div className="flex gap-1.5 border-b overflow-x-auto lg:hidden">
                 {selectedProject.environments.map((env) => (
                   <button
                     key={env.id}
                     onClick={() => setSelectedEnvId(env.id)}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${selectedEnvId === env.id ? "border-indigo-500 text-indigo-600" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                    className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${selectedEnvId === env.id ? "border-indigo-500 text-indigo-600" : "border-transparent text-muted-foreground hover:text-foreground"}`}
                   >
                     {env.name} <span className="text-xs opacity-60">({env.vars.length})</span>
                   </button>
@@ -937,34 +937,34 @@ export function EnvManagerContent() {
 
               {/* Rotation due banner */}
               {rotationDueVars.length > 0 && (
-                <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg text-sm">
+                <div className="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg text-sm">
                   <Clock className="w-4 h-4 text-amber-500 shrink-0" />
                   <span><strong>{rotationDueVars.length}</strong> secret{rotationDueVars.length !== 1 ? "s" : ""} due for rotation: {rotationDueVars.map((v) => v.key).join(", ")}</span>
                 </div>
               )}
 
               {selectedEnv && (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {/* Env actions */}
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setShowAddVar(true)}><Plus className="w-3.5 h-3.5 mr-1" /> Add Var</Button>
-                    <Button variant="outline" size="sm" onClick={() => setShowImport(true)}><Upload className="w-3.5 h-3.5 mr-1" /> Import .env</Button>
-                    <Button variant="outline" size="sm" onClick={() => setShowImportUrl(true)}><LinkIcon className="w-3.5 h-3.5 mr-1" /> Import URL</Button>
-                    <Button variant="outline" size="sm" onClick={() => downloadEnv(selectedEnv)}><Download className="w-3.5 h-3.5 mr-1" /> Export .env</Button>
-                    <Button variant="outline" size="sm" onClick={() => { setEncryptEnv(selectedEnv); setShowEncryptExport(true) }}><Shield className="w-3.5 h-3.5 mr-1" /> Encrypted Export</Button>
-                    <Button variant="outline" size="sm" onClick={() => requestShareURL(selectedEnv)}><Copy className="w-3.5 h-3.5 mr-1" /> Share URL</Button>
-                    <div className="flex items-center gap-1">
+                  <div className="flex flex-wrap gap-3">
+                    <Button variant="outline" size="sm" onClick={() => setShowAddVar(true)}><Plus className="w-4 h-4 mr-1" /> Add Var</Button>
+                    <Button variant="outline" size="sm" onClick={() => setShowImport(true)}><Upload className="w-4 h-4 mr-1" /> Import .env</Button>
+                    <Button variant="outline" size="sm" onClick={() => setShowImportUrl(true)}><LinkIcon className="w-4 h-4 mr-1" /> Import URL</Button>
+                    <Button variant="outline" size="sm" onClick={() => downloadEnv(selectedEnv)}><Download className="w-4 h-4 mr-1" /> Export .env</Button>
+                    <Button variant="outline" size="sm" onClick={() => { setEncryptEnv(selectedEnv); setShowEncryptExport(true) }}><Shield className="w-4 h-4 mr-1" /> Encrypted Export</Button>
+                    <Button variant="outline" size="sm" onClick={() => requestShareURL(selectedEnv)}><Copy className="w-4 h-4 mr-1" /> Share URL</Button>
+                    <div className="flex items-center gap-1.5">
                       <span className="text-xs text-muted-foreground">Copy to:</span>
                       {selectedProject.environments.filter((e) => e.id !== selectedEnvId).map((env) => (
                         <Button key={env.id} variant="ghost" size="sm" onClick={() => copyEnvToEnv(selectedEnvId!, env.id)}>
-                          <ArrowRight className="w-3 h-3 mr-1" />{env.name}
+                          <ArrowRight className="w-4 h-4 mr-1" />{env.name}
                         </Button>
                       ))}
                     </div>
                   </div>
 
                   {/* Environment inheritance selector */}
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span>Inherits from:</span>
                     <select
                       value={selectedEnv.inheritsFrom ?? ""}
@@ -977,7 +977,7 @@ export function EnvManagerContent() {
                         } : p)
                         updateProjects(next)
                       }}
-                      className="h-7 text-xs rounded border border-input bg-background px-2"
+                      className="h-7 text-xs rounded border border-input bg-background px-3"
                     >
                       <option value="">None</option>
                       {selectedProject.environments.filter((e) => e.id !== selectedEnvId).map((e) => (
@@ -994,19 +994,19 @@ export function EnvManagerContent() {
                   {/* Add var form */}
                   {showAddVar && (
                     <Card className="border-indigo-200 dark:border-indigo-800">
-                      <CardContent className="pt-4 space-y-3">
+                      <CardContent className="pt-4 space-y-4">
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-medium">Add Variable</p>
                           <button onClick={() => setShowAddVar(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
                         </div>
-                        <div className="grid sm:grid-cols-2 gap-3">
+                        <div className="grid sm:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-medium mb-1 block">Key *</label>
                             <Input placeholder="DATABASE_URL" value={newVarKey} onChange={(e) => setNewVarKey(e.target.value)} />
                           </div>
                           <div>
                             <label className="text-xs font-medium mb-1 block">Type</label>
-                            <select value={newVarType} onChange={(e) => setNewVarType(e.target.value as VarType)} className="w-full h-8 rounded border border-input bg-background px-2 text-sm">
+                            <select value={newVarType} onChange={(e) => setNewVarType(e.target.value as VarType)} className="w-full h-9 rounded border border-input bg-background px-3 text-sm">
                               {(Object.entries(VAR_TYPE_META) as [VarType, typeof VAR_TYPE_META[VarType]][]).map(([k, v]) => (
                                 <option key={k} value={k}>{v.label}</option>
                               ))}
@@ -1026,21 +1026,21 @@ export function EnvManagerContent() {
                           </div>
                           <div>
                             <label className="text-xs font-medium mb-1 block">Validation</label>
-                            <div className="flex gap-2">
-                              <select value={newVarValidationType} onChange={(e) => setNewVarValidationType(e.target.value as ValidationType)} className="flex-1 h-8 rounded border border-input bg-background px-2 text-xs">
+                            <div className="flex gap-3">
+                              <select value={newVarValidationType} onChange={(e) => setNewVarValidationType(e.target.value as ValidationType)} className="flex-1 h-9 rounded border border-input bg-background px-3 text-xs">
                                 {(["none", "url", "email", "uuid", "jwt"] as ValidationType[]).map((t) => (
                                   <option key={t} value={t}>{t}</option>
                                 ))}
                               </select>
-                              <label className="flex items-center gap-1 text-xs">
+                              <label className="flex items-center gap-1.5 text-xs">
                                 <input type="checkbox" checked={newVarRequired} onChange={(e) => setNewVarRequired(e.target.checked)} />
                                 Required
                               </label>
                             </div>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={addVar}><Plus className="w-3 h-3 mr-1" /> Add</Button>
+                        <div className="flex gap-3">
+                          <Button size="sm" onClick={addVar}><Plus className="w-4 h-4 mr-1" /> Add</Button>
                           <Button variant="ghost" size="sm" onClick={() => setShowAddVar(false)}>Cancel</Button>
                         </div>
                       </CardContent>
@@ -1050,14 +1050,14 @@ export function EnvManagerContent() {
                   {/* Import .env */}
                   {showImport && (
                     <Card className="border-indigo-200 dark:border-indigo-800">
-                      <CardContent className="pt-4 space-y-3">
+                      <CardContent className="pt-4 space-y-4">
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-medium">Import .env File</p>
                           <button onClick={() => setShowImport(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
                         </div>
                         <Textarea className="font-mono text-xs" rows={8} placeholder={"DATABASE_URL=postgresql://...\nNEXT_PUBLIC_URL=https://...\nSECRET_KEY=abc123"} value={importText} onChange={(e) => setImportText(e.target.value)} />
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={handleImport}><Upload className="w-3 h-3 mr-1" /> Import</Button>
+                        <div className="flex gap-3">
+                          <Button size="sm" onClick={handleImport}><Upload className="w-4 h-4 mr-1" /> Import</Button>
                           <Button variant="ghost" size="sm" onClick={() => setShowImport(false)}>Cancel</Button>
                         </div>
                       </CardContent>
@@ -1067,16 +1067,16 @@ export function EnvManagerContent() {
                   {/* Import from URL */}
                   {showImportUrl && (
                     <Card className="border-indigo-200 dark:border-indigo-800">
-                      <CardContent className="pt-4 space-y-3">
+                      <CardContent className="pt-4 space-y-4">
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-medium">Import from URL</p>
                           <button onClick={() => setShowImportUrl(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
                         </div>
                         <p className="text-xs text-muted-foreground">Fetch a .env file from a URL (fetched server-side to avoid CORS). Use a private S3 URL, secure Gist, etc.</p>
                         <Input placeholder="https://..." value={importUrl} onChange={(e) => setImportUrl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleImportFromUrl()} />
-                        <div className="flex gap-2">
+                        <div className="flex gap-3">
                           <Button size="sm" onClick={handleImportFromUrl} disabled={importUrlLoading}>
-                            {importUrlLoading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <LinkIcon className="w-3 h-3 mr-1" />}
+                            {importUrlLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <LinkIcon className="w-4 h-4 mr-1" />}
                             Import
                           </Button>
                           <Button variant="ghost" size="sm" onClick={() => setShowImportUrl(false)}>Cancel</Button>
@@ -1089,7 +1089,7 @@ export function EnvManagerContent() {
                   <Card>
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-sm flex items-center gap-2">
+                        <CardTitle className="text-sm flex items-center gap-3">
                           <FileText className="w-4 h-4 text-indigo-500" /> .env.example
                         </CardTitle>
                         <button onClick={() => setShowExampleSync((v) => !v)} className="text-muted-foreground hover:text-foreground">
@@ -1098,7 +1098,7 @@ export function EnvManagerContent() {
                       </div>
                     </CardHeader>
                     {showExampleSync && (
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-4">
                         {exampleDiff && (exampleDiff.notInExample.length > 0 || exampleDiff.notInEnv.length > 0) && (
                           <div className="space-y-1">
                             {exampleDiff.notInExample.length > 0 && (
@@ -1124,14 +1124,14 @@ export function EnvManagerContent() {
                             updateProjects(next)
                           }}
                         />
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" onClick={syncExampleFile}><RefreshCw className="w-3 h-3 mr-1" /> Sync .env.example</Button>
+                        <div className="flex gap-3">
+                          <Button size="sm" variant="outline" onClick={syncExampleFile}><RefreshCw className="w-4 h-4 mr-1" /> Sync .env.example</Button>
                           <Button size="sm" variant="ghost" onClick={() => {
                             if (selectedEnv.exampleContent) {
                               const blob = new Blob([selectedEnv.exampleContent], { type: "text/plain" })
                               const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = ".env.example"; a.click(); URL.revokeObjectURL(a.href)
                             }
-                          }}><Download className="w-3 h-3 mr-1" /> Download</Button>
+                          }}><Download className="w-4 h-4 mr-1" /> Download</Button>
                         </div>
                       </CardContent>
                     )}
@@ -1140,10 +1140,10 @@ export function EnvManagerContent() {
                   {/* Variable templates */}
                   <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center gap-2"><Layers className="w-4 h-4 text-indigo-500" /> Quick Templates</CardTitle>
+                      <CardTitle className="text-sm flex items-center gap-3"><Layers className="w-4 h-4 text-indigo-500" /> Quick Templates</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-3">
                         {VAR_TEMPLATES.map((t) => (
                           <Button
                             key={t.category}
@@ -1177,15 +1177,15 @@ export function EnvManagerContent() {
                   {/* Variables table */}
                   <Card>
                     <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center justify-between flex-wrap gap-3">
                         <CardTitle className="text-sm">{selectedEnv.name} Variables ({selectedEnv.vars.length})</CardTitle>
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="space-y-3">
                       {selectedEnv.vars.length > 0 && (
                         <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                          <Input placeholder="Filter by key or value..." value={varSearch} onChange={(e) => setVarSearch(e.target.value)} className="pl-8 h-8 text-xs" />
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <Input placeholder="Filter by key or value..." value={varSearch} onChange={(e) => setVarSearch(e.target.value)} className="pl-8 h-9 text-xs" />
                         </div>
                       )}
                       {selectedEnv.vars.length === 0 ? (
@@ -1201,17 +1201,17 @@ export function EnvManagerContent() {
                             const rotationDue = isRotationDue(v)
                             const isValidationEditing = validationVarId === v.id
                             return (
-                              <div key={v.id} className={`${idx % 2 === 0 ? "" : "bg-muted/20"} border-b last:border-0 px-3 py-2 hover:bg-muted/30 transition-colors`}>
-                                <div className="grid grid-cols-12 gap-2 items-center">
-                                  <div className="col-span-4 flex items-center gap-2 min-w-0">
-                                    <span className={`text-[10px] font-medium shrink-0 ${VAR_TYPE_META[v.type].color}`}>
+                              <div key={v.id} className={`${idx % 2 === 0 ? "" : "bg-muted/20"} border-b last:border-0 px-4 py-2.5 hover:bg-muted/30 transition-colors`}>
+                                <div className="grid grid-cols-12 gap-3 items-center">
+                                  <div className="col-span-4 flex items-center gap-3 min-w-0">
+                                    <span className={`text-xs font-medium shrink-0 ${VAR_TYPE_META[v.type].color}`}>
                                       {VAR_TYPE_META[v.type].label}
                                     </span>
                                     <code className="text-xs font-semibold truncate">{v.key}</code>
-                                    {rotationDue && <span title="Rotation due"><Clock className="w-3 h-3 text-amber-500 shrink-0" /></span>}
+                                    {rotationDue && <span title="Rotation due"><Clock className="w-4 h-4 text-amber-500 shrink-0" /></span>}
                                     <ValidationIndicator v={v} />
                                   </div>
-                                  <div className="col-span-6 flex items-center gap-1 min-w-0">
+                                  <div className="col-span-6 flex items-center gap-1.5 min-w-0">
                                     <Input
                                       type={v.type === "secret" && !isRevealed ? "password" : "text"}
                                       value={isEditingValue ? editingVarValue : v.value}
@@ -1228,24 +1228,24 @@ export function EnvManagerContent() {
                                     />
                                     {v.type === "secret" && (
                                       <button onClick={() => toggleSecret(v.id)} className="shrink-0">
-                                        {isRevealed ? <EyeOff className="w-3.5 h-3.5 text-muted-foreground" /> : <Eye className="w-3.5 h-3.5 text-muted-foreground" />}
+                                        {isRevealed ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
                                       </button>
                                     )}
                                   </div>
-                                  <div className="col-span-2 flex items-center justify-end gap-1">
+                                  <div className="col-span-2 flex items-center justify-end gap-1.5">
                                     {(v.type === "secret" || v.rotationInterval) && (
                                       <button onClick={() => setRotateVarId(v.id)} title="Rotate secret" className="p-0.5 text-muted-foreground hover:text-amber-500">
-                                        <RotateCcw className="w-3 h-3" />
+                                        <RotateCcw className="w-4 h-4" />
                                       </button>
                                     )}
                                     <button onClick={() => setValidationVarId(isValidationEditing ? null : v.id)} title="Validation settings" className="p-0.5 text-muted-foreground hover:text-indigo-500">
-                                      <Shield className="w-3 h-3" />
+                                      <Shield className="w-4 h-4" />
                                     </button>
                                     <button onClick={() => copyText(v.value, v.id)}>
-                                      {copiedKey === v.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+                                      {copiedKey === v.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
                                     </button>
                                     <button onClick={() => deleteVar(v.id)}>
-                                      <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                                      <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
                                     </button>
                                   </div>
                                 </div>
@@ -1257,13 +1257,13 @@ export function EnvManagerContent() {
                                       onChange={(e) => setEditingDescValue(e.target.value)}
                                       onBlur={() => { updateVar(v.id, { description: editingDescValue }); setEditingDescId(null); setEditingDescValue("") }}
                                       autoFocus
-                                      className="h-6 text-[11px] text-muted-foreground"
+                                      className="h-6 text-xs text-muted-foreground"
                                       placeholder="Add description..."
                                     />
                                   ) : (
                                     <button
                                       onClick={() => { setEditingDescId(v.id); setEditingDescValue(v.description ?? "") }}
-                                      className="text-[11px] text-muted-foreground hover:text-foreground text-left truncate max-w-full"
+                                      className="text-xs text-muted-foreground hover:text-foreground text-left truncate max-w-full"
                                     >
                                       {v.description || <span className="opacity-40 italic">Add description</span>}
                                     </button>
@@ -1271,14 +1271,14 @@ export function EnvManagerContent() {
                                 </div>
                                 {/* Rotation info */}
                                 {v.rotationInterval && (
-                                  <div className="mt-0.5 pl-1 flex items-center gap-2 text-[11px] text-muted-foreground">
-                                    <Clock className="w-3 h-3" />
+                                  <div className="mt-0.5 pl-1 flex items-center gap-3 text-xs text-muted-foreground">
+                                    <Clock className="w-4 h-4" />
                                     <span>Rotate every {v.rotationInterval}d{v.lastRotatedAt ? ` · last rotated ${new Date(v.lastRotatedAt).toLocaleDateString()}` : " · never rotated"}</span>
                                   </div>
                                 )}
                                 {/* Inline validation editor */}
                                 {isValidationEditing && (
-                                  <div className="mt-2 pl-1 flex items-center gap-2 flex-wrap">
+                                  <div className="mt-2 pl-1 flex items-center gap-3 flex-wrap">
                                     <span className="text-xs text-muted-foreground">Validation:</span>
                                     <select
                                       value={v.validation?.type ?? "none"}
@@ -1289,7 +1289,7 @@ export function EnvManagerContent() {
                                         <option key={t} value={t}>{t}</option>
                                       ))}
                                     </select>
-                                    <label className="flex items-center gap-1 text-xs">
+                                    <label className="flex items-center gap-1.5 text-xs">
                                       <input type="checkbox" checked={v.validation?.required ?? false} onChange={(e) => updateVar(v.id, { validation: { type: v.validation?.type ?? "none", required: e.target.checked } })} />
                                       Required
                                     </label>
@@ -1309,9 +1309,9 @@ export function EnvManagerContent() {
                           </p>
                           <div className="rounded-lg border border-dashed overflow-hidden opacity-60">
                             {inheritedVars.map((v) => (
-                              <div key={v.id} className="px-3 py-2 border-b last:border-0">
-                                <div className="flex items-center gap-2">
-                                  <span className={`text-[10px] font-medium shrink-0 ${VAR_TYPE_META[v.type].color}`}>{VAR_TYPE_META[v.type].label}</span>
+                              <div key={v.id} className="px-4 py-2.5 border-b last:border-0">
+                                <div className="flex items-center gap-3">
+                                  <span className={`text-xs font-medium shrink-0 ${VAR_TYPE_META[v.type].color}`}>{VAR_TYPE_META[v.type].label}</span>
                                   <code className="text-xs font-semibold">{v.key}</code>
                                   <span className="text-xs text-muted-foreground font-mono truncate">{v.type === "secret" ? "••••••••" : v.value}</span>
                                 </div>
@@ -1327,14 +1327,14 @@ export function EnvManagerContent() {
                   <Card>
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-sm flex items-center gap-2"><Code className="w-4 h-4 text-indigo-500" /> Unused Variable Detector</CardTitle>
+                        <CardTitle className="text-sm flex items-center gap-3"><Code className="w-4 h-4 text-indigo-500" /> Unused Variable Detector</CardTitle>
                         <button onClick={() => setShowUnusedDetector((v) => !v)} className="text-muted-foreground hover:text-foreground">
                           {showUnusedDetector ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                         </button>
                       </div>
                     </CardHeader>
                     {showUnusedDetector && (
-                      <CardContent className="space-y-3">
+                      <CardContent className="space-y-4">
                         <p className="text-xs text-muted-foreground">Paste source code to scan for <code className="font-mono">process.env.KEY</code> patterns.</p>
                         <Textarea
                           className="font-mono text-xs"
@@ -1343,13 +1343,13 @@ export function EnvManagerContent() {
                           value={unusedScanCode}
                           onChange={(e) => setUnusedScanCode(e.target.value)}
                         />
-                        <Button size="sm" variant="outline" onClick={scanUnusedVars}><Search className="w-3.5 h-3.5 mr-1" /> Scan</Button>
+                        <Button size="sm" variant="outline" onClick={scanUnusedVars}><Search className="w-4 h-4 mr-1" /> Scan</Button>
                         {unusedResult && (
-                          <div className="space-y-2 text-xs">
+                          <div className="space-y-3 text-xs">
                             {unusedResult.unused.length > 0 && (
                               <div>
                                 <p className="font-semibold text-amber-600 mb-1">Defined but not used in code ({unusedResult.unused.length})</p>
-                                <div className="flex flex-wrap gap-1">
+                                <div className="flex flex-wrap gap-1.5">
                                   {unusedResult.unused.map((k) => <Badge key={k} variant="secondary" className="font-mono text-amber-600">{k}</Badge>)}
                                 </div>
                               </div>
@@ -1357,7 +1357,7 @@ export function EnvManagerContent() {
                             {unusedResult.undeclared.length > 0 && (
                               <div>
                                 <p className="font-semibold text-red-600 mb-1">Referenced in code but not defined ({unusedResult.undeclared.length})</p>
-                                <div className="flex flex-wrap gap-1">
+                                <div className="flex flex-wrap gap-1.5">
                                   {unusedResult.undeclared.map((k) => <Badge key={k} variant="secondary" className="font-mono text-red-600">{k}</Badge>)}
                                 </div>
                               </div>
@@ -1374,9 +1374,9 @@ export function EnvManagerContent() {
                   {/* Missing vars detector */}
                   <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center gap-2"><AlertCircle className="w-4 h-4 text-indigo-500" /> Missing Vars Detector</CardTitle>
+                      <CardTitle className="text-sm flex items-center gap-3"><AlertCircle className="w-4 h-4 text-indigo-500" /> Missing Vars Detector</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-3">
+                    <CardContent className="space-y-4">
                       <Textarea
                         className="font-mono text-xs"
                         rows={4}
@@ -1384,9 +1384,9 @@ export function EnvManagerContent() {
                         value={exampleInput}
                         onChange={(e) => setExampleInput(e.target.value)}
                       />
-                      <Button size="sm" variant="outline" onClick={checkMissingVars}><Search className="w-3.5 h-3.5 mr-1" /> Check Missing</Button>
+                      <Button size="sm" variant="outline" onClick={checkMissingVars}><Search className="w-4 h-4 mr-1" /> Check Missing</Button>
                       {missingVars.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-3">
                           {missingVars.map((k) => <Badge key={k} variant="secondary" className="font-mono text-xs text-red-600">{k}</Badge>)}
                         </div>
                       )}
@@ -1401,10 +1401,10 @@ export function EnvManagerContent() {
                       <CardContent>
                         <div className="space-y-1.5 max-h-48 overflow-y-auto">
                           {envAudit.map((a) => (
-                            <div key={a.id} className="flex items-center gap-3 text-xs">
+                            <div key={a.id} className="flex items-center gap-4 text-xs">
                               <span className="shrink-0"><AuditIcon action={a.action} /></span>
                               <code className="font-mono font-medium shrink-0">{a.varKey}</code>
-                              <Badge variant="secondary" className="text-[10px] shrink-0">{a.action}</Badge>
+                              <Badge variant="secondary" className="text-xs shrink-0">{a.action}</Badge>
                               <span className="text-muted-foreground ml-auto shrink-0">{new Date(a.timestamp).toLocaleString()}</span>
                             </div>
                           ))}
@@ -1420,18 +1420,18 @@ export function EnvManagerContent() {
           {/* ── DIFF VIEW ─────────────────────────────────────────────────────── */}
           {view === "diff" && selectedProject && (
             <div className="space-y-5">
-              <h1 className="text-2xl font-bold">Environment Diff</h1>
+              <h1 className="text-3xl font-bold">Environment Diff</h1>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Environment A</label>
-                  <select value={diffEnvA} onChange={(e) => setDiffEnvA(e.target.value)} className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+                  <select value={diffEnvA} onChange={(e) => setDiffEnvA(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm">
                     <option value="">Select...</option>
                     {selectedProject.environments.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-medium mb-1 block">Environment B</label>
-                  <select value={diffEnvB} onChange={(e) => setDiffEnvB(e.target.value)} className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+                  <select value={diffEnvB} onChange={(e) => setDiffEnvB(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm">
                     <option value="">Select...</option>
                     {selectedProject.environments.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
                   </select>
@@ -1439,7 +1439,7 @@ export function EnvManagerContent() {
               </div>
 
               {diffResult && (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {diffResult.onlyInA.length > 0 && (
                     <Card>
                       <CardHeader className="pb-2"><CardTitle className="text-sm text-blue-600">Only in {selectedProject.environments.find((e) => e.id === diffEnvA)?.name} ({diffResult.onlyInA.length})</CardTitle></CardHeader>
@@ -1459,13 +1459,13 @@ export function EnvManagerContent() {
                   {diffResult.changed.length > 0 && (
                     <Card>
                       <CardHeader className="pb-2"><CardTitle className="text-sm text-amber-600">Different values ({diffResult.changed.length})</CardTitle></CardHeader>
-                      <CardContent className="space-y-2">
+                      <CardContent className="space-y-3">
                         {diffResult.changed.map((c) => (
                           <div key={c.key} className="text-xs">
                             <code className="font-mono font-semibold">{c.key}</code>
-                            <div className="grid grid-cols-2 gap-2 mt-1">
-                              <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded font-mono truncate">{c.valueA}</div>
-                              <div className="bg-green-50 dark:bg-green-950 p-2 rounded font-mono truncate">{c.valueB}</div>
+                            <div className="grid grid-cols-2 gap-3 mt-1">
+                              <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded font-mono truncate">{c.valueA}</div>
+                              <div className="bg-green-50 dark:bg-green-950 p-3 rounded font-mono truncate">{c.valueB}</div>
                             </div>
                           </div>
                         ))}
@@ -1481,17 +1481,17 @@ export function EnvManagerContent() {
           {/* ── SYNC VIEW ─────────────────────────────────────────────────────── */}
           {view === "sync" && selectedProject && (
             <div className="space-y-5 max-w-lg mx-auto">
-              <h1 className="text-2xl font-bold">Sync to Platform</h1>
+              <h1 className="text-3xl font-bold">Sync to Platform</h1>
               <Card>
-                <CardContent className="pt-5 space-y-4">
+                <CardContent className="pt-5 space-y-5">
                   <div>
-                    <label className="text-xs font-medium mb-2 block">Platform</label>
-                    <div className="flex gap-2">
+                    <label className="text-xs font-medium mb-3 block">Platform</label>
+                    <div className="flex gap-3">
                       {(["vercel", "railway", "fly"] as const).map((platform) => (
                         <button
                           key={platform}
                           onClick={() => setSyncPlatform(platform)}
-                          className={`flex-1 py-2 rounded border text-sm font-medium transition-colors ${syncPlatform === platform ? "bg-indigo-500 text-white border-indigo-500" : "border-border hover:bg-muted"}`}
+                          className={`flex-1 py-2.5 rounded border text-sm font-medium transition-colors ${syncPlatform === platform ? "bg-indigo-500 text-white border-indigo-500" : "border-border hover:bg-muted"}`}
                         >
                           {platform === "fly" ? "Fly.io" : platform.charAt(0).toUpperCase() + platform.slice(1)}
                         </button>
@@ -1500,7 +1500,7 @@ export function EnvManagerContent() {
                   </div>
                   <div>
                     <label className="text-xs font-medium mb-1 block">Environment</label>
-                    <select value={syncEnvId} onChange={(e) => setSyncEnvId(e.target.value)} className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+                    <select value={syncEnvId} onChange={(e) => setSyncEnvId(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm">
                       <option value="">Select environment...</option>
                       {selectedProject.environments.map((e) => <option key={e.id} value={e.id}>{e.name} ({e.vars.length} vars)</option>)}
                     </select>
@@ -1540,6 +1540,6 @@ export function EnvManagerContent() {
 function DiffRow({ label, status }: { label: string; status: "only-a" | "only-b" }) {
   const color = status === "only-a" ? "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300" : "bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300"
   return (
-    <div className={`px-3 py-1.5 rounded font-mono text-xs ${color}`}>{label}</div>
+    <div className={`px-4 py-2 rounded font-mono text-xs ${color}`}>{label}</div>
   )
 }

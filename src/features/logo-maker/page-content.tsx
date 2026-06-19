@@ -205,11 +205,11 @@ export function LogoMakerContent() {
   return (
     <>
       <ToolHeader title="Logo Maker" icon={Palette} color="text-pink-500" badge="Creative" />
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-5 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
           {/* ── Controls ──────────────────────────────────────────────────── */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-5">
             {/* App name */}
             <Card>
               <CardHeader><CardTitle>App / Company Name</CardTitle></CardHeader>
@@ -226,9 +226,9 @@ export function LogoMakerContent() {
                   <span className="text-xs text-muted-foreground font-mono">{selectedIcon}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
                 <div className="relative">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     placeholder="Search icons..."
                     value={iconSearch}
@@ -236,7 +236,7 @@ export function LogoMakerContent() {
                     className="pl-7"
                   />
                 </div>
-                <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-8 gap-1.5 max-h-48 overflow-y-auto">
                   {filteredIcons.map((icon) => {
                     const IconComp = (LucideIcons as unknown as Record<string, React.ComponentType<{className?: string; size?: number}>>)[icon]
                     if (!IconComp) return null
@@ -245,7 +245,7 @@ export function LogoMakerContent() {
                         key={icon}
                         onClick={() => setSelectedIcon(icon)}
                         title={icon}
-                        className={`w-8 h-8 flex items-center justify-center rounded transition-all ${
+                        className={`w-8 h-9 flex items-center justify-center rounded transition-all ${
                           selectedIcon === icon
                             ? "bg-foreground text-background"
                             : "hover:bg-muted"
@@ -262,20 +262,20 @@ export function LogoMakerContent() {
             {/* AI icon suggest */}
             <Card>
               <CardHeader><CardTitle>AI Icon Suggest</CardTitle></CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex gap-2">
+              <CardContent className="space-y-3">
+                <div className="flex gap-4">
                   <Input placeholder="Describe your app..." value={aiDesc} onChange={(e) => setAiDesc(e.target.value)} />
                   <Button onClick={suggestIcons} disabled={aiLoading || !aiDesc.trim()} size="sm">
-                    {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                    {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                   </Button>
                 </div>
                 {aiSuggestions.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {aiSuggestions.map((icon) => (
                       <button
                         key={icon}
                         onClick={() => { setSelectedIcon(icon); setIconSearch("") }}
-                        className={`text-xs px-2 py-1 rounded border transition-all ${
+                        className={`text-xs px-3 py-1.5 rounded border transition-all ${
                           selectedIcon === icon
                             ? "bg-foreground text-background border-foreground"
                             : "border-border hover:border-foreground/30"
@@ -292,37 +292,37 @@ export function LogoMakerContent() {
             {/* Color presets */}
             <Card>
               <CardHeader><CardTitle>Color Preset</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-2">
+              <CardContent className="space-y-4">
+                <div className="flex flex-wrap gap-4">
                   {LOGO_PRESETS.map((preset) => (
                     <button
                       key={preset.id}
                       onClick={() => selectPreset(preset)}
                       title={preset.label}
-                      className={`w-8 h-8 rounded-full border-2 transition-all ${
+                      className={`w-8 h-9 rounded-full border-2 transition-all ${
                         bgColor === preset.bg && iconColor === preset.iconColor
                           ? "border-foreground scale-110"
                           : "border-transparent hover:border-foreground/30"
                       }`}
                       style={{ backgroundColor: preset.bg }}
                     >
-                      <div className="w-3 h-3 rounded-full mx-auto" style={{ backgroundColor: preset.iconColor }} />
+                      <div className="w-4 h-4 rounded-full mx-auto" style={{ backgroundColor: preset.iconColor }} />
                     </button>
                   ))}
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <div>
-                    <label className="text-[10px] text-muted-foreground mb-1 block">Background</label>
-                    <div className="flex gap-1">
-                      <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0" />
-                      <Input value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-24 text-xs h-8" />
+                    <label className="text-xs text-muted-foreground mb-1 block">Background</label>
+                    <div className="flex gap-1.5">
+                      <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-8 h-9 rounded cursor-pointer border-0 p-0" />
+                      <Input value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-24 text-xs h-9" />
                     </div>
                   </div>
                   <div>
-                    <label className="text-[10px] text-muted-foreground mb-1 block">Icon Color</label>
-                    <div className="flex gap-1">
-                      <input type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0" />
-                      <Input value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-24 text-xs h-8" />
+                    <label className="text-xs text-muted-foreground mb-1 block">Icon Color</label>
+                    <div className="flex gap-1.5">
+                      <input type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-8 h-9 rounded cursor-pointer border-0 p-0" />
+                      <Input value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-24 text-xs h-9" />
                     </div>
                   </div>
                 </div>
@@ -333,12 +333,12 @@ export function LogoMakerContent() {
             <Card>
               <CardHeader><CardTitle>Shape</CardTitle></CardHeader>
               <CardContent>
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                   {(["circle", "rounded", "square"] as const).map((s) => (
                     <button
                       key={s}
                       onClick={() => setShape(s)}
-                      className={`flex-1 py-2 text-xs font-medium border rounded-lg transition-all ${
+                      className={`flex-1 py-2.5 text-xs font-medium border rounded-xl transition-all ${
                         shape === s ? "bg-foreground text-background border-foreground" : "border-border hover:border-foreground/30"
                       }`}
                     >
@@ -353,12 +353,12 @@ export function LogoMakerContent() {
             <Card>
               <CardHeader><CardTitle>Export Size</CardTitle></CardHeader>
               <CardContent>
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                   {([400, 512, 1024] as const).map((s) => (
                     <button
                       key={s}
                       onClick={() => setSize(s)}
-                      className={`flex-1 py-2 text-xs font-medium border rounded-lg transition-all ${
+                      className={`flex-1 py-2.5 text-xs font-medium border rounded-xl transition-all ${
                         size === s ? "bg-foreground text-background border-foreground" : "border-border hover:border-foreground/30"
                       }`}
                     >
@@ -372,7 +372,7 @@ export function LogoMakerContent() {
 
           {/* ── Preview ──────────────────────────────────────────────────── */}
           <div className="lg:col-span-3 flex flex-col items-center">
-            <div className="mb-6">
+            <div className="mb-8">
               <div
                 className="rounded-xl overflow-hidden shadow-2xl"
                 style={{ width: 400, height: 400 }}
@@ -381,7 +381,7 @@ export function LogoMakerContent() {
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-4 mb-5">
               <Button onClick={() => downloadPNG(svgString, size, `${filename}.png`)}>
                 <Download className="w-4 h-4" /> Download PNG
               </Button>
@@ -399,13 +399,13 @@ export function LogoMakerContent() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   SVG Code
-                  <Button variant="ghost" size="xs" onClick={copySvg}>
-                    {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  <Button variant="ghost" size="sm" onClick={copySvg}>
+                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <pre className="text-[10px] text-muted-foreground overflow-x-auto max-h-40 overflow-y-auto font-mono whitespace-pre-wrap break-all">
+                <pre className="text-xs text-muted-foreground overflow-x-auto max-h-40 overflow-y-auto font-mono whitespace-pre-wrap break-all">
                   {svgString}
                 </pre>
               </CardContent>

@@ -454,23 +454,23 @@ export function LaunchPadContent() {
         color="text-orange-500"
         badge="Marketing"
         actions={
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-4 flex-wrap">
             {view !== "form" && <Button variant="outline" size="sm" onClick={() => { setForm(defaultForm()); setView("form") }}>← New Launch</Button>}
             <Button variant="ghost" size="sm" onClick={() => setView("waitlist")} className={view === "waitlist" ? "bg-muted" : ""}>
-              <Megaphone className="w-3.5 h-3.5 mr-1" /> Waitlist
+              <Megaphone className="w-4 h-4 mr-1" /> Waitlist
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setView("research")} className={view === "research" ? "bg-muted" : ""}>
-              <Search className="w-3.5 h-3.5 mr-1" /> Research
+              <Search className="w-4 h-4 mr-1" /> Research
             </Button>
             {records.length > 0 && (
               <Button variant="ghost" size="sm" onClick={() => setView(view === "history" ? "form" : "history")} className={view === "history" ? "bg-muted" : ""}>
-                <History className="w-3.5 h-3.5 mr-1" /> History
+                <History className="w-4 h-4 mr-1" /> History
               </Button>
             )}
           </div>
         }
       />
-      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full">
+      <main className="flex-1 max-w-4xl mx-auto px-5 py-6 w-full">
 
         {/* ── FORM ─────────────────────────────────────────────────────────── */}
         {view === "form" && (
@@ -481,9 +481,9 @@ export function LaunchPadContent() {
             </div>
 
             {/* Product basics */}
-            <section className="space-y-4">
+            <section className="space-y-5">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Product</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-5">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Product name *</label>
                   <Input placeholder="DevDash" value={form.productName} onChange={(e) => setForm((f) => ({ ...f, productName: e.target.value }))} />
@@ -518,24 +518,24 @@ export function LaunchPadContent() {
             </section>
 
             {/* Features */}
-            <section className="space-y-3">
+            <section className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Key Features</h2>
                 <Button variant="ghost" size="sm" onClick={addFeature} disabled={form.keyFeatures.length >= 6}>
-                  <Plus className="w-3 h-3 mr-1" /> Add
+                  <Plus className="w-4 h-4 mr-1" /> Add
                 </Button>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {form.keyFeatures.map((f, i) => (
-                  <div key={i} className="flex gap-2">
+                  <div key={i} className="flex gap-4">
                     <Input
                       placeholder={`Feature ${i + 1}`}
                       value={f}
                       onChange={(e) => updateFeature(i, e.target.value)}
                     />
                     {form.keyFeatures.length > 1 && (
-                      <Button variant="ghost" size="icon-sm" onClick={() => removeFeature(i)}>
-                        <X className="w-3.5 h-3.5" />
+                      <Button variant="ghost" size="icon" onClick={() => removeFeature(i)}>
+                        <X className="w-4 h-4" />
                       </Button>
                     )}
                   </div>
@@ -544,9 +544,9 @@ export function LaunchPadContent() {
             </section>
 
             {/* Tech + URL */}
-            <section className="space-y-3">
+            <section className="space-y-4">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Details</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-5">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Tech stack (optional)</label>
                   <Input placeholder="Next.js, Postgres, Vercel" value={form.techStack} onChange={(e) => setForm((f) => ({ ...f, techStack: e.target.value }))} />
@@ -559,14 +559,14 @@ export function LaunchPadContent() {
             </section>
 
             {/* Tone */}
-            <section className="space-y-3">
+            <section className="space-y-4">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Tone</h2>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-4">
                 {(Object.entries(TONES) as [ToneId, typeof TONES[ToneId]][]).map(([id, t]) => (
                   <button
                     key={id}
                     onClick={() => setForm((f) => ({ ...f, tone: id }))}
-                    className={`px-3 py-1.5 rounded-lg border text-sm transition-colors ${form.tone === id ? "bg-orange-500 text-white border-orange-500" : "border-border hover:bg-muted"}`}
+                    className={`px-4 py-2 rounded-xl border text-sm transition-colors ${form.tone === id ? "bg-orange-500 text-white border-orange-500" : "border-border hover:bg-muted"}`}
                   >
                     <span className="font-medium">{t.label}</span>
                     <span className="text-xs opacity-70 ml-1 hidden sm:inline">— {t.desc}</span>
@@ -576,16 +576,16 @@ export function LaunchPadContent() {
             </section>
 
             {/* Launch date + Schedule */}
-            <section className="space-y-3">
+            <section className="space-y-4">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Launch Schedule</h2>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-5">
                 <div className="flex-1">
                   <label className="text-xs font-medium mb-1 block">Target launch date (optional)</label>
                   <input
                     type="date"
                     value={form.launchDate ?? ""}
                     onChange={(e) => setForm((f) => ({ ...f, launchDate: e.target.value || undefined }))}
-                    className="h-8 text-sm rounded-md border border-input bg-background px-3 w-full"
+                    className="h-9 text-sm rounded-md border border-input bg-background px-4 w-full"
                   />
                 </div>
                 {form.launchDate && (
@@ -599,14 +599,14 @@ export function LaunchPadContent() {
               {form.launchDate && (
                 <div>
                   <button
-                    className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
+                    className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
                     onClick={() => setShowSchedule(!showSchedule)}
                   >
-                    {showSchedule ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                    {showSchedule ? <ChevronUp className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                     Pre-launch timeline
                   </button>
                   {showSchedule && (
-                    <div className="mt-3 space-y-2 pl-2 border-l-2 border-orange-200 dark:border-orange-900">
+                    <div className="mt-4 space-y-3 pl-2 border-l-2 border-orange-200 dark:border-orange-900">
                       {PRE_LAUNCH_TIMELINE.map((item) => {
                         const d = daysUntil(form.launchDate!)
                         const daysFromNow = d + item.dayOffset
@@ -637,10 +637,10 @@ export function LaunchPadContent() {
             {/* Checklist */}
             <section>
               <button
-                className="w-full text-left flex items-center justify-between py-2"
+                className="w-full text-left flex items-center justify-between py-2.5"
                 onClick={() => setShowChecklist(!showChecklist)}
               >
-                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-4">
                   <CheckSquare className="w-4 h-4 text-orange-500" />
                   Before You Launch
                   <span className="normal-case font-normal text-xs">({checkedCount}/{LAUNCH_CHECKLIST.length})</span>
@@ -648,9 +648,9 @@ export function LaunchPadContent() {
                 {showChecklist ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
               {showChecklist && (
-                <div className="mt-2 space-y-2">
+                <div className="mt-2 space-y-3">
                   {LAUNCH_CHECKLIST.map((item, i) => (
-                    <label key={i} className="flex items-center gap-3 cursor-pointer">
+                    <label key={i} className="flex items-center gap-4 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={!!checkedItems[i]}
@@ -665,12 +665,12 @@ export function LaunchPadContent() {
             </section>
 
             {/* Best times */}
-            <section className="space-y-2">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+            <section className="space-y-3">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-4">
                 <Clock className="w-4 h-4 text-orange-500" /> Best Times to Launch
               </h2>
               {Object.entries(BEST_TIMES).map(([platform, time]) => (
-                <div key={platform} className="flex items-start gap-3 text-sm">
+                <div key={platform} className="flex items-start gap-4 text-sm">
                   <span className="font-medium w-32 shrink-0">{platform}</span>
                   <span className="text-muted-foreground">{time}</span>
                 </div>
@@ -681,50 +681,50 @@ export function LaunchPadContent() {
 
         {/* ── OUTPUT ───────────────────────────────────────────────────────── */}
         {view === "output" && currentOutput && (
-          <div className="space-y-6">
-            <div className="flex items-start justify-between gap-4">
+          <div className="space-y-8">
+            <div className="flex items-start justify-between gap-5">
               <div>
                 <h1 className="text-2xl font-bold">Launch Copy Ready</h1>
                 <p className="text-muted-foreground text-sm">6 platform-optimized formats generated.</p>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-4 shrink-0">
                 {/* Checklist progress badge */}
-                <span className="text-xs text-muted-foreground px-2 py-1 rounded-lg bg-muted border">
-                  <CheckSquare className="inline w-3 h-3 mr-1" />
+                <span className="text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-muted border">
+                  <CheckSquare className="inline w-4 h-4 mr-1" />
                   {checkedCount}/{LAUNCH_CHECKLIST.length} checked
                 </span>
                 <Button variant="outline" size="sm" onClick={handleGenerate} disabled={loading}>
-                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
                   Regenerate
                 </Button>
               </div>
             </div>
 
             {/* Tone selector */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-4">
               <span className="text-sm text-muted-foreground">Tone:</span>
               {(Object.entries(TONES) as [ToneId, typeof TONES[ToneId]][]).map(([id, t]) => (
                 <button
                   key={id}
                   onClick={() => setForm((f) => ({ ...f, tone: id }))}
-                  className={`px-2 py-1 rounded text-xs border transition-colors ${form.tone === id ? "bg-orange-500 text-white border-orange-500" : "border-border hover:bg-muted"}`}
+                  className={`px-3 py-1.5 rounded text-xs border transition-colors ${form.tone === id ? "bg-orange-500 text-white border-orange-500" : "border-border hover:bg-muted"}`}
                 >
                   {t.label}
                 </button>
               ))}
               <Button size="sm" variant="outline" onClick={handleGenerate} disabled={loading}>
-                {loading ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
+                {loading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
                 Apply tone
               </Button>
             </div>
 
             {/* Bold pill tab bar */}
-            <div className="flex gap-1.5 p-1 bg-muted/60 rounded-xl overflow-x-auto">
+            <div className="flex gap-2 p-1 bg-muted/60 rounded-xl overflow-x-auto">
               {OUTPUT_TABS.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setOutputTab(t.id)}
-                  className={`px-4 py-1.5 text-sm font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 ${outputTab === t.id ? "bg-background text-foreground shadow-sm ring-1 ring-foreground/10" : "text-muted-foreground hover:text-foreground"}`}
+                  className={`px-5 py-2 text-sm font-semibold rounded-xl transition-all whitespace-nowrap flex items-center gap-2 ${outputTab === t.id ? "bg-background text-foreground shadow-sm ring-1 ring-foreground/10" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   <span className={outputTab === t.id ? t.color : ""}>{t.label}</span>
                 </button>
@@ -732,7 +732,7 @@ export function LaunchPadContent() {
             </div>
 
             {/* Per-tab header with char count progress */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-5">
               <CharCountBar outputTab={outputTab} currentOutput={currentOutput} />
               <Button
                 variant="ghost"
@@ -742,8 +742,8 @@ export function LaunchPadContent() {
                 className="shrink-0"
               >
                 {regenLoading === outputTab
-                  ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Regenerating...</>
-                  : <><RefreshCw className="w-3.5 h-3.5 mr-1" /> Redo {OUTPUT_TABS.find((t) => t.id === outputTab)?.label}</>}
+                  ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Regenerating...</>
+                  : <><RefreshCw className="w-4 h-4 mr-1" /> Redo {OUTPUT_TABS.find((t) => t.id === outputTab)?.label}</>}
               </Button>
             </div>
 
@@ -779,31 +779,31 @@ export function LaunchPadContent() {
 
             {outputTab === "tweet" && (
               <OutputSection title="Tweet Thread" color="text-sky-500">
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {currentOutput.tweetThread.map((tweet, i) => (
-                    <div key={i} className="group relative bg-muted/30 rounded-lg p-4 border">
+                    <div key={i} className="group relative bg-muted/30 rounded-xl p-5 border">
                       <p className="text-sm pr-8">{tweet}</p>
                       <div className="flex items-center justify-between mt-2">
                         <span className={`text-xs ${tweet.length > 280 ? "text-red-500" : "text-muted-foreground"}`}>
                           {tweet.length}/280
                         </span>
                         <button onClick={() => copyText(tweet, `tweet-${i}`)} className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          {copiedKey === `tweet-${i}` ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+                          {copiedKey === `tweet-${i}` ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
                         </button>
                       </div>
                     </div>
                   ))}
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="flex gap-4 flex-wrap">
                     <Button variant="outline" size="sm" onClick={() => copyText(currentOutput.tweetThread.join("\n\n"), "tweet-all")}>
-                      {copiedKey === "tweet-all" ? <Check className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                      {copiedKey === "tweet-all" ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                       Copy full thread
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => copyText(getBufferFormat(currentOutput.tweetThread), "tweet-buffer")}>
-                      {copiedKey === "tweet-buffer" ? <Check className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                      {copiedKey === "tweet-buffer" ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                       Copy for Buffer
                     </Button>
                   </div>
-                  <div className="text-xs text-muted-foreground bg-muted/30 rounded-lg p-3 border">
+                  <div className="text-xs text-muted-foreground bg-muted/30 rounded-xl p-4 border">
                     <p className="font-medium mb-1">Engagement tips for {TONES[form.tone]?.label} tone:</p>
                     {form.tone === "excited" && <p>• Post on Tuesday–Thursday 9–11 AM. Reply to every reply within 30 min to boost reach. Add a GIF or screenshot to the first tweet.</p>}
                     {form.tone === "casual" && <p>• Personal tweets outperform branded ones. Start thread with a story or relatable pain point. End with a direct question.</p>}
@@ -823,15 +823,15 @@ export function LaunchPadContent() {
 
             {outputTab === "email" && (
               <OutputSection title="Cold Email" color="text-violet-500">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-medium text-muted-foreground">Subject line</label>
                     <Button size="sm" variant="ghost" onClick={handleGenerateSubjectLines} disabled={subjectLoading}>
-                      {subjectLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1" />}
+                      {subjectLoading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />}
                       Generate alternatives
                     </Button>
                   </div>
-                  <div className="bg-muted/30 rounded-lg px-3 py-2 border text-sm font-medium">
+                  <div className="bg-muted/30 rounded-xl px-4 py-2.5 border text-sm font-medium">
                     {activeSubject ?? currentOutput.coldEmail.subject}
                   </div>
                   {altSubjectLines.length > 0 && (
@@ -844,13 +844,13 @@ export function LaunchPadContent() {
                             ? "bg-yellow-100 text-yellow-700"
                             : "bg-muted text-muted-foreground"
                         return (
-                          <div key={i} className="flex items-start gap-2 p-2 rounded-lg border hover:bg-muted/30 cursor-pointer group" onClick={() => { setActiveSubject(sl.subject); copyText(sl.subject, `sl-${i}`) }}>
+                          <div key={i} className="flex items-start gap-4 p-3 rounded-xl border hover:bg-muted/30 cursor-pointer group" onClick={() => { setActiveSubject(sl.subject); copyText(sl.subject, `sl-${i}`) }}>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm">{sl.subject}</p>
                               <p className="text-xs text-muted-foreground">{sl.reason}</p>
                             </div>
-                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${badge}`}>{sl.openRateLabel}</span>
-                            {copiedKey === `sl-${i}` ? <Check className="w-3.5 h-3.5 text-green-500 shrink-0" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100" />}
+                            <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${badge}`}>{sl.openRateLabel}</span>
+                            {copiedKey === `sl-${i}` ? <Check className="w-4 h-4 text-green-500 shrink-0" /> : <Copy className="w-4 h-4 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100" />}
                           </div>
                         )
                       })}
@@ -873,7 +873,7 @@ export function LaunchPadContent() {
                 <button className="w-full text-left" onClick={() => setExpandedPerf(expandedPerf === currentRecordId ? null : currentRecordId)}>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center justify-between">
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center gap-4">
                         <BarChart2 className="w-4 h-4 text-orange-500" />
                         Track Performance
                         {perfData.length > 0 && <Badge variant="secondary">{perfData.length} entries</Badge>}
@@ -883,11 +883,11 @@ export function LaunchPadContent() {
                   </CardHeader>
                 </button>
                 {expandedPerf === currentRecordId && (
-                  <CardContent className="pt-0 space-y-4">
+                  <CardContent className="pt-0 space-y-5">
                     {perfData.length > 0 && (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {perfData.map((p, i) => (
-                          <div key={i} className="flex items-center gap-3 text-sm bg-muted/30 rounded-lg p-3 border">
+                          <div key={i} className="flex items-center gap-4 text-sm bg-muted/30 rounded-xl p-4 border">
                             <span className="font-medium w-24 shrink-0">{p.platformLabel}</span>
                             <span className="text-muted-foreground">↑ {p.upvotes}</span>
                             <span className="text-muted-foreground">💬 {p.comments}</span>
@@ -897,13 +897,13 @@ export function LaunchPadContent() {
                         ))}
                       </div>
                     )}
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-medium mb-1 block">Platform</label>
                         <select
                           value={perfDraft.platform ?? ""}
                           onChange={(e) => setPerfDraft((d) => ({ ...d, platform: e.target.value as LaunchPlatformId }))}
-                          className="w-full h-8 text-xs rounded-md border border-input bg-background px-2"
+                          className="w-full h-9 text-xs rounded-md border border-input bg-background px-3"
                         >
                           <option value="">Select platform</option>
                           {LAUNCH_PLATFORM_OPTIONS.map((p) => (
@@ -951,7 +951,7 @@ export function LaunchPadContent() {
                       </div>
                     </div>
                     <Button size="sm" onClick={addPerformanceEntry}>
-                      <Plus className="w-3.5 h-3.5 mr-1" /> Log Entry
+                      <Plus className="w-4 h-4 mr-1" /> Log Entry
                     </Button>
                   </CardContent>
                 )}
@@ -962,21 +962,21 @@ export function LaunchPadContent() {
 
         {/* ── WAITLIST BUILDER ─────────────────────────────────────────────── */}
         {view === "waitlist" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
+              <h1 className="text-2xl font-bold mb-1 flex items-center gap-4">
                 <Megaphone className="w-6 h-6 text-orange-500" /> Waitlist Builder
               </h1>
               <p className="text-muted-foreground text-sm">Generate a self-contained HTML waitlist page ready to deploy anywhere.</p>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-5">
               <div>
                 <label className="text-xs font-medium mb-1 block">Product name</label>
                 <Input value={waitlist.productName} onChange={(e) => setWaitlist((w) => ({ ...w, productName: e.target.value }))} placeholder="DevDash" />
               </div>
               <div>
                 <label className="text-xs font-medium mb-1 block">Accent color</label>
-                <input type="color" value={waitlist.accentColor} onChange={(e) => setWaitlist((w) => ({ ...w, accentColor: e.target.value }))} className="w-full h-8 rounded-md border border-input cursor-pointer" />
+                <input type="color" value={waitlist.accentColor} onChange={(e) => setWaitlist((w) => ({ ...w, accentColor: e.target.value }))} className="w-full h-9 rounded-md border border-input cursor-pointer" />
               </div>
               <div className="sm:col-span-2">
                 <label className="text-xs font-medium mb-1 block">Headline</label>
@@ -995,7 +995,7 @@ export function LaunchPadContent() {
                 <Input value={waitlist.formspreeEndpoint} onChange={(e) => setWaitlist((w) => ({ ...w, formspreeEndpoint: e.target.value }))} placeholder="https://formspree.io/f/YOUR_ID" />
               </div>
             </div>
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-4 flex-wrap">
               <Button
                 onClick={() => {
                   downloadHtml(generateWaitlistHtml(waitlist), "waitlist.html")
@@ -1019,15 +1019,15 @@ export function LaunchPadContent() {
             </div>
             <Card className="border-dashed">
               <CardContent className="pt-4">
-                <p className="text-xs text-muted-foreground font-medium mb-2">Preview (dark background)</p>
+                <p className="text-xs text-muted-foreground font-medium mb-3">Preview (dark background)</p>
                 <div className="rounded-xl overflow-hidden" style={{ background: "#0f0f0f", minHeight: 200 }}>
-                  <div className="p-8 text-center text-white space-y-3">
+                  <div className="p-8 text-center text-white space-y-4">
                     <p style={{ color: waitlist.accentColor }} className="text-lg font-bold">{waitlist.productName || "Product"}</p>
                     <p className="text-2xl font-bold">{waitlist.headline || "Headline"}</p>
                     <p className="text-sm opacity-60">{waitlist.description}</p>
-                    <div className="flex gap-2 justify-center mt-4 flex-wrap">
-                      <div className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-sm text-white/50">you@example.com</div>
-                      <div className="px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{ background: waitlist.accentColor }}>{waitlist.ctaText || "Join"}</div>
+                    <div className="flex gap-4 justify-center mt-4 flex-wrap">
+                      <div className="bg-white/10 border border-white/20 rounded-xl px-5 py-2.5 text-sm text-white/50">you@example.com</div>
+                      <div className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: waitlist.accentColor }}>{waitlist.ctaText || "Join"}</div>
                     </div>
                   </div>
                 </div>
@@ -1038,14 +1038,14 @@ export function LaunchPadContent() {
 
         {/* ── COMPETITOR RESEARCH ─────────────────────────────────────────── */}
         {view === "research" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
+              <h1 className="text-2xl font-bold mb-1 flex items-center gap-4">
                 <Search className="w-6 h-6 text-orange-500" /> Competitor Research
               </h1>
               <p className="text-muted-foreground text-sm">AI-powered market analysis: find your competitors, positioning angles, and unique value proposition.</p>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-5">
               <div>
                 <label className="text-xs font-medium mb-1 block">Product name</label>
                 <Input value={researchProductName} onChange={(e) => setResearchProductName(e.target.value)} placeholder="DevDash" />
@@ -1068,22 +1068,22 @@ export function LaunchPadContent() {
                   <CardContent className="pt-4">
                     <p className="text-xs font-semibold text-orange-600 mb-1 uppercase tracking-wide">Suggested Unique Value Proposition</p>
                     <p className="text-base font-medium">{research.suggestedUVP}</p>
-                    <button onClick={() => copyText(research.suggestedUVP, "uvp")} className="mt-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
-                      {copiedKey === "uvp" ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />} Copy
+                    <button onClick={() => copyText(research.suggestedUVP, "uvp")} className="mt-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5">
+                      {copiedKey === "uvp" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} Copy
                     </button>
                   </CardContent>
                 </Card>
 
                 {/* Positioning angles */}
                 <div>
-                  <p className="text-sm font-medium mb-2">Positioning Angles</p>
-                  <div className="space-y-2">
+                  <p className="text-sm font-medium mb-3">Positioning Angles</p>
+                  <div className="space-y-3">
                     {research.positioningAngles.map((angle, i) => (
-                      <div key={i} className="flex items-start gap-2 p-3 rounded-lg border bg-muted/30 group">
+                      <div key={i} className="flex items-start gap-4 p-4 rounded-xl border bg-muted/30 group">
                         <span className="text-orange-500 font-bold text-sm shrink-0">{i + 1}.</span>
                         <p className="text-sm flex-1">{angle}</p>
                         <button onClick={() => copyText(angle, `angle-${i}`)} className="opacity-0 group-hover:opacity-100 shrink-0">
-                          {copiedKey === `angle-${i}` ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+                          {copiedKey === `angle-${i}` ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
                         </button>
                       </div>
                     ))}
@@ -1092,29 +1092,29 @@ export function LaunchPadContent() {
 
                 {/* Competitor table */}
                 <div>
-                  <p className="text-sm font-medium mb-2">5 Competitors</p>
+                  <p className="text-sm font-medium mb-3">5 Competitors</p>
                   <div className="rounded-xl border overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="bg-muted/50 border-b">
-                          <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Name</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5 hidden sm:table-cell">Pricing</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5">Differentiator</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground px-4 py-2.5 hidden md:table-cell">Weakness</th>
+                          <th className="text-left text-xs font-medium text-muted-foreground px-5 py-2.5">Name</th>
+                          <th className="text-left text-xs font-medium text-muted-foreground px-5 py-2.5 hidden sm:table-cell">Pricing</th>
+                          <th className="text-left text-xs font-medium text-muted-foreground px-5 py-2.5">Differentiator</th>
+                          <th className="text-left text-xs font-medium text-muted-foreground px-5 py-2.5 hidden md:table-cell">Weakness</th>
                         </tr>
                       </thead>
                       <tbody>
                         {research.competitors.map((c, i) => (
                           <tr key={i} className="border-b last:border-0 hover:bg-muted/20">
-                            <td className="px-4 py-3">
+                            <td className="px-5 py-4">
                               <p className="font-medium">{c.name}</p>
-                              <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-0.5">
+                              <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-0.5">
                                 <Globe className="w-2.5 h-2.5" /> {c.url.replace(/^https?:\/\//, "").slice(0, 30)}
                               </a>
                             </td>
-                            <td className="px-4 py-3 text-xs text-muted-foreground hidden sm:table-cell">{c.pricingModel}</td>
-                            <td className="px-4 py-3 text-xs">{c.keyDifferentiator}</td>
-                            <td className="px-4 py-3 text-xs text-muted-foreground hidden md:table-cell">{c.weakness}</td>
+                            <td className="px-5 py-4 text-xs text-muted-foreground hidden sm:table-cell">{c.pricingModel}</td>
+                            <td className="px-5 py-4 text-xs">{c.keyDifferentiator}</td>
+                            <td className="px-5 py-4 text-xs text-muted-foreground hidden md:table-cell">{c.weakness}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1128,7 +1128,7 @@ export function LaunchPadContent() {
 
         {/* ── HISTORY ─────────────────────────────────────────────────────── */}
         {view === "history" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
               <h1 className="text-2xl font-bold mb-1">Launch History</h1>
               <p className="text-muted-foreground text-sm">{records.length} saved launches</p>
@@ -1138,7 +1138,7 @@ export function LaunchPadContent() {
             {records.some((r) => (r.performanceData?.length ?? 0) > 0) && (
               <Card className="bg-muted/30">
                 <CardContent className="pt-4">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">All-Time Stats</p>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">All-Time Stats</p>
                   <AggregateStats records={records} />
                 </CardContent>
               </Card>
@@ -1159,7 +1159,7 @@ export function LaunchPadContent() {
                         <p className="text-sm text-muted-foreground">{r.input.tagline}</p>
                         <p className="text-xs text-muted-foreground mt-1">{new Date(r.createdAt).toLocaleDateString()}</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-4">
                         <Badge variant="secondary">{r.input.tone}</Badge>
                         {r.competitorResearch && (
                           <Badge variant="secondary" className="text-orange-600">Research</Badge>
@@ -1172,7 +1172,7 @@ export function LaunchPadContent() {
                         )}
                         <Button
                           variant="ghost"
-                          size="icon-sm"
+                          size="icon"
                           onClick={(e) => {
                             e.stopPropagation()
                             setRecords((prev) => {
@@ -1183,14 +1183,14 @@ export function LaunchPadContent() {
                             toast.success("Deleted")
                           }}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
 
                     {/* Performance summary */}
                     {(r.performanceData?.length ?? 0) > 0 && (
-                      <div className="mt-3 flex gap-4 text-xs text-muted-foreground border-t pt-3">
+                      <div className="mt-4 flex gap-5 text-xs text-muted-foreground border-t pt-3">
                         {r.performanceData!.map((p) => (
                           <span key={p.platform}><span className="font-medium">{p.platformLabel}</span>: ↑{p.upvotes} 💬{p.comments} ✉{p.signups}</span>
                         ))}
@@ -1198,9 +1198,9 @@ export function LaunchPadContent() {
                     )}
 
                     {/* Notes */}
-                    <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+                    <div className="mt-4" onClick={(e) => e.stopPropagation()}>
                       {editingNotes === r.id ? (
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <Textarea
                             placeholder="Add notes about this launch..."
                             value={r.notes}
@@ -1237,11 +1237,11 @@ function OutputSection({ title, color, children }: { title: string; color: strin
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className={`text-sm font-semibold flex items-center gap-2 ${color}`}>
-          <Rocket className="w-3.5 h-3.5" /> {title}
+        <CardTitle className={`text-sm font-semibold flex items-center gap-4 ${color}`}>
+          <Rocket className="w-4 h-4" /> {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">{children}</CardContent>
+      <CardContent className="space-y-5">{children}</CardContent>
     </Card>
   )
 }
@@ -1257,13 +1257,13 @@ function OutputField({
       <div className="flex items-center justify-between mb-1.5">
         <label className={`text-xs font-medium ${warning ? "text-amber-600" : "text-muted-foreground"}`}>{label}</label>
         <button onClick={() => onCopy(value, copyKey)} className="shrink-0">
-          {copiedKey === copyKey ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+          {copiedKey === copyKey ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
         </button>
       </div>
       {multiline ? (
-        <div className="bg-muted/30 rounded-lg p-3 border whitespace-pre-wrap text-sm">{value}</div>
+        <div className="bg-muted/30 rounded-xl p-4 border whitespace-pre-wrap text-sm">{value}</div>
       ) : (
-        <div className="bg-muted/30 rounded-lg px-3 py-2 border text-sm">{value}</div>
+        <div className="bg-muted/30 rounded-xl px-4 py-2.5 border text-sm">{value}</div>
       )}
     </div>
   )
@@ -1285,7 +1285,7 @@ function CharCountBar({ outputTab, currentOutput }: { outputTab: OutputTab; curr
   const pct = Math.min(100, Math.round((count / limit) * 100))
   const over = count > limit
   return (
-    <div className="flex items-center gap-3 flex-1">
+    <div className="flex items-center gap-4 flex-1">
       <div className="flex-1 bg-muted rounded-full h-1.5 overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${over ? "bg-red-500" : pct > 80 ? "bg-amber-500" : "bg-green-500"}`}
@@ -1316,7 +1316,7 @@ function AggregateStats({ records }: { records: LaunchRecord[] }) {
   const totalUpvotes = allPerf.reduce((s, p) => s + p.upvotes, 0)
 
   return (
-    <div className="flex flex-wrap gap-4 text-sm">
+    <div className="flex flex-wrap gap-5 text-sm">
       <div>
         <p className="text-xs text-muted-foreground">Total upvotes</p>
         <p className="font-bold text-lg">{totalUpvotes}</p>

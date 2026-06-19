@@ -55,12 +55,12 @@ function SemverBumper({ version, onChange }: { version: string; onChange: (v: st
     { type: "patch", label: "PATCH +0.0.1" },
   ]
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-1.5">
       {bumps.map(({ type, label }) => (
         <button
           key={type}
           onClick={() => onChange(bumpVersion(version, type))}
-          className="px-2 py-1 text-[10px] font-mono font-semibold border rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          className="px-3 py-1.5 text-xs font-mono font-semibold border rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
         >
           {label}
         </button>
@@ -83,18 +83,18 @@ function GroupedPreview({ entries }: { entries: ChangelogEntry[] }) {
   }, [entries])
 
   if (entries.length === 0) {
-    return <p className="text-xs text-muted-foreground italic p-3">No entries yet — generate or add some above.</p>
+    return <p className="text-xs text-muted-foreground italic p-4">No entries yet — generate or add some above.</p>
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {order.map((type) => {
         const items = byType.get(type)
         if (!items || items.length === 0) return null
         const meta = CHANGE_TYPE_META[type]
         return (
           <div key={type} className={`rounded-lg p-2.5 border ${meta.bg}`}>
-            <div className="flex items-center gap-1.5 mb-1.5">
+            <div className="flex items-center gap-2 mb-1.5">
               <span className="text-sm">{meta.emoji}</span>
               <span className={`text-xs font-semibold ${meta.color}`}>{meta.label}</span>
               <span className={`ml-auto text-xs font-mono font-bold ${meta.color}`}>{items.length}</span>
@@ -126,25 +126,25 @@ function ReleaseStatsPanel({ entries }: { entries: ChangelogEntry[] }) {
   return (
     <Card className="border-cyan-200 dark:border-cyan-800">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center gap-2">
+        <CardTitle className="text-sm flex items-center gap-3">
           <BarChart2 className="w-4 h-4 text-cyan-500" /> Release Statistics
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex items-center gap-3 flex-wrap">
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="text-center">
             <p className="text-3xl font-black text-cyan-500">{stats.total}</p>
             <p className="text-xs text-muted-foreground">Total entries</p>
           </div>
-          <div className={`ml-2 px-3 py-1.5 rounded-lg border text-sm font-semibold ${sizeLabelColor}`}>
+          <div className={`ml-2 px-4 py-2 rounded-lg border text-sm font-semibold ${sizeLabelColor}`}>
             {stats.sizeLabel}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
           {(Object.entries(stats.byType) as [ChangeType, number][]).map(([type, count]) => {
             const meta = CHANGE_TYPE_META[type]
             return (
-              <span key={type} className={`text-xs px-2 py-0.5 rounded-full ${meta.bg} ${meta.color} font-medium`}>
+              <span key={type} className={`text-xs px-3 py-0.5 rounded-full ${meta.bg} ${meta.color} font-medium`}>
                 {meta.emoji} {count} {type}
               </span>
             )
@@ -193,7 +193,7 @@ function AppendModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/60">
       <div className="bg-card rounded-xl shadow-2xl border w-full max-w-2xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-5 py-4 border-b">
           <h2 className="font-semibold">Export CHANGELOG.md</h2>
@@ -201,21 +201,21 @@ function AppendModal({
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
-          <div className="grid sm:grid-cols-2 gap-3">
+        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+          <div className="grid sm:grid-cols-2 gap-4">
             <button
               onClick={() => { setResult(current); handleDownload() }}
-              className="border rounded-lg p-4 text-left hover:bg-muted/50 transition-colors"
+              className="border rounded-lg p-5 text-left hover:bg-muted/50 transition-colors"
             >
-              <Download className="w-4 h-4 mb-2 text-cyan-500" />
+              <Download className="w-4 h-4 mb-3 text-cyan-500" />
               <p className="font-medium text-sm">Download current release</p>
               <p className="text-xs text-muted-foreground mt-0.5">Just this release as CHANGELOG.md</p>
             </button>
             <button
               onClick={() => setResult("")}
-              className="border rounded-lg p-4 text-left hover:bg-muted/50 transition-colors border-cyan-200 dark:border-cyan-800"
+              className="border rounded-lg p-5 text-left hover:bg-muted/50 transition-colors border-cyan-200 dark:border-cyan-800"
             >
-              <Plus className="w-4 h-4 mb-2 text-cyan-500" />
+              <Plus className="w-4 h-4 mb-3 text-cyan-500" />
               <p className="font-medium text-sm">Append to existing</p>
               <p className="text-xs text-muted-foreground mt-0.5">Prepend to your existing CHANGELOG.md</p>
             </button>
@@ -233,25 +233,25 @@ function AppendModal({
           </div>
 
           <Button className="w-full" onClick={handleMerge}>
-            <Eye className="w-3.5 h-3.5 mr-1" /> Preview merged CHANGELOG.md
+            <Eye className="w-4 h-4 mr-1" /> Preview merged CHANGELOG.md
           </Button>
 
           {result && (
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-medium">Preview</p>
                 <button
                   onClick={() => { navigator.clipboard.writeText(result); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
                 >
-                  {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />} Copy
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} Copy
                 </button>
               </div>
-              <pre className="bg-muted/30 border rounded p-3 text-xs font-mono whitespace-pre-wrap max-h-48 overflow-auto">
+              <pre className="bg-muted/30 border rounded p-4 text-xs font-mono whitespace-pre-wrap max-h-48 overflow-auto">
                 {result}
               </pre>
               <Button className="w-full" onClick={handleDownload}>
-                <Download className="w-3.5 h-3.5 mr-1" /> Download CHANGELOG.md
+                <Download className="w-4 h-4 mr-1" /> Download CHANGELOG.md
               </Button>
             </div>
           )}
@@ -274,16 +274,16 @@ function PublicPageModal({
   const activeRelease = releases.find((r) => r.id === selected) ?? releases[0]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/60">
       <div className="bg-card rounded-xl shadow-2xl border w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Browser chrome */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/40 rounded-t-xl">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-400" />
-            <div className="w-3 h-3 rounded-full bg-amber-400" />
-            <div className="w-3 h-3 rounded-full bg-green-400" />
+        <div className="flex items-center gap-3 px-4 py-2.5 border-b bg-muted/40 rounded-t-xl">
+          <div className="flex gap-2">
+            <div className="w-4 h-4 rounded-full bg-red-400" />
+            <div className="w-4 h-4 rounded-full bg-amber-400" />
+            <div className="w-4 h-4 rounded-full bg-green-400" />
           </div>
-          <div className="flex-1 bg-background border rounded-md px-3 py-0.5 text-xs text-muted-foreground font-mono">
+          <div className="flex-1 bg-background border rounded-md px-4 py-0.5 text-xs text-muted-foreground font-mono">
             yourapp.com/changelog
           </div>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -292,20 +292,20 @@ function PublicPageModal({
         </div>
         <div className="flex-1 overflow-hidden flex">
           {/* Sidebar — version timeline */}
-          <div className="w-52 shrink-0 border-r overflow-y-auto p-4 space-y-1">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Versions</p>
+          <div className="w-52 shrink-0 border-r overflow-y-auto p-5 space-y-1">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Versions</p>
             <div className="relative pl-4">
               <div className="absolute left-1.5 top-0 bottom-0 w-px bg-border" />
               {releases.map((r) => (
                 <button
                   key={r.id}
                   onClick={() => setSelected(r.id)}
-                  className="relative flex flex-col mb-4 text-left w-full group"
+                  className="relative flex flex-col mb-5 text-left w-full group"
                 >
                   <div className={`absolute -left-[11px] top-1 w-2.5 h-2.5 rounded-full border-2 border-background ${selected === r.id ? "bg-cyan-500" : "bg-muted-foreground/40 group-hover:bg-cyan-400"} transition-colors`} />
                   <span className={`font-mono font-bold text-sm ${selected === r.id ? "text-cyan-500" : "text-foreground"}`}>{r.version}</span>
-                  <span className="text-[10px] text-muted-foreground">{r.releaseDate}</span>
-                  <span className="text-[10px] text-muted-foreground">{r.entries.length} changes</span>
+                  <span className="text-xs text-muted-foreground">{r.releaseDate}</span>
+                  <span className="text-xs text-muted-foreground">{r.entries.length} changes</span>
                 </button>
               ))}
             </div>
@@ -314,25 +314,25 @@ function PublicPageModal({
           <div className="flex-1 overflow-y-auto p-6">
             {activeRelease && (
               <div className="max-w-2xl">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground mb-5">
                   <span>Changelog</span>
                   <span>/</span>
                   <span className="text-foreground font-medium">{activeRelease.version}</span>
                 </div>
                 <h1 className="text-3xl font-black font-mono mb-1">{activeRelease.version}</h1>
-                <p className="text-sm text-muted-foreground mb-6">{activeRelease.releaseDate} · {activeRelease.entries.length} changes</p>
+                <p className="text-sm text-muted-foreground mb-8">{activeRelease.releaseDate} · {activeRelease.entries.length} changes</p>
                 {(["breaking", "feature", "improvement", "fix", "deprecation"] as ChangeType[]).map((type) => {
                   const items = activeRelease.entries.filter((e) => e.type === type)
                   if (items.length === 0) return null
                   const meta = CHANGE_TYPE_META[type]
                   return (
-                    <div key={type} className="mb-6">
-                      <h2 className={`text-base font-semibold mb-3 flex items-center gap-2 ${meta.color}`}>
+                    <div key={type} className="mb-8">
+                      <h2 className={`text-base font-semibold mb-4 flex items-center gap-3 ${meta.color}`}>
                         <span>{meta.emoji}</span> {meta.label}
                       </h2>
-                      <ul className="space-y-3">
+                      <ul className="space-y-4">
                         {items.map((e) => (
-                          <li key={e.id} className="border-l-2 pl-4 py-1" style={{ borderColor: "currentColor" }}>
+                          <li key={e.id} className="border-l-2 pl-4 py-1.5" style={{ borderColor: "currentColor" }}>
                             <p className="font-medium text-sm">{e.title}</p>
                             <p className="text-sm text-muted-foreground mt-0.5">{e.description}</p>
                           </li>
@@ -345,7 +345,7 @@ function PublicPageModal({
             )}
           </div>
         </div>
-        <div className="px-4 py-3 border-t bg-muted/20 text-xs text-muted-foreground text-center rounded-b-xl">
+        <div className="px-4 py-4 border-t bg-muted/20 text-xs text-muted-foreground text-center rounded-b-xl">
           This is a preview. Public changelog hosting is coming soon.
         </div>
       </div>
@@ -574,7 +574,7 @@ export function ChangelogAIContent() {
         color="text-cyan-500"
         badge="Dev Tools"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {view !== "input" && (
               <Button variant="outline" size="sm" onClick={() => { setView("input"); setCurrentRelease(null) }}>
                 ← New Release
@@ -583,10 +583,10 @@ export function ChangelogAIContent() {
             {releases.length > 0 && (
               <>
                 <Button variant="ghost" size="sm" onClick={() => setView(view === "history" ? "input" : "history")}>
-                  <History className="w-3.5 h-3.5 mr-1" /> History
+                  <History className="w-4 h-4 mr-1" /> History
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => setShowPublicPageModal(true)}>
-                  <Globe className="w-3.5 h-3.5 mr-1" /> Preview Page
+                  <Globe className="w-4 h-4 mr-1" /> Preview Page
                 </Button>
               </>
             )}
@@ -597,37 +597,37 @@ export function ChangelogAIContent() {
 
         {/* ── INPUT ──────────────────────────────────────────────────────────── */}
         {view === "input" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
               <h1 className="text-3xl font-bold mb-1">Changelog AI</h1>
-              <p className="text-muted-foreground">Paste your git log → get a beautiful, user-facing changelog.</p>
+              <p className="text-muted-foreground leading-relaxed">Paste your git log → get a beautiful, user-facing changelog.</p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-4">
               {/* Left: paste area */}
-              <div className="lg:col-span-2 space-y-4">
+              <div className="lg:col-span-2 space-y-5">
                 <Card>
-                  <CardContent className="pt-5 space-y-4">
+                  <CardContent className="pt-5 space-y-5">
                     {/* Input source tabs */}
                     <div className="flex gap-0.5 border-b">
                       <button
                         onClick={() => setInputTab("paste")}
-                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 -mb-px transition-colors ${inputTab === "paste" ? "border-cyan-500 text-cyan-600 dark:text-cyan-400" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                        className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors ${inputTab === "paste" ? "border-cyan-500 text-cyan-600 dark:text-cyan-400" : "border-transparent text-muted-foreground hover:text-foreground"}`}
                       >
-                        <Copy className="w-3 h-3" /> Paste
+                        <Copy className="w-4 h-4" /> Paste
                       </button>
                       <button
                         onClick={() => setInputTab("github")}
-                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 -mb-px transition-colors ${inputTab === "github" ? "border-cyan-500 text-cyan-600 dark:text-cyan-400" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                        className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors ${inputTab === "github" ? "border-cyan-500 text-cyan-600 dark:text-cyan-400" : "border-transparent text-muted-foreground hover:text-foreground"}`}
                       >
-                        <GitFork className="w-3 h-3" /> GitHub
+                        <GitFork className="w-4 h-4" /> GitHub
                       </button>
                     </div>
 
                     {/* ── Paste tab ── */}
                     {inputTab === "paste" && (
                       <div>
-                        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2 block">
+                        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 block">
                           Git log, PR descriptions, or manual changes
                         </label>
                         <Textarea
@@ -647,7 +647,7 @@ pqr1234 perf: 40% faster load times via lazy loading`}
 
                     {/* ── GitHub tab ── */}
                     {inputTab === "github" && (
-                      <div className="space-y-4">
+                      <div className="space-y-5">
                         <ConnectButton
                           provider="github"
                           returnTo="/tools/changelog-ai"
@@ -671,7 +671,7 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                             className="font-mono text-sm"
                           />
                         </div>
-                        <div className="grid sm:grid-cols-2 gap-3">
+                        <div className="grid sm:grid-cols-2 gap-4">
                           <div>
                             <label className="text-xs font-medium mb-1.5 block">Since</label>
                             <Input
@@ -690,7 +690,7 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                           </div>
                         </div>
                         <Button
-                          className="w-full h-10"
+                          className="w-full h-11"
                           variant="outline"
                           onClick={handleFetchGithubCommits}
                           disabled={ghLoading}
@@ -705,21 +705,21 @@ pqr1234 perf: 40% faster load times via lazy loading`}
 
                     {/* Git log helper — only on paste tab */}
                     {inputTab === "paste" && (
-                      <div className="rounded-lg border bg-muted/30 p-3 space-y-1.5">
+                      <div className="rounded-lg border bg-muted/30 p-4 space-y-1.5">
                         <p className="text-xs font-medium text-muted-foreground">Get your git log</p>
-                        <div className="flex items-center gap-2">
-                          <code className="text-xs font-mono bg-background border rounded px-2 py-1 flex-1">git log --oneline v1.0..HEAD</code>
+                        <div className="flex items-center gap-3">
+                          <code className="text-xs font-mono bg-background border rounded px-3 py-1.5 flex-1">git log --oneline v1.0..HEAD</code>
                           <button
                             onClick={() => { navigator.clipboard.writeText("git log --oneline v1.0..HEAD"); toast.success("Copied!") }}
                             className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
                           >
-                            <Copy className="w-3.5 h-3.5" />
+                            <Copy className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
                     )}
 
-                    <Button className="w-full h-10" onClick={handleGenerate} disabled={loading}>
+                    <Button className="w-full h-11" onClick={handleGenerate} disabled={loading}>
                       {loading
                         ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Transforming...</>
                         : <><Sparkles className="w-4 h-4 mr-2" /> Generate Changelog</>
@@ -730,10 +730,10 @@ pqr1234 perf: 40% faster load times via lazy loading`}
               </div>
 
               {/* Right: settings + how it works guide */}
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <Card>
                   <CardHeader className="pb-3"><CardTitle className="text-sm">Release Info</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-4">
                     <div>
                       <label className="text-xs font-medium mb-1 block">Version</label>
                       <Input
@@ -744,7 +744,7 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                       />
                       {latestVersion && (
                         <div className="mt-2">
-                          <p className="text-[10px] text-muted-foreground mb-1">Bump from <span className="font-mono">{latestVersion}</span></p>
+                          <p className="text-xs text-muted-foreground mb-1">Bump from <span className="font-mono">{latestVersion}</span></p>
                           <SemverBumper version={latestVersion} onChange={setVersion} />
                         </div>
                       )}
@@ -758,15 +758,15 @@ pqr1234 perf: 40% faster load times via lazy loading`}
 
                 <Card>
                   <CardHeader className="pb-3"><CardTitle className="text-sm">Options</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-4">
                     <div>
-                      <label className="text-xs font-medium mb-2 block">Tone</label>
-                      <div className="flex flex-col gap-1">
+                      <label className="text-xs font-medium mb-3 block">Tone</label>
+                      <div className="flex flex-col gap-1.5">
                         {TONE_OPTIONS.map((t) => (
                           <button
                             key={t.id}
                             onClick={() => setTone(t.id)}
-                            className={`px-3 py-2 rounded text-sm border text-left transition-colors ${tone === t.id ? "bg-cyan-500 text-white border-cyan-500" : "border-border hover:bg-muted"}`}
+                            className={`px-4 py-2.5 rounded text-sm border text-left transition-colors ${tone === t.id ? "bg-cyan-500 text-white border-cyan-500" : "border-border hover:bg-muted"}`}
                           >
                             <span className="font-medium">{t.label}</span>
                             <span className={`block text-xs mt-0.5 ${tone === t.id ? "text-cyan-100" : "text-muted-foreground"}`}>{t.desc}</span>
@@ -774,7 +774,7 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                         ))}
                       </div>
                     </div>
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex items-center gap-4 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={useEmojis}
@@ -789,7 +789,7 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                 {/* How it works */}
                 <Card className="bg-muted/30">
                   <CardHeader className="pb-2"><CardTitle className="text-xs uppercase tracking-widest text-muted-foreground">How it works</CardTitle></CardHeader>
-                  <CardContent className="space-y-2.5">
+                  <CardContent className="space-y-3.5">
                     {[
                       { step: "1", text: "Paste raw git commits or PR descriptions" },
                       { step: "2", text: "AI categorizes and rewrites for your users" },
@@ -797,15 +797,15 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                       { step: "4", text: "Export in Markdown, HTML, GitHub, Tweet, or Email" },
                     ].map(({ step, text }) => (
                       <div key={step} className="flex gap-2.5">
-                        <span className="w-5 h-5 rounded-full bg-cyan-500 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{step}</span>
+                        <span className="w-5 h-5 rounded-full bg-cyan-500 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">{step}</span>
                         <p className="text-xs text-muted-foreground">{text}</p>
                       </div>
                     ))}
                     <div className="mt-3 pt-3 border-t space-y-1">
-                      <p className="text-[10px] font-medium text-muted-foreground">Example input → output</p>
-                      <code className="block text-[10px] font-mono bg-background border rounded p-2 text-muted-foreground">feat: add dark mode toggle</code>
-                      <p className="text-[10px] text-muted-foreground pl-1">→</p>
-                      <p className="text-[10px] font-medium pl-1">Dark mode support — your eyes will thank you</p>
+                      <p className="text-xs font-medium text-muted-foreground">Example input → output</p>
+                      <code className="block text-xs font-mono bg-background border rounded p-3 text-muted-foreground">feat: add dark mode toggle</code>
+                      <p className="text-xs text-muted-foreground pl-1">→</p>
+                      <p className="text-xs font-medium pl-1">Dark mode support — your eyes will thank you</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -816,13 +816,13 @@ pqr1234 perf: 40% faster load times via lazy loading`}
 
         {/* ── EDITOR ─────────────────────────────────────────────────────────── */}
         {view === "editor" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-start gap-4 justify-between">
               <div>
-                <h1 className="text-2xl font-bold">Review & Edit</h1>
-                <p className="text-muted-foreground text-sm">{entries.length} entries. Edit, add, remove, then save.</p>
+                <h1 className="text-3xl font-bold">Review & Edit</h1>
+                <p className="text-muted-foreground text-sm leading-relaxed">{entries.length} entries. Edit, add, remove, then save.</p>
               </div>
-              <div className="flex flex-wrap items-end gap-2">
+              <div className="flex flex-wrap items-end gap-3">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Version</label>
                   <Input
@@ -837,18 +837,18 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                   <Input type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} className="w-36" />
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)}>
-                  {showPreview ? <EyeOff className="w-3.5 h-3.5 mr-1" /> : <Eye className="w-3.5 h-3.5 mr-1" />}
+                  {showPreview ? <EyeOff className="w-4 h-4 mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
                   {showPreview ? "Hide" : "Show"} preview
                 </Button>
                 <Button size="sm" onClick={saveRelease}>
-                  <Check className="w-3.5 h-3.5 mr-1" /> Save Release
+                  <Check className="w-4 h-4 mr-1" /> Save Release
                 </Button>
               </div>
             </div>
 
             {/* Semver bumper in editor too */}
             {latestVersion && version === "" && (
-              <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border">
+              <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg border">
                 <p className="text-xs text-muted-foreground shrink-0">Bump from <span className="font-mono">{latestVersion}</span>:</p>
                 <SemverBumper version={latestVersion} onChange={setVersion} />
               </div>
@@ -859,18 +859,18 @@ pqr1234 perf: 40% faster load times via lazy loading`}
 
             <div className={`grid gap-6 ${showPreview ? "lg:grid-cols-2" : ""}`}>
               {/* Entries editor */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">Entries</p>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <button
                       onClick={() => setShowGroupedPreview(!showGroupedPreview)}
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
                     >
-                      {showGroupedPreview ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                      {showGroupedPreview ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       Group view
                     </button>
-                    <Button variant="outline" size="sm" onClick={addEntry}><Plus className="w-3 h-3 mr-1" /> Add</Button>
+                    <Button variant="outline" size="sm" onClick={addEntry}><Plus className="w-4 h-4 mr-1" /> Add</Button>
                   </div>
                 </div>
 
@@ -888,23 +888,23 @@ pqr1234 perf: 40% faster load times via lazy loading`}
 
                 {entries.map((entry) => (
                   <Card key={entry.id}>
-                    <CardContent className="pt-4 space-y-3">
-                      <div className="flex items-center justify-between gap-2">
+                    <CardContent className="pt-4 space-y-4">
+                      <div className="flex items-center justify-between gap-3">
                         <select
                           value={entry.type}
                           onChange={(e) => updateEntry(entry.id, "type", e.target.value)}
-                          className="h-9 rounded border border-input bg-background px-2 text-xs font-medium"
+                          className="h-10 rounded border border-input bg-background px-3 text-xs font-medium"
                         >
                           {(Object.entries(CHANGE_TYPE_META) as [ChangeType, typeof CHANGE_TYPE_META[ChangeType]][]).map(([k, v]) => (
                             <option key={k} value={k}>{v.emoji} {v.label}</option>
                           ))}
                         </select>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1.5">
                           <button onClick={() => toggleExpand(entry.id)} className="text-muted-foreground hover:text-foreground transition-colors">
-                            {expandedEntries.has(entry.id) ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                            {expandedEntries.has(entry.id) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </button>
                           <button onClick={() => removeEntry(entry.id)} className="text-muted-foreground hover:text-destructive transition-colors">
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
@@ -922,7 +922,7 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                         className="text-sm"
                       />
                       {expandedEntries.has(entry.id) && (
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <Textarea
                             placeholder="Technical details (optional)"
                             value={entry.technicalDetails ?? ""}
@@ -931,9 +931,9 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                             className="text-sm text-muted-foreground"
                           />
                           {entry.rawCommit && (
-                            <div className="bg-muted/30 rounded p-2 border">
-                              <p className="text-[10px] text-muted-foreground mb-0.5 font-medium">Original commit</p>
-                              <code className="text-[10px] font-mono text-muted-foreground">{entry.rawCommit}</code>
+                            <div className="bg-muted/30 rounded p-3 border">
+                              <p className="text-xs text-muted-foreground mb-0.5 font-medium">Original commit</p>
+                              <code className="text-xs font-mono text-muted-foreground">{entry.rawCommit}</code>
                             </div>
                           )}
                         </div>
@@ -943,19 +943,19 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                 ))}
 
                 <Button className="w-full" onClick={saveRelease}>
-                  <Check className="w-3.5 h-3.5 mr-1" /> Save Release
+                  <Check className="w-4 h-4 mr-1" /> Save Release
                 </Button>
               </div>
 
               {/* Preview */}
               {showPreview && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex gap-0.5 border-b overflow-x-auto">
                     {FORMAT_TABS.map((t) => (
                       <button
                         key={t.id}
                         onClick={() => setOutputFormat(t.id)}
-                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold border-b-2 -mb-px transition-colors whitespace-nowrap shrink-0 ${outputFormat === t.id ? `border-cyan-500 ${t.color}` : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                        className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 -mb-px transition-colors whitespace-nowrap shrink-0 ${outputFormat === t.id ? `border-cyan-500 ${t.color}` : "border-transparent text-muted-foreground hover:text-foreground"}`}
                       >
                         <span className="font-mono">{t.icon}</span>
                         {t.label}
@@ -964,14 +964,14 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                   </div>
 
                   {outputFormat === "email" ? (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-3.5 h-3.5 text-cyan-500" />
+                        <div className="flex items-center gap-3">
+                          <Mail className="w-4 h-4 text-cyan-500" />
                           <span className="text-xs text-muted-foreground">Email HTML preview</span>
                         </div>
                         <Button variant="outline" size="sm" onClick={() => copyText(outputText, "output")}>
-                          {copiedKey === "output" ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                          {copiedKey === "output" ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                           Copy HTML
                         </Button>
                       </div>
@@ -988,18 +988,18 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                         className="absolute top-2 right-2 z-10"
                         onClick={() => copyText(outputText, "output")}
                       >
-                        {copiedKey === "output" ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                        {copiedKey === "output" ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                         Copy
                       </Button>
-                      <pre className="bg-muted/30 rounded-xl border p-4 pt-10 text-xs font-mono whitespace-pre-wrap overflow-auto max-h-[600px]">
+                      <pre className="bg-muted/30 rounded-xl border p-5 pt-10 text-xs font-mono whitespace-pre-wrap overflow-auto max-h-[600px]">
                         {outputText}
                       </pre>
                     </div>
                   )}
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowAppendModal(true)}>
-                      <Download className="w-3.5 h-3.5 mr-1" /> Export CHANGELOG.md
+                      <Download className="w-4 h-4 mr-1" /> Export CHANGELOG.md
                     </Button>
                   </div>
                 </div>
@@ -1010,17 +1010,17 @@ pqr1234 perf: 40% faster load times via lazy loading`}
 
         {/* ── HISTORY ────────────────────────────────────────────────────────── */}
         {view === "history" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Changelog History</h1>
-              <div className="flex gap-2">
+              <h1 className="text-3xl font-bold">Changelog History</h1>
+              <div className="flex gap-3">
                 {releases.length > 0 && (
                   <>
                     <Button variant="outline" size="sm" onClick={() => setShowPublicPageModal(true)}>
-                      <Globe className="w-3.5 h-3.5 mr-1" /> Preview Page
+                      <Globe className="w-4 h-4 mr-1" /> Preview Page
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setShowAppendModal(true)}>
-                      <Download className="w-3.5 h-3.5 mr-1" /> Export CHANGELOG.md
+                      <Download className="w-4 h-4 mr-1" /> Export CHANGELOG.md
                     </Button>
                   </>
                 )}
@@ -1047,26 +1047,26 @@ pqr1234 perf: 40% faster load times via lazy loading`}
               <div className="relative pl-4">
                 {/* Timeline line */}
                 <div className="absolute left-1.5 top-0 bottom-0 w-px bg-border" />
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {filteredReleases.map((r) => {
                     const stats = computeReleaseStats(r.entries)
                     return (
                       <div key={r.id} className="relative">
                         {/* Timeline dot */}
-                        <div className="absolute -left-[19px] top-5 w-3 h-3 rounded-full bg-cyan-500 border-2 border-background" />
+                        <div className="absolute -left-[19px] top-5 w-4 h-4 rounded-full bg-cyan-500 border-2 border-background" />
                         <Card>
                           <CardContent className="py-4">
-                            <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start justify-between gap-4">
                               <button
                                 className="flex-1 text-left"
                                 onClick={() => { setEntries(r.entries); setVersion(r.version); setReleaseDate(r.releaseDate); setTone(r.tone); setUseEmojis(r.useEmojis); setCurrentRelease(r); setView("editor") }}
                               >
-                                <div className="flex items-baseline gap-3 flex-wrap">
-                                  <p className="font-black font-mono text-xl tracking-tight text-cyan-500">{r.version}</p>
+                                <div className="flex items-baseline gap-4 flex-wrap">
+                                  <p className="font-black font-mono text-2xl tracking-tight text-cyan-500">{r.version}</p>
                                   <span className="text-sm text-muted-foreground">{r.releaseDate}</span>
                                 </div>
-                                <div className="flex items-center gap-2 flex-wrap mt-1.5">
-                                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                                <div className="flex items-center gap-3 flex-wrap mt-1.5">
+                                  <span className={`text-xs font-medium px-3 py-0.5 rounded-full ${
                                     stats.sizeLabel === "Breaking release" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" :
                                     stats.sizeLabel === "Feature release" ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" :
                                     "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
@@ -1084,29 +1084,29 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-1">{r.entries.length} entries · {r.tone} tone</p>
                               </button>
-                              <div className="flex items-center gap-1 shrink-0">
+                              <div className="flex items-center gap-1.5 shrink-0">
                                 <button
                                   onClick={() => toggleReleaseExpand(r.id)}
                                   className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                                 >
-                                  {expandedReleases.has(r.id) ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                  {expandedReleases.has(r.id) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                 </button>
                                 <Button
                                   variant="ghost"
-                                  size="icon-sm"
+                                  size="icon"
                                   onClick={() => {
                                     setReleases((prev) => { const next = prev.filter((rel) => rel.id !== r.id); save(next); return next })
                                     toast.success("Deleted")
                                   }}
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <Trash2 className="w-4 h-4" />
                                 </Button>
                               </div>
                             </div>
 
                             {expandedReleases.has(r.id) && (
                               <div className="mt-3 pt-3 border-t">
-                                <pre className="text-xs font-mono whitespace-pre-wrap bg-muted/30 p-3 rounded border max-h-48 overflow-auto">
+                                <pre className="text-xs font-mono whitespace-pre-wrap bg-muted/30 p-4 rounded border max-h-48 overflow-auto">
                                   {generateMarkdown(r)}
                                 </pre>
                               </div>

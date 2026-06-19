@@ -51,8 +51,8 @@ function HeatmapGrid({ habit, logs }: { habit: Habit; logs: DailyLog[] }) {
 
   return (
     <div>
-      <div className="flex gap-0.5 mb-1">
-        {DOW_LABELS.map((l) => <span key={l} className="text-[9px] text-muted-foreground w-3 text-center">{l}</span>)}
+      <div className="flex gap-1.5 mb-1">
+        {DOW_LABELS.map((l) => <span key={l} className="text-[10px] text-muted-foreground w-3 text-center">{l}</span>)}
       </div>
       <div className="grid grid-flow-col grid-rows-7 gap-0.5">
         {padded.map((d, i) =>
@@ -67,10 +67,10 @@ function HeatmapGrid({ habit, logs }: { habit: Habit; logs: DailyLog[] }) {
           )
         )}
       </div>
-      <div className="flex items-center gap-1 mt-1">
-        <span className="text-[9px] text-muted-foreground">Less</span>
+      <div className="flex items-center gap-1.5 mt-1">
+        <span className="text-[10px] text-muted-foreground">Less</span>
         {c.heatmap.map((cls, i) => <div key={i} className={`w-3 h-3 rounded-[2px] ${cls}`} />)}
-        <span className="text-[9px] text-muted-foreground">More</span>
+        <span className="text-[10px] text-muted-foreground">More</span>
       </div>
     </div>
   )
@@ -141,8 +141,8 @@ function HabitForm({ stacks, initial, onSave, onCancel }: HabitFormProps) {
       <CardHeader className="pb-3">
         <CardTitle className="text-sm">{initial ? "Edit Habit" : "New Habit"}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-[1fr_auto] gap-3">
+      <CardContent className="space-y-5">
+        <div className="grid grid-cols-[1fr_auto] gap-4">
           <div>
             <label className="text-xs font-medium block mb-1">Name *</label>
             <Input placeholder="Meditate, Exercise, Read..." value={name} onChange={(e) => setName(e.target.value)} />
@@ -160,8 +160,8 @@ function HabitForm({ stacks, initial, onSave, onCancel }: HabitFormProps) {
 
         {/* Color */}
         <div>
-          <label className="text-xs font-medium block mb-2">Color</label>
-          <div className="flex gap-2 flex-wrap">
+          <label className="text-xs font-medium block mb-3">Color</label>
+          <div className="flex gap-3 flex-wrap">
             {PRESET_COLORS.map((col) => (
               <button
                 key={col}
@@ -176,20 +176,20 @@ function HabitForm({ stacks, initial, onSave, onCancel }: HabitFormProps) {
 
         {/* Frequency */}
         <div>
-          <label className="text-xs font-medium block mb-2">Frequency</label>
-          <div className="flex gap-2 mb-2">
+          <label className="text-xs font-medium block mb-3">Frequency</label>
+          <div className="flex gap-3 mb-3">
             {(["daily","specific_days","times_per_week"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setFreqType(t)}
-                className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${freqType === t ? `${c.bg} ${c.text} border-transparent` : "border-border text-muted-foreground hover:text-foreground"}`}
+                className={`px-4 py-2 text-xs rounded-md border transition-colors ${freqType === t ? `${c.bg} ${c.text} border-transparent` : "border-border text-muted-foreground hover:text-foreground"}`}
               >
                 {t === "daily" ? "Daily" : t === "specific_days" ? "Specific days" : "X/week"}
               </button>
             ))}
           </div>
           {freqType === "specific_days" && (
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {DOW_LABELS.map((l, i) => (
                 <button
                   key={i}
@@ -202,7 +202,7 @@ function HabitForm({ stacks, initial, onSave, onCancel }: HabitFormProps) {
             </div>
           )}
           {freqType === "times_per_week" && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Input type="number" min={1} max={7} className="w-20" value={freqTimes} onChange={(e) => setFreqTimes(Number(e.target.value))} />
               <span className="text-sm text-muted-foreground">times per week</span>
             </div>
@@ -211,20 +211,20 @@ function HabitForm({ stacks, initial, onSave, onCancel }: HabitFormProps) {
 
         {/* Target */}
         <div>
-          <label className="text-xs font-medium block mb-2">Target type</label>
-          <div className="flex gap-2 mb-2">
+          <label className="text-xs font-medium block mb-3">Target type</label>
+          <div className="flex gap-3 mb-3">
             {(["boolean","number"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTargetType(t)}
-                className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${targetType === t ? `${c.bg} ${c.text} border-transparent` : "border-border text-muted-foreground hover:text-foreground"}`}
+                className={`px-4 py-2 text-xs rounded-md border transition-colors ${targetType === t ? `${c.bg} ${c.text} border-transparent` : "border-border text-muted-foreground hover:text-foreground"}`}
               >
                 {t === "boolean" ? "Yes/No" : "Numeric"}
               </button>
             ))}
           </div>
           {targetType === "number" && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Input type="number" min={1} className="w-24" value={targetGoal} onChange={(e) => setTargetGoal(Number(e.target.value))} />
               <Input placeholder="glasses, pages, mins…" className="w-36" value={targetUnit} onChange={(e) => setTargetUnit(e.target.value)} />
             </div>
@@ -232,13 +232,13 @@ function HabitForm({ stacks, initial, onSave, onCancel }: HabitFormProps) {
         </div>
 
         {/* Stack & reminder */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-xs font-medium block mb-1">Stack (optional)</label>
             <select
               value={stackId}
               onChange={(e) => setStackId(e.target.value)}
-              className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm"
+              className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm"
             >
               <option value="">None</option>
               {stacks.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -250,7 +250,7 @@ function HabitForm({ stacks, initial, onSave, onCancel }: HabitFormProps) {
           </div>
         </div>
 
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-3 pt-2">
           <Button size="sm" onClick={handleSave}>Save Habit</Button>
           <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
         </div>
@@ -414,7 +414,7 @@ export function HabitTrackerContent() {
     const currentVal = log?.value ?? 0
 
     return (
-      <div className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${log?.completed ? `${c.bg} border-transparent` : "border-border bg-card hover:bg-muted/30"}`}>
+      <div className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${log?.completed ? `${c.bg} border-transparent` : "border-border bg-card hover:bg-muted/30"}`}>
         <button
           onClick={() => !isNum && toggleComplete(habit)}
           className={`w-8 h-8 rounded-full flex items-center justify-center text-xl shrink-0 border-2 transition-all ${log?.completed ? `border-transparent ${c.bg}` : "border-muted-foreground/30"}`}
@@ -426,7 +426,7 @@ export function HabitTrackerContent() {
           {habit.description && <p className="text-xs text-muted-foreground truncate">{habit.description}</p>}
         </div>
         {isNum && (
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button onClick={() => setNumericValue(habit, Math.max(0, currentVal - 1))} className="w-6 h-6 rounded border text-xs hover:bg-muted">-</button>
             <span className={`text-sm font-bold w-8 text-center ${c.text}`}>{currentVal}</span>
             <button onClick={() => setNumericValue(habit, currentVal + 1)} className="w-6 h-6 rounded border text-xs hover:bg-muted">+</button>
@@ -434,8 +434,8 @@ export function HabitTrackerContent() {
           </div>
         )}
         {streak > 0 && (
-          <div className="flex items-center gap-1 shrink-0">
-            <Flame className="w-3.5 h-3.5 text-orange-400" />
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Flame className="w-4 h-4 text-orange-400" />
             <span className="text-xs font-bold text-orange-400">{streak}</span>
           </div>
         )}
@@ -453,39 +453,39 @@ export function HabitTrackerContent() {
         actions={
           tab === "habits" && !showForm ? (
             <Button size="sm" onClick={() => { setShowForm(true); setEditingHabit(null) }}>
-              <Plus className="w-3.5 h-3.5 mr-1" /> New Habit
+              <Plus className="w-4 h-4 mr-1" /> New Habit
             </Button>
           ) : undefined
         }
       />
 
-      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-6">
+      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
         {/* Daily banner */}
         {pendingCount > 0 && (
-          <div className="flex items-center gap-3 p-3 rounded-lg border border-teal-500/30 bg-teal-500/10">
+          <div className="flex items-center gap-4 p-4 rounded-xl border border-teal-500/30 bg-teal-500/10">
             <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
             <p className="text-sm">You have <span className="font-bold text-teal-400">{pendingCount}</span> habit{pendingCount !== 1 ? "s" : ""} left to complete today.</p>
           </div>
         )}
         {pendingCount === 0 && dueToday.length > 0 && (
-          <div className="flex items-center gap-3 p-3 rounded-lg border border-green-500/30 bg-green-500/10">
+          <div className="flex items-center gap-4 p-4 rounded-xl border border-green-500/30 bg-green-500/10">
             <span className="text-xl">🎉</span>
             <p className="text-sm font-medium text-green-400">All habits done for today! Keep it up!</p>
           </div>
         )}
 
         {/* Tab bar */}
-        <div className="flex gap-1 p-1 bg-muted/50 rounded-lg w-fit flex-wrap">
+        <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl w-fit flex-wrap">
           {([
-            { key: "today" as Tab,   label: "Today",   icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-            { key: "habits" as Tab,  label: "Habits",  icon: <Layers className="w-3.5 h-3.5" /> },
-            { key: "heatmap" as Tab, label: "Heatmap", icon: <Calendar className="w-3.5 h-3.5" /> },
-            { key: "weekly" as Tab,  label: "Weekly",  icon: <BarChart3 className="w-3.5 h-3.5" /> },
+            { key: "today" as Tab,   label: "Today",   icon: <CheckCircle2 className="w-4 h-4" /> },
+            { key: "habits" as Tab,  label: "Habits",  icon: <Layers className="w-4 h-4" /> },
+            { key: "heatmap" as Tab, label: "Heatmap", icon: <Calendar className="w-4 h-4" /> },
+            { key: "weekly" as Tab,  label: "Weekly",  icon: <BarChart3 className="w-4 h-4" /> },
           ]).map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${tab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              className={`flex items-center gap-2 px-4 py-2 text-sm rounded-md font-medium transition-colors ${tab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               {t.icon}{t.label}
             </button>
@@ -494,21 +494,21 @@ export function HabitTrackerContent() {
 
         {/* ── TODAY ── */}
         {tab === "today" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="flex items-end justify-between">
               <div>
-                <h2 className="text-2xl font-bold">Today&apos;s Habits</h2>
+                <h2 className="text-3xl font-bold">Today&apos;s Habits</h2>
                 <p className="text-muted-foreground text-sm">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-teal-400">{dueToday.filter((h) => getLog(h.id, today)?.completed).length}<span className="text-muted-foreground text-lg">/{dueToday.length}</span></p>
+                <p className="text-3xl font-bold text-teal-400">{dueToday.filter((h) => getLog(h.id, today)?.completed).length}<span className="text-muted-foreground text-xl">/{dueToday.length}</span></p>
                 <p className="text-xs text-muted-foreground">completed</p>
               </div>
             </div>
 
             {dueToday.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
-                <CheckCircle2 className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <CheckCircle2 className="w-12 h-12 mx-auto mb-4 opacity-20" />
                 <p className="font-medium">No habits scheduled for today</p>
                 <p className="text-sm mt-1">Go to the Habits tab to create your first habit</p>
               </div>
@@ -516,8 +516,8 @@ export function HabitTrackerContent() {
               <>
                 {/* Stacked groups */}
                 {stackedGroups.grouped.map(({ stack, habits }) => (
-                  <div key={stack.id} className="space-y-2">
-                    <div className="flex items-center gap-2">
+                  <div key={stack.id} className="space-y-3">
+                    <div className="flex items-center gap-3">
                       <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{stack.name}</span>
                       <div className="flex-1 h-px bg-border" />
                     </div>
@@ -526,9 +526,9 @@ export function HabitTrackerContent() {
                 ))}
                 {/* Unstacked */}
                 {stackedGroups.unstacked.length > 0 && (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {stackedGroups.grouped.length > 0 && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Other</span>
                         <div className="flex-1 h-px bg-border" />
                       </div>
@@ -543,7 +543,7 @@ export function HabitTrackerContent() {
 
         {/* ── HABITS ── */}
         {tab === "habits" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {(showForm || editingHabit) && (
               <HabitForm
                 stacks={stacks}
@@ -555,26 +555,26 @@ export function HabitTrackerContent() {
 
             {activeHabits.length === 0 && !showForm ? (
               <div className="py-12 text-center text-muted-foreground">
-                <CheckCircle2 className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <CheckCircle2 className="w-12 h-12 mx-auto mb-4 opacity-20" />
                 <p className="font-medium text-foreground">No habits yet</p>
                 <p className="text-sm mt-1">Create your first habit to start tracking</p>
                 <Button className="mt-4" size="sm" onClick={() => setShowForm(true)}>
-                  <Plus className="w-3.5 h-3.5 mr-1" /> New Habit
+                  <Plus className="w-4 h-4 mr-1" /> New Habit
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {activeHabits.map((h) => {
                   const c = COLOR_MAP[h.color]
                   const streak = currentStreak(h, store.logs)
                   const longest = longestStreak(h, store.logs)
                   return (
                     <Card key={h.id}>
-                      <CardContent className="py-3">
-                        <div className="flex items-center gap-3">
+                      <CardContent className="py-4">
+                        <div className="flex items-center gap-4">
                           <span className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg ${c.bg} shrink-0`}>{h.emoji}</span>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                               <p className="font-semibold text-sm">{h.name}</p>
                               <Badge variant="secondary" className={`text-xs ${c.text}`}>
                                 {h.frequency.type === "daily" ? "Daily"
@@ -584,23 +584,23 @@ export function HabitTrackerContent() {
                             </div>
                             {h.description && <p className="text-xs text-muted-foreground">{h.description}</p>}
                           </div>
-                          <div className="flex items-center gap-3 shrink-0 text-center">
+                          <div className="flex items-center gap-4 shrink-0 text-center">
                             <div>
-                              <div className="flex items-center gap-1">
-                                <Flame className="w-3.5 h-3.5 text-orange-400" />
+                              <div className="flex items-center gap-1.5">
+                                <Flame className="w-4 h-4 text-orange-400" />
                                 <span className="text-sm font-bold">{streak}</span>
                               </div>
-                              <p className="text-[10px] text-muted-foreground">streak</p>
+                              <p className="text-xs text-muted-foreground">streak</p>
                             </div>
                             <div>
                               <p className="text-sm font-bold">{longest}</p>
-                              <p className="text-[10px] text-muted-foreground">best</p>
+                              <p className="text-xs text-muted-foreground">best</p>
                             </div>
-                            <Button variant="ghost" size="icon-sm" onClick={() => { setEditingHabit(h); setShowForm(false) }}>
-                              <ChevronDown className="w-3.5 h-3.5" />
+                            <Button variant="ghost" size="icon" onClick={() => { setEditingHabit(h); setShowForm(false) }}>
+                              <ChevronDown className="w-4 h-4" />
                             </Button>
-                            <Button variant="ghost" size="icon-sm" onClick={() => archiveHabit(h.id)}>
-                              <Archive className="w-3.5 h-3.5 text-muted-foreground" />
+                            <Button variant="ghost" size="icon" onClick={() => archiveHabit(h.id)}>
+                              <Archive className="w-4 h-4 text-muted-foreground" />
                             </Button>
                           </div>
                         </div>
@@ -612,19 +612,19 @@ export function HabitTrackerContent() {
             )}
 
             {/* Stacks manager */}
-            <div className="pt-4 border-t space-y-3">
+            <div className="pt-4 border-t space-y-4">
               <h3 className="text-sm font-semibold">Habit Stacks</h3>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Input placeholder="Morning Routine, Evening Routine..." value={newStackName} onChange={(e) => setNewStackName(e.target.value)} className="flex-1" />
-                <Button size="sm" variant="outline" onClick={addStack}><Plus className="w-3.5 h-3.5 mr-1" /> Add</Button>
+                <Button size="sm" variant="outline" onClick={addStack}><Plus className="w-4 h-4 mr-1" /> Add</Button>
               </div>
               {stacks.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {stacks.map((st) => (
-                    <Badge key={st.id} variant="secondary" className="gap-1">
+                    <Badge key={st.id} variant="secondary" className="gap-1.5">
                       {st.name}
                       <button onClick={() => update((s) => ({ ...s, stacks: s.stacks.filter((x) => x.id !== st.id) }))} className="ml-1 hover:text-destructive">
-                        <X className="w-3 h-3" />
+                        <X className="w-4 h-4" />
                       </button>
                     </Badge>
                   ))}
@@ -637,19 +637,19 @@ export function HabitTrackerContent() {
               <div className="pt-4 border-t">
                 <button
                   onClick={() => setShowArchived((v) => !v)}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showArchived ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   Archived habits ({archivedHabits.length})
                 </button>
                 {showArchived && (
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-3 space-y-3">
                     {archivedHabits.map((h) => (
-                      <div key={h.id} className="flex items-center gap-3 p-3 rounded-lg border border-dashed opacity-60">
+                      <div key={h.id} className="flex items-center gap-4 p-4 rounded-xl border border-dashed opacity-60">
                         <span className="text-xl">{h.emoji}</span>
                         <p className="text-sm flex-1 line-through">{h.name}</p>
-                        <Button size="sm" variant="ghost" onClick={() => restoreHabit(h.id)}><RotateCcw className="w-3.5 h-3.5 mr-1" /> Restore</Button>
-                        <Button size="sm" variant="ghost" onClick={() => deleteHabit(h.id)} className="text-destructive"><Trash2 className="w-3.5 h-3.5" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => restoreHabit(h.id)}><RotateCcw className="w-4 h-4 mr-1" /> Restore</Button>
+                        <Button size="sm" variant="ghost" onClick={() => deleteHabit(h.id)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
                       </div>
                     ))}
                   </div>
@@ -661,8 +661,8 @@ export function HabitTrackerContent() {
 
         {/* ── HEATMAP ── */}
         {tab === "heatmap" && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Activity Heatmap</h2>
+          <div className="space-y-8">
+            <h2 className="text-3xl font-bold">Activity Heatmap</h2>
             <p className="text-muted-foreground text-sm">GitHub-style contribution graph — last 6 months</p>
             {activeHabits.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">No habits to show</div>
@@ -675,24 +675,24 @@ export function HabitTrackerContent() {
                 return (
                   <Card key={h.id}>
                     <CardHeader className="pb-2">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-4">
                         <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-base ${c.bg}`}>{h.emoji}</span>
                         <CardTitle className="text-sm flex-1">{h.name}</CardTitle>
                         <div className="flex items-center gap-4 text-center">
                           <div>
-                            <div className="flex items-center gap-1">
-                              <Flame className="w-3.5 h-3.5 text-orange-400" />
+                            <div className="flex items-center gap-1.5">
+                              <Flame className="w-4 h-4 text-orange-400" />
                               <span className={`text-lg font-bold ${c.text}`}>{streak}</span>
                             </div>
-                            <p className="text-[10px] text-muted-foreground">current</p>
+                            <p className="text-xs text-muted-foreground">current</p>
                           </div>
                           <div>
                             <p className={`text-lg font-bold ${c.text}`}>{longest}</p>
-                            <p className="text-[10px] text-muted-foreground">best ever</p>
+                            <p className="text-xs text-muted-foreground">best ever</p>
                           </div>
                         </div>
-                        <Button variant="ghost" size="icon-sm" onClick={() => setShowHeatmapFor(expanded ? null : h.id)}>
-                          {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        <Button variant="ghost" size="icon" onClick={() => setShowHeatmapFor(expanded ? null : h.id)}>
+                          {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </Button>
                       </div>
                     </CardHeader>
@@ -710,8 +710,8 @@ export function HabitTrackerContent() {
 
         {/* ── WEEKLY ── */}
         {tab === "weekly" && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Weekly Summary</h2>
+          <div className="space-y-5">
+            <h2 className="text-3xl font-bold">Weekly Summary</h2>
             <p className="text-muted-foreground text-sm">Last 7 days completion rates</p>
             {weeklyStats.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">No habits to show</div>
@@ -720,8 +720,8 @@ export function HabitTrackerContent() {
                 const c = COLOR_MAP[habit.color]
                 return (
                   <Card key={habit.id}>
-                    <CardContent className="py-4 space-y-3">
-                      <div className="flex items-center gap-3">
+                    <CardContent className="py-5 space-y-4">
+                      <div className="flex items-center gap-4">
                         <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-base ${c.bg}`}>{habit.emoji}</span>
                         <div className="flex-1">
                           <p className="font-semibold text-sm">{habit.name}</p>
@@ -737,13 +737,13 @@ export function HabitTrackerContent() {
                         <div className={`h-full rounded-full ${c.bg} transition-all`} style={{ width: `${rate * 100}%` }} />
                       </div>
                       {/* Per-day breakdown */}
-                      <div className="grid grid-cols-7 gap-1">
+                      <div className="grid grid-cols-7 gap-1.5">
                         {DOW_LABELS.map((l, i) => {
                           const r = byDow[i]
                           return (
                             <div key={i} className="text-center">
                               <div className={`w-full h-6 rounded-sm ${(r == null) ? "bg-muted/20" : r >= 1 ? c.bg.replace("/20", "") : r > 0 ? c.bg : "bg-muted/30"}`} />
-                              <p className="text-[9px] text-muted-foreground mt-0.5">{l}</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">{l}</p>
                             </div>
                           )
                         })}

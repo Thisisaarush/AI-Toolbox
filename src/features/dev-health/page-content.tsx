@@ -173,12 +173,12 @@ export function DevHealthContent() {
       <div className="max-w-4xl mx-auto px-4 py-6">
 
         {/* Tab bar */}
-        <div className="flex gap-1 border-b border-border mb-6">
+        <div className="flex gap-1.5 border-b border-border mb-8">
           {(["pomodoro", "log", "stats"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setActiveTab(t)}
-              className={`px-3 py-2 text-xs font-medium border-b-2 transition-all capitalize ${
+              className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-all capitalize ${
                 activeTab === t ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -189,7 +189,7 @@ export function DevHealthContent() {
 
         {/* ── Pomodoro ──────────────────────────────────────────────────────── */}
         {activeTab === "pomodoro" && (
-          <div className="max-w-sm mx-auto text-center space-y-6">
+          <div className="max-w-sm mx-auto text-center space-y-8">
             <div className="relative w-48 h-48 mx-auto">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r={radius} fill="none" stroke="currentColor" strokeWidth="6" className="text-muted/20" />
@@ -208,7 +208,7 @@ export function DevHealthContent() {
               </div>
             </div>
 
-            <div className="flex justify-center gap-2">
+            <div className="flex justify-center gap-3">
               {pomodoroRunning ? (
                 <Button onClick={pauseTimer}><Pause className="w-4 h-4" /> Pause</Button>
               ) : (
@@ -224,20 +224,20 @@ export function DevHealthContent() {
 
         {/* ── Daily Log ─────────────────────────────────────────────────────── */}
         {activeTab === "log" && (
-          <div className="max-w-lg mx-auto space-y-4">
+          <div className="max-w-lg mx-auto space-y-5">
             <Card>
               <CardHeader><CardTitle>Log for {activeLog.date}</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-5">
                 {/* Sleep */}
                 <div>
-                  <label className="text-xs font-medium flex items-center gap-1.5 mb-1"><Moon className="w-3 h-3" /> Sleep (hours)</label>
-                  <input type="number" min={0} max={16} step={0.5} value={activeLog.sleep} onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v)) saveLog({ ...activeLog, sleep: v }) }} className="flex h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40" />
+                  <label className="text-xs font-medium flex items-center gap-2 mb-1"><Moon className="w-4 h-4" /> Sleep (hours)</label>
+                  <input type="number" min={0} max={16} step={0.5} value={activeLog.sleep} onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v)) saveLog({ ...activeLog, sleep: v }) }} className="flex h-9 w-full min-w-0 rounded-xl border border-input bg-transparent px-2.5 py-1.5 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40" />
                 </div>
 
                 {/* Energy */}
                 <div>
-                  <label className="text-xs font-medium flex items-center gap-1.5 mb-1"><Sun className="w-3 h-3" /> Energy</label>
-                  <div className="flex gap-1">
+                  <label className="text-xs font-medium flex items-center gap-2 mb-1"><Sun className="w-4 h-4" /> Energy</label>
+                  <div className="flex gap-1.5">
                     {([1, 2, 3, 4, 5] as EnergyLevel[]).map((v) => (
                       <button
                         key={v}
@@ -254,8 +254,8 @@ export function DevHealthContent() {
 
                 {/* Mood */}
                 <div>
-                  <label className="text-xs font-medium flex items-center gap-1.5 mb-1"><Activity className="w-3 h-3" /> Mood</label>
-                  <div className="flex gap-1">
+                  <label className="text-xs font-medium flex items-center gap-2 mb-1"><Activity className="w-4 h-4" /> Mood</label>
+                  <div className="flex gap-1.5">
                     {([1, 2, 3, 4, 5] as MoodLevel[]).map((v) => (
                       <button
                         key={v}
@@ -272,38 +272,38 @@ export function DevHealthContent() {
 
                 {/* Water */}
                 <div>
-                  <label className="text-xs font-medium flex items-center gap-1.5 mb-1"><Droplets className="w-3 h-3" /> Water (glasses)</label>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon-xs" onClick={() => { if ((activeLog.water ?? 0) > 0) saveLog({ ...activeLog, water: activeLog.water - 1 }) }}>
-                      <Trash2 className="w-3 h-3" />
+                  <label className="text-xs font-medium flex items-center gap-2 mb-1"><Droplets className="w-4 h-4" /> Water (glasses)</label>
+                  <div className="flex items-center gap-3">
+                    <Button variant="ghost" size="icon" onClick={() => { if ((activeLog.water ?? 0) > 0) saveLog({ ...activeLog, water: activeLog.water - 1 }) }}>
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                     <span className="text-lg font-bold w-8 text-center">{activeLog.water}</span>
-                    <Button variant="ghost" size="icon-xs" onClick={() => saveLog({ ...activeLog, water: activeLog.water + 1 })}>
-                      <Plus className="w-3 h-3" />
+                    <Button variant="ghost" size="icon" onClick={() => saveLog({ ...activeLog, water: activeLog.water + 1 })}>
+                      <Plus className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
 
                 {/* Caffeine */}
                 <div>
-                  <label className="text-xs font-medium flex items-center gap-1.5 mb-1"><Coffee className="w-3 h-3" /> Caffeine (cups)</label>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon-xs" onClick={() => { if ((activeLog.caffeine ?? 0) > 0) saveLog({ ...activeLog, caffeine: activeLog.caffeine - 1 }) }}>
-                      <Trash2 className="w-3 h-3" />
+                  <label className="text-xs font-medium flex items-center gap-2 mb-1"><Coffee className="w-4 h-4" /> Caffeine (cups)</label>
+                  <div className="flex items-center gap-3">
+                    <Button variant="ghost" size="icon" onClick={() => { if ((activeLog.caffeine ?? 0) > 0) saveLog({ ...activeLog, caffeine: activeLog.caffeine - 1 }) }}>
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                     <span className="text-lg font-bold w-8 text-center">{activeLog.caffeine}</span>
-                    <Button variant="ghost" size="icon-xs" onClick={() => saveLog({ ...activeLog, caffeine: activeLog.caffeine + 1 })}>
-                      <Plus className="w-3 h-3" />
+                    <Button variant="ghost" size="icon" onClick={() => saveLog({ ...activeLog, caffeine: activeLog.caffeine + 1 })}>
+                      <Plus className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
 
                 {/* Exercise */}
                 <div>
-                  <label className="text-xs font-medium flex items-center gap-1.5 mb-1"><Dumbbell className="w-3 h-3" /> Exercise</label>
+                  <label className="text-xs font-medium flex items-center gap-2 mb-1"><Dumbbell className="w-4 h-4" /> Exercise</label>
                   <button
                     onClick={() => saveLog({ ...activeLog, exercised: !activeLog.exercised })}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                    className={`px-4 py-2 text-xs font-medium rounded-xl border transition-all ${
                       activeLog.exercised ? "bg-green-500 text-white border-green-500" : "border-border text-muted-foreground hover:border-foreground/30"
                     }`}
                   >
@@ -313,8 +313,8 @@ export function DevHealthContent() {
 
                 {/* Pomodoros */}
                 <div>
-                  <label className="text-xs font-medium flex items-center gap-1.5 mb-1"><Timer className="w-3 h-3" /> Pomodoros Completed</label>
-                  <input type="number" min={0} value={activeLog.pomodorosCompleted} onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v)) saveLog({ ...activeLog, pomodorosCompleted: v }) }} className="flex h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40" />
+                  <label className="text-xs font-medium flex items-center gap-2 mb-1"><Timer className="w-4 h-4" /> Pomodoros Completed</label>
+                  <input type="number" min={0} value={activeLog.pomodorosCompleted} onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v)) saveLog({ ...activeLog, pomodorosCompleted: v }) }} className="flex h-9 w-full min-w-0 rounded-xl border border-input bg-transparent px-2.5 py-1.5 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40" />
                 </div>
 
                 {/* Notes */}
@@ -334,7 +334,7 @@ export function DevHealthContent() {
 
         {/* ── Stats ─────────────────────────────────────────────────────────── */}
         {activeTab === "stats" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Streak */}
             <div className="text-center">
               <span className="text-5xl font-bold">{data.streak}</span>
@@ -342,26 +342,26 @@ export function DevHealthContent() {
             </div>
 
             {/* Averages */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 gap-4">
               <Card><CardContent className="py-4 text-center">
                 <Moon className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
                 <p className="text-lg font-bold">{avgSleep}h</p>
-                <p className="text-[10px] text-muted-foreground">Avg Sleep</p>
+                <p className="text-xs text-muted-foreground">Avg Sleep</p>
               </CardContent></Card>
               <Card><CardContent className="py-4 text-center">
                 <Sun className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
                 <p className="text-lg font-bold">{avgEnergy}</p>
-                <p className="text-[10px] text-muted-foreground">Avg Energy</p>
+                <p className="text-xs text-muted-foreground">Avg Energy</p>
               </CardContent></Card>
               <Card><CardContent className="py-4 text-center">
                 <Activity className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
                 <p className="text-lg font-bold">{avgMood}</p>
-                <p className="text-[10px] text-muted-foreground">Avg Mood</p>
+                <p className="text-xs text-muted-foreground">Avg Mood</p>
               </CardContent></Card>
               <Card><CardContent className="py-4 text-center">
                 <Droplets className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
                 <p className="text-lg font-bold">{avgWater}</p>
-                <p className="text-[10px] text-muted-foreground">Avg Water</p>
+                <p className="text-xs text-muted-foreground">Avg Water</p>
               </CardContent></Card>
             </div>
 
@@ -379,7 +379,7 @@ export function DevHealthContent() {
             <Card>
               <CardHeader><CardTitle>Last 35 Days</CardTitle></CardHeader>
               <CardContent>
-                <div className="grid grid-cols-7 gap-1">
+                <div className="grid grid-cols-7 gap-1.5">
                   {heatmapData.map((d) => (
                     <div
                       key={d.date}
@@ -388,10 +388,10 @@ export function DevHealthContent() {
                     />
                   ))}
                 </div>
-                <div className="flex items-center gap-2 mt-2 text-[10px] text-muted-foreground">
+                <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                   <span>Less</span>
-                  <div className="w-3 h-3 rounded bg-muted" />
-                  <div className="w-3 h-3 rounded bg-green-500" />
+                  <div className="w-4 h-4 rounded bg-muted" />
+                  <div className="w-4 h-4 rounded bg-green-500" />
                   <span>More</span>
                 </div>
               </CardContent>
@@ -401,7 +401,7 @@ export function DevHealthContent() {
             {recentLogs.length > 2 && (
               <Card>
                 <CardHeader><CardTitle>Tips</CardTitle></CardHeader>
-                <CardContent className="space-y-1 text-sm">
+                <CardContent className="space-y-1.5 text-sm">
                   {avgSleep < 7 && <p>• Try to get more sleep (aim for 7-8h)</p>}
                   {avgWater < 5 && <p>• Increase water intake (aim for 8 glasses)</p>}
                   {recentLogs.filter((l) => l.exercised).length < 5 && <p>• Aim to exercise more (3+ times/week)</p>}

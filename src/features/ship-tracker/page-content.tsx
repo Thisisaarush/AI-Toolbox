@@ -132,13 +132,13 @@ export function ShipTrackerContent() {
     return (
       <>
         <ToolHeader title="Ship Tracker" icon={Rocket} color="text-amber-500" badge="Personal" />
-        <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+        <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
           <Button onClick={() => setView("new")}><Plus className="w-4 h-4" /> New Challenge</Button>
 
           {active && (
             <Card className="border-t-2 border-t-indigo-500 cursor-pointer hover:shadow-md transition-all" onClick={() => setView("challenge")}>
               <CardContent className="py-4">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-bold">{active.name}</h3>
                   <Badge variant="secondary" className="text-xs">{progress(active).completed}/{progress(active).total} days</Badge>
                 </div>
@@ -147,7 +147,7 @@ export function ShipTrackerContent() {
                   <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${progress(active).pct}%` }} />
                 </div>
                 <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500" /> {progress(active).streak} day streak</span>
+                  <span className="flex items-center gap-1.5"><Flame className="w-4 h-4 text-orange-500" /> {progress(active).streak} day streak</span>
                   <span>{active.dailyCommitment}</span>
                 </div>
               </CardContent>
@@ -165,10 +165,10 @@ export function ShipTrackerContent() {
           {data.challenges.filter((c) => c.archived).length > 0 && (
             <div className="mt-8">
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Archived</h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {data.challenges.filter((c) => c.archived).map((c) => (
                   <Card key={c.id} size="sm" className="opacity-60">
-                    <CardContent className="py-2 flex items-center justify-between">
+                    <CardContent className="py-2.5 flex items-center justify-between">
                       <span className="text-sm">{c.name}</span>
                       <span className="text-xs text-muted-foreground">{progress(c).completed}/{progress(c).total}</span>
                     </CardContent>
@@ -187,7 +187,7 @@ export function ShipTrackerContent() {
     return (
       <>
         <ToolHeader title="New Challenge" icon={Rocket} color="text-amber-500" badge="Personal" actions={<Button variant="ghost" size="sm" onClick={() => setView("list")}>Back</Button>} />
-        <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
+        <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
           <Input placeholder="Challenge name (e.g. Ship 30 in 30)" value={newName} onChange={(e) => setNewName(e.target.value)} />
           <Textarea placeholder="Description or goal" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} rows={3} />
           <Input type="date" placeholder="Deadline" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} />
@@ -224,17 +224,17 @@ export function ShipTrackerContent() {
   return (
     <>
       <ToolHeader title={activeChallenge.name} icon={Rocket} color="text-amber-500" badge="Personal" actions={
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           <Button variant="ghost" size="sm" onClick={() => setView("list")}>All</Button>
           <Button variant="ghost" size="sm" onClick={() => archiveChallenge(activeChallenge.id)}>Archive</Button>
         </div>
       } />
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
 
         {/* Progress */}
         <Card>
           <CardContent className="py-4">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="text-sm text-muted-foreground">{activeChallenge.dailyCommitment}</p>
                 <p className="text-xs text-muted-foreground">Target: {activeChallenge.publicGoal}</p>
@@ -251,21 +251,21 @@ export function ShipTrackerContent() {
         </Card>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card><CardContent className="py-3 text-center">
+        <div className="grid grid-cols-3 gap-4">
+          <Card><CardContent className="py-4 text-center">
             <Flame className={`w-5 h-5 mx-auto mb-1 ${p.streak >= 3 ? "text-orange-500" : "text-muted-foreground"}`} />
             <p className="text-lg font-bold">{p.streak}</p>
-            <p className="text-[10px] text-muted-foreground">Day streak</p>
+            <p className="text-xs text-muted-foreground">Day streak</p>
           </CardContent></Card>
-          <Card><CardContent className="py-3 text-center">
+          <Card><CardContent className="py-4 text-center">
             <CheckCircle2 className="w-5 h-5 mx-auto mb-1 text-green-500" />
             <p className="text-lg font-bold">{p.completed}</p>
-            <p className="text-[10px] text-muted-foreground">Done</p>
+            <p className="text-xs text-muted-foreground">Done</p>
           </CardContent></Card>
-          <Card><CardContent className="py-3 text-center">
+          <Card><CardContent className="py-4 text-center">
             <Target className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
             <p className="text-lg font-bold">{p.total - p.completed}</p>
-            <p className="text-[10px] text-muted-foreground">Remaining</p>
+            <p className="text-xs text-muted-foreground">Remaining</p>
           </CardContent></Card>
         </div>
 
@@ -273,8 +273,8 @@ export function ShipTrackerContent() {
         {shameMode && (
           <Card className="border-t-2 border-t-red-500 bg-red-50 dark:bg-red-950">
             <CardContent className="py-4 text-center">
-              <XCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-              <h3 className="text-lg font-bold text-red-600">Accountability Check!</h3>
+              <XCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-red-600">Accountability Check!</h3>
               <p className="text-sm text-red-500">You missed 2+ days. Get back to shipping!</p>
             </CardContent>
           </Card>
@@ -285,24 +285,24 @@ export function ShipTrackerContent() {
           <CardHeader><CardTitle>{todayEntry ? "Today's Entry" : "Log Today"}</CardTitle></CardHeader>
           <CardContent>
             {todayEntry ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">
                     {todayEntry.completed ? <span className="text-green-500">✓ Completed</span> : <span className="text-amber-500">○ In progress</span>}
                   </span>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <span title={MOOD_LABELS[todayEntry.mood]}>{MOOD_EMOJIS[todayEntry.mood]}</span>
-                    <Button variant="ghost" size="icon-xs" onClick={() => deleteEntry(today())}><Trash2 className="w-3 h-3 text-destructive" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => deleteEntry(today())}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">{todayEntry.note}</p>
-                <Button variant="ghost" size="xs" onClick={() => logDay({ ...todayEntry, completed: !todayEntry.completed })}>
+                <Button variant="ghost" size="sm" onClick={() => logDay({ ...todayEntry, completed: !todayEntry.completed })}>
                   {todayEntry.completed ? "Mark incomplete" : "Mark complete"}
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2">
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                <div className="flex gap-3">
                   <Button onClick={() => logDay({ date: today(), note: "", completed: true, mood: 3 })}>
                     <CheckCircle2 className="w-4 h-4" /> Done
                   </Button>
@@ -326,13 +326,13 @@ export function ShipTrackerContent() {
         </Card>
 
         {/* Mood/note quick log */}
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           {([1, 2, 3, 4, 5] as const).map((mood) => (
             <button
               key={mood}
               onClick={() => logDay({ date: today(), note: todayEntry?.note ?? "", completed: todayEntry?.completed ?? false, mood })}
               title={MOOD_LABELS[mood]}
-              className={`text-lg w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
+              className={`text-lg w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                 todayEntry?.mood === mood ? "bg-foreground/10 ring-2 ring-foreground/30" : "hover:bg-muted"
               }`}
             >
@@ -345,7 +345,7 @@ export function ShipTrackerContent() {
         <Card>
           <CardHeader><CardTitle>Last 30 Days</CardTitle></CardHeader>
           <CardContent>
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-1.5">
               {heatmapData.map((d) => (
                 <div
                   key={d.date}
@@ -354,11 +354,11 @@ export function ShipTrackerContent() {
                 />
               ))}
             </div>
-            <div className="flex items-center gap-2 mt-2 text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
               <span>Missed</span>
-              <div className="w-3 h-3 rounded bg-muted" />
-              <div className="w-3 h-3 rounded bg-amber-300" />
-              <div className="w-3 h-3 rounded bg-green-500" />
+              <div className="w-4 h-4 rounded bg-muted" />
+              <div className="w-4 h-4 rounded bg-amber-300" />
+              <div className="w-4 h-4 rounded bg-green-500" />
               <span>Done</span>
             </div>
           </CardContent>
@@ -368,12 +368,12 @@ export function ShipTrackerContent() {
         {sortedEntries.length > 0 && (
           <Card>
             <CardHeader><CardTitle>Log</CardTitle></CardHeader>
-            <CardContent className="space-y-1">
+            <CardContent className="space-y-1.5">
               {sortedEntries.slice(0, 14).map((e) => (
                 <div key={e.date} className="flex items-center justify-between py-1.5 border-b border-border last:border-b-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <span className={e.completed ? "text-green-500" : "text-amber-500"}>
-                      {e.completed ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                      {e.completed ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
                     </span>
                     <span className="text-xs text-muted-foreground">{e.date}</span>
                     <span className="text-xs">{e.note}</span>

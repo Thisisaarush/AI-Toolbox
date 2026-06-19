@@ -201,12 +201,12 @@ export function ContractGenContent() {
         color="text-rose-500"
         badge="Legal"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-5">
             {view !== "library" ? (
               <Button variant="outline" size="sm" onClick={() => setView("library")}>← Library</Button>
             ) : (
               <Button size="sm" onClick={() => setView("new-contract")}>
-                <Plus className="w-3.5 h-3.5 mr-1" /> New Contract
+                <Plus className="w-4 h-4 mr-1" /> New Contract
               </Button>
             )}
           </div>
@@ -214,9 +214,9 @@ export function ContractGenContent() {
       />
 
       {/* Disclaimer banner */}
-      <div className="bg-amber-500/10 border-b border-amber-500/20 py-2 px-4">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300">
-          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+      <div className="bg-amber-500/10 border-b border-amber-500/20 py-2.5 px-4">
+        <div className="max-w-7xl mx-auto flex items-center gap-5 text-xs text-amber-700 dark:text-amber-300">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>
             <strong>Legal Disclaimer:</strong> This tool generates template contracts for reference only. For binding legal agreements, consult a licensed attorney in your jurisdiction.
           </span>
@@ -227,18 +227,18 @@ export function ContractGenContent() {
 
         {/* ── New Contract ── */}
         {view === "new-contract" && (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <h1 className="text-2xl font-bold">New Contract</h1>
+          <div className="max-w-2xl mx-auto space-y-8">
+            <h1 className="text-3xl font-bold">New Contract</h1>
 
             <Card>
               <CardHeader><CardTitle className="text-sm">Contract Type</CardTitle></CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-5">
                   {(Object.entries(CONTRACT_META) as [ContractType, typeof CONTRACT_META[ContractType]][]).map(([type, meta]) => (
                     <button
                       key={type}
                       onClick={() => { setSelectedType(type); setFieldValues({}) }}
-                      className={`p-3 rounded-lg border text-left transition-colors ${
+                      className={`p-5 rounded-xl border text-left transition-colors ${
                         selectedType === type
                           ? "border-rose-500 bg-rose-500/10"
                           : "border-border hover:bg-muted/50"
@@ -255,12 +255,12 @@ export function ContractGenContent() {
             <Card>
               <CardHeader><CardTitle className="text-sm">Jurisdiction</CardTitle></CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-5">
                   {(Object.entries(JURISDICTION_META) as [Jurisdiction, string][]).map(([j, label]) => (
                     <button
                       key={j}
                       onClick={() => setSelectedJurisdiction(j)}
-                      className={`px-3 py-1.5 rounded-full border text-sm font-medium transition-colors ${
+                      className={`px-4 py-2.5 rounded-full border text-sm font-medium transition-colors ${
                         selectedJurisdiction === j
                           ? "bg-rose-500 text-white border-rose-500"
                           : "border-border hover:bg-muted/50"
@@ -275,7 +275,7 @@ export function ContractGenContent() {
 
             <Card>
               <CardHeader><CardTitle className="text-sm">Contract Details</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-5">
                 {fields.map((field) => (
                   <div key={field.key}>
                     <label className="text-xs font-medium mb-1 block">
@@ -287,12 +287,13 @@ export function ContractGenContent() {
                         value={fieldValues[field.key] ?? ""}
                         onChange={(e) => setField(field.key, e.target.value)}
                         rows={3}
+                        className="leading-relaxed"
                       />
                     ) : field.type === "select" ? (
                       <select
                         value={fieldValues[field.key] ?? ""}
                         onChange={(e) => setField(field.key, e.target.value)}
-                        className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                        className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm"
                       >
                         <option value="">Select...</option>
                         {(field.options ?? []).map((opt) => <option key={opt} value={opt}>{opt}</option>)}
@@ -324,10 +325,10 @@ export function ContractGenContent() {
 
         {/* ── Library ── */}
         {view === "library" && (
-          <div className="space-y-6">
-            <div className="flex items-end justify-between gap-4">
+          <div className="space-y-8">
+            <div className="flex items-end justify-between gap-5">
               <div>
-                <h1 className="text-2xl font-bold">Contract Library</h1>
+                <h1 className="text-3xl font-bold">Contract Library</h1>
                 <p className="text-muted-foreground text-sm">{contracts.length} contracts saved</p>
               </div>
             </div>
@@ -347,16 +348,16 @@ export function ContractGenContent() {
             {contracts.length === 0 ? (
               <Card className="max-w-md mx-auto mt-12">
                 <CardContent className="py-16 text-center">
-                  <FileSignature className="w-14 h-14 mx-auto mb-4 text-muted-foreground opacity-40" />
-                  <h2 className="text-xl font-semibold mb-2">No contracts yet</h2>
-                  <p className="text-muted-foreground text-sm mb-6">Generate your first AI contract in minutes.</p>
+                  <FileSignature className="w-14 h-14 mx-auto mb-5 text-muted-foreground opacity-40" />
+                  <h2 className="text-2xl font-semibold mb-3">No contracts yet</h2>
+                  <p className="text-muted-foreground text-sm mb-8">Generate your first AI contract in minutes.</p>
                   <Button onClick={() => setView("new-contract")}>
                     <Plus className="w-4 h-4 mr-1" /> Create Contract
                   </Button>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {filtered.map((contract) => (
                   <Card
                     key={contract.id}
@@ -369,11 +370,11 @@ export function ContractGenContent() {
                       setView("contract-detail")
                     }}
                   >
-                    <CardContent className="py-4 flex items-center gap-4">
+                    <CardContent className="py-4 flex items-center gap-5">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-5">
                           <p className="font-medium text-sm truncate">{contract.title}</p>
-                          <Badge variant="secondary" className="text-[10px] shrink-0">{JURISDICTION_META[contract.jurisdiction]}</Badge>
+                          <Badge variant="secondary" className="text-xs shrink-0">{JURISDICTION_META[contract.jurisdiction]}</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           {CONTRACT_META[contract.type].label} · {contract.versions.length} version{contract.versions.length !== 1 ? "s" : ""}
@@ -391,45 +392,45 @@ export function ContractGenContent() {
 
         {/* ── Contract Detail ── */}
         {view === "contract-detail" && selectedContract && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="space-y-5">
+            <div className="flex items-center justify-between gap-5 flex-wrap">
               <div>
-                <h1 className="text-xl font-bold">{selectedContract.title}</h1>
+                <h1 className="text-2xl font-bold">{selectedContract.title}</h1>
                 <p className="text-muted-foreground text-sm">
                   {CONTRACT_META[selectedContract.type].label} · {JURISDICTION_META[selectedContract.jurisdiction]}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-5">
                 <Button variant="outline" size="sm" onClick={addVersion}>
-                  <History className="w-3.5 h-3.5 mr-1" /> Save Version
+                  <History className="w-4 h-4 mr-1" /> Save Version
                 </Button>
                 <Button variant="outline" size="sm" onClick={saveEdits}>Save Edits</Button>
                 <Button variant="outline" size="sm" onClick={exportTxt}>
-                  <Download className="w-3.5 h-3.5 mr-1" /> .txt
+                  <Download className="w-4 h-4 mr-1" /> .txt
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => window.print()}>
                   Print PDF
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => deleteContract(selectedContract.id)}>
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>
 
             {/* Version tabs */}
             {selectedContract.versions.length > 1 && (
-              <div className="flex gap-1 p-1 bg-muted/50 rounded-lg w-fit">
+              <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl w-fit">
                 {selectedContract.versions.map((v) => (
                   <button
                     key={v.id}
                     onClick={() => switchVersion(v.id)}
-                    className={`px-3 py-1.5 text-xs rounded-md font-medium transition-colors flex items-center gap-1 ${
+                    className={`px-4 py-2.5 text-xs rounded-md font-medium transition-colors flex items-center gap-1.5 ${
                       activeVersionId === v.id
                         ? "bg-background shadow-sm text-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <Clock className="w-3 h-3" />
+                    <Clock className="w-4 h-4" />
                     {v.label ?? "Draft"} · {new Date(v.createdAt).toLocaleDateString()}
                   </button>
                 ))}
@@ -437,9 +438,9 @@ export function ContractGenContent() {
             )}
 
             {/* Split editor */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[600px]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 min-h-[600px]">
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Edit</p>
+                <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wider">Edit</p>
                 <Textarea
                   value={editedContent}
                   onChange={(e) => setEditedContent(e.target.value)}
@@ -447,16 +448,16 @@ export function ContractGenContent() {
                 />
               </div>
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Preview</p>
                   <button
                     onClick={() => { navigator.clipboard.writeText(editedContent); toast.success("Copied") }}
-                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5"
                   >
-                    <Copy className="w-3 h-3" /> Copy
+                    <Copy className="w-4 h-4" /> Copy
                   </button>
                 </div>
-                <div className="print-area h-[600px] overflow-y-auto p-4 border rounded-lg bg-white dark:bg-background text-sm font-serif whitespace-pre-wrap leading-relaxed">
+                <div className="print-area h-[600px] overflow-y-auto p-5 border rounded-xl bg-white dark:bg-background text-sm font-serif whitespace-pre-wrap leading-relaxed">
                   {editedContent}
                 </div>
               </div>

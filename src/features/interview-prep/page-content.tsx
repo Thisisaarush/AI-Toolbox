@@ -58,15 +58,15 @@ function FlashCard({ question, onRate }: { question: Question; onRate: (c: 1 | 2
       >
         {/* Front */}
         <div className="absolute inset-0 rounded-2xl border bg-card p-6 flex flex-col items-center justify-center text-center backface-hidden">
-          <Badge variant="secondary" className={`text-xs mb-3 ${CATEGORY_COLORS[question.category]}`}>{CATEGORY_LABELS[question.category]}</Badge>
-          <p className="text-lg font-semibold">{question.question}</p>
+          <Badge variant="secondary" className={`text-xs mb-5 ${CATEGORY_COLORS[question.category]}`}>{CATEGORY_LABELS[question.category]}</Badge>
+          <p className="text-xl font-semibold">{question.question}</p>
           <p className="text-xs text-muted-foreground mt-4">Click to reveal answer approach</p>
         </div>
         {/* Back */}
         <div className="absolute inset-0 rounded-2xl border bg-card p-6 flex flex-col items-center justify-center text-center" style={{ transform: "rotateY(180deg)", backfaceVisibility: "hidden" }}>
-          <p className="text-sm text-muted-foreground mb-4">{question.tips || "No tips available for this question. Practice answering it out loud!"}</p>
+          <p className="text-sm text-muted-foreground mb-5">{question.tips || "No tips available for this question. Practice answering it out loud!"}</p>
           {flipped && (
-            <div className="flex gap-3 mt-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex gap-5 mt-4" onClick={(e) => e.stopPropagation()}>
               <Button size="sm" variant="outline" onClick={() => onRate(1)} className="text-red-400 border-red-400/30">Hard</Button>
               <Button size="sm" variant="outline" onClick={() => onRate(2)} className="text-amber-400 border-amber-400/30">OK</Button>
               <Button size="sm" variant="outline" onClick={() => onRate(3)} className="text-green-400 border-green-400/30">Easy</Button>
@@ -81,7 +81,7 @@ function FlashCard({ question, onRate }: { question: Question; onRate: (c: 1 | 2
 // ── STAR Helper ──────────────────────────────────────────────────────────────
 function StarHelper({ value, onChange }: { value: STARAnswer; onChange: (v: STARAnswer) => void }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {(["situation","task","action","result"] as const).map((key) => (
         <div key={key}>
           <label className="text-xs font-semibold block mb-1 uppercase tracking-wider text-amber-400">{key}</label>
@@ -358,25 +358,25 @@ export function InterviewPrepContent() {
         actions={
           tab === "bank" ? (
             <Button size="sm" variant="outline" onClick={() => setShowCustomForm(true)}>
-              <Plus className="w-3.5 h-3.5 mr-1" /> Add Question
+              <Plus className="w-4 h-4 mr-1" /> Add Question
             </Button>
           ) : undefined
         }
       />
-      <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full space-y-6">
+      <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full space-y-8">
         {/* Tab bar */}
-        <div className="flex gap-1 p-1 bg-muted/50 rounded-lg flex-wrap">
+        <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl flex-wrap">
           {([
-            { key: "bank" as Tab, label: "Question Bank", icon: <BookOpen className="w-3.5 h-3.5" /> },
-            { key: "practice" as Tab, label: "Practice", icon: <MessageSquare className="w-3.5 h-3.5" /> },
-            { key: "mock" as Tab, label: "Mock Interview", icon: <Clock className="w-3.5 h-3.5" /> },
-            { key: "flashcards" as Tab, label: "Flashcards", icon: <Zap className="w-3.5 h-3.5" /> },
-            { key: "company" as Tab, label: "Company Prep", icon: <Building2 className="w-3.5 h-3.5" /> },
-            { key: "progress" as Tab, label: "Progress", icon: <BarChart3 className="w-3.5 h-3.5" /> },
-            { key: "resources" as Tab, label: "Resources", icon: <ExternalLink className="w-3.5 h-3.5" /> },
+            { key: "bank" as Tab, label: "Question Bank", icon: <BookOpen className="w-4 h-4" /> },
+            { key: "practice" as Tab, label: "Practice", icon: <MessageSquare className="w-4 h-4" /> },
+            { key: "mock" as Tab, label: "Mock Interview", icon: <Clock className="w-4 h-4" /> },
+            { key: "flashcards" as Tab, label: "Flashcards", icon: <Zap className="w-4 h-4" /> },
+            { key: "company" as Tab, label: "Company Prep", icon: <Building2 className="w-4 h-4" /> },
+            { key: "progress" as Tab, label: "Progress", icon: <BarChart3 className="w-4 h-4" /> },
+            { key: "resources" as Tab, label: "Resources", icon: <ExternalLink className="w-4 h-4" /> },
           ]).map((t) => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${tab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              className={`flex items-center gap-4 px-4 py-2.5 text-sm rounded-md font-medium transition-colors ${tab === t.key ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
               {t.icon}{t.label}
             </button>
           ))}
@@ -384,58 +384,58 @@ export function InterviewPrepContent() {
 
         {/* ── QUESTION BANK ── */}
         {tab === "bank" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {showCustomForm && (
               <Card className="border-amber-500/30">
-                <CardContent className="pt-4 space-y-3">
+                <CardContent className="pt-4 space-y-4">
                   <div>
                     <label className="text-xs font-medium block mb-1">Question *</label>
                     <Textarea value={customQ} onChange={(e) => setCustomQ(e.target.value)} rows={2} placeholder="Enter your custom question..." />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs font-medium block mb-1">Category</label>
-                      <select value={customCat} onChange={(e) => setCustomCat(e.target.value as QuestionCategory)} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                      <select value={customCat} onChange={(e) => setCustomCat(e.target.value as QuestionCategory)} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                         {(Object.keys(CATEGORY_LABELS) as QuestionCategory[]).map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="text-xs font-medium block mb-1">Difficulty</label>
-                      <select value={customDiff} onChange={(e) => setCustomDiff(e.target.value as Difficulty)} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                      <select value={customDiff} onChange={(e) => setCustomDiff(e.target.value as Difficulty)} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                         {(["easy","medium","hard"] as Difficulty[]).map((d) => <option key={d}>{d}</option>)}
                       </select>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-5">
                     <Button size="sm" onClick={() => {
                       if (!customQ.trim()) { toast.error("Question required"); return }
                       const q: Question = { id: `custom-${crypto.randomUUID()}`, category: customCat, difficulty: customDiff, question: customQ.trim(), custom: true }
                       update((s) => ({ ...s, customQuestions: [...s.customQuestions, q] }))
                       setCustomQ(""); setShowCustomForm(false); toast.success("Question added")
-                    }}><Check className="w-3.5 h-3.5 mr-1" /> Save</Button>
+                    }}><Check className="w-4 h-4 mr-1" /> Save</Button>
                     <Button size="sm" variant="ghost" onClick={() => setShowCustomForm(false)}>Cancel</Button>
                   </div>
                 </CardContent>
               </Card>
             )}
-            <div className="flex flex-wrap gap-2 items-center">
+            <div className="flex flex-wrap gap-5 items-center">
               <Input placeholder="Search questions..." value={bankSearch} onChange={(e) => setBankSearch(e.target.value)} className="w-48" />
-              <select value={bankCategory} onChange={(e) => setBankCategory(e.target.value as QuestionCategory | "all")} className="h-8 rounded-md border border-input bg-background px-3 text-sm">
+              <select value={bankCategory} onChange={(e) => setBankCategory(e.target.value as QuestionCategory | "all")} className="h-9 rounded-md border border-input bg-background px-4 text-sm">
                 <option value="all">All categories</option>
                 {(Object.keys(CATEGORY_LABELS) as QuestionCategory[]).map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
               </select>
-              <select value={bankDifficulty} onChange={(e) => setBankDifficulty(e.target.value as Difficulty | "all")} className="h-8 rounded-md border border-input bg-background px-3 text-sm">
+              <select value={bankDifficulty} onChange={(e) => setBankDifficulty(e.target.value as Difficulty | "all")} className="h-9 rounded-md border border-input bg-background px-4 text-sm">
                 <option value="all">All difficulties</option>
                 {(["easy","medium","hard"] as Difficulty[]).map((d) => <option key={d}>{d}</option>)}
               </select>
               <span className="text-xs text-muted-foreground">{filteredQs.length} questions</span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {filteredQs.slice(0, 50).map((q) => (
-                <div key={q.id} className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/30 group transition-colors">
+                <div key={q.id} className="flex items-center gap-5 p-5 rounded-xl border hover:bg-muted/30 group transition-colors">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm">{q.question}</p>
-                    <div className="flex gap-2 mt-1">
+                    <div className="flex gap-5 mt-1">
                       <Badge variant="secondary" className={`text-xs ${CATEGORY_COLORS[q.category]}`}>{CATEGORY_LABELS[q.category]}</Badge>
                       <Badge variant="secondary" className={`text-xs ${DIFFICULTY_COLORS[q.difficulty]}`}>{q.difficulty}</Badge>
                       {q.starTemplate && <Badge variant="secondary" className="text-xs bg-amber-500/20 text-amber-400">STAR</Badge>}
@@ -443,11 +443,11 @@ export function InterviewPrepContent() {
                     </div>
                   </div>
                   <Button size="sm" variant="outline" onClick={() => startPractice(q)}>
-                    Practice <ChevronRight className="w-3 h-3 ml-1" />
+                    Practice <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                   {q.custom && (
-                    <Button size="icon-sm" variant="ghost" onClick={() => update((s) => ({ ...s, customQuestions: s.customQuestions.filter((x) => x.id !== q.id) }))} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100">
-                      <X className="w-3.5 h-3.5" />
+                    <Button size="icon" variant="ghost" onClick={() => update((s) => ({ ...s, customQuestions: s.customQuestions.filter((x) => x.id !== q.id) }))} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100">
+                      <X className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -459,10 +459,10 @@ export function InterviewPrepContent() {
 
         {/* ── PRACTICE ── */}
         {tab === "practice" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {!practiceQuestion ? (
               <div className="py-16 text-center text-muted-foreground">
-                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <MessageSquare className="w-12 h-12 mx-auto mb-5 opacity-20" />
                 <p className="font-medium text-foreground">No question selected</p>
                 <p className="text-sm mt-1">Go to the Question Bank and click Practice on any question</p>
                 <Button className="mt-4" size="sm" onClick={() => setTab("bank")}>Browse Questions</Button>
@@ -471,20 +471,20 @@ export function InterviewPrepContent() {
               <>
                 <Card className="border-amber-500/30">
                   <CardContent className="pt-4">
-                    <div className="flex gap-2 mb-3">
+                    <div className="flex gap-5 mb-5">
                       <Badge variant="secondary" className={`text-xs ${CATEGORY_COLORS[practiceQuestion.category]}`}>{CATEGORY_LABELS[practiceQuestion.category]}</Badge>
                       <Badge variant="secondary" className={`text-xs ${DIFFICULTY_COLORS[practiceQuestion.difficulty]}`}>{practiceQuestion.difficulty}</Badge>
                     </div>
-                    <p className="text-lg font-semibold">{practiceQuestion.question}</p>
+                    <p className="text-xl font-semibold">{practiceQuestion.question}</p>
                     {practiceQuestion.tips && <p className="text-xs text-muted-foreground mt-2">Tip: {practiceQuestion.tips}</p>}
                   </CardContent>
                 </Card>
 
                 {practiceQuestion.starTemplate && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-5">
                     <button
                       onClick={() => setUseStar(!useStar)}
-                      className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${useStar ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "border-border text-muted-foreground"}`}
+                      className={`px-4 py-2.5 text-sm rounded-md border transition-colors ${useStar ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "border-border text-muted-foreground"}`}
                     >
                       Use STAR Framework
                     </button>
@@ -496,13 +496,13 @@ export function InterviewPrepContent() {
                 ) : (
                   <div>
                     <label className="text-xs font-medium block mb-1">Your Answer</label>
-                    <Textarea value={practiceAnswer} onChange={(e) => setPracticeAnswer(e.target.value)} rows={8} placeholder="Write your answer here..." />
+                    <Textarea value={practiceAnswer} onChange={(e) => setPracticeAnswer(e.target.value)} rows={8} placeholder="Write your answer here..." className="leading-relaxed" />
                   </div>
                 )}
 
-                <div className="flex gap-2">
+                <div className="flex gap-5">
                   <Button size="sm" onClick={submitAnswer} disabled={practiceLoading}>
-                    {practiceLoading ? <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />Evaluating...</> : <><Sparkles className="w-3.5 h-3.5 mr-1" />Get AI Feedback</>}
+                    {practiceLoading ? <><Loader2 className="w-4 h-4 animate-spin mr-1" />Evaluating...</> : <><Sparkles className="w-4 h-4 mr-1" />Get AI Feedback</>}
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => { setPracticeQuestion(null); setTab("bank") }}>Back to Bank</Button>
                 </div>
@@ -512,7 +512,7 @@ export function InterviewPrepContent() {
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-sm">AI Feedback</CardTitle>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
                           {Array.from({length:10}).map((_,i) => (
                             <div key={i} className={`w-2 h-4 rounded-sm ${i < (practiceFeedback.score ?? 0) ? "bg-amber-400" : "bg-muted"}`} />
                           ))}
@@ -520,29 +520,29 @@ export function InterviewPrepContent() {
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-5">
                       <div>
                         <p className="text-xs font-semibold text-green-400 mb-1">Strengths</p>
                         {practiceFeedback.strengths.map((s, i) => (
-                          <div key={i} className="flex gap-2 text-sm"><Check className="w-3.5 h-3.5 text-green-400 mt-0.5 shrink-0" />{s}</div>
+                          <div key={i} className="flex gap-5 text-sm"><Check className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />{s}</div>
                         ))}
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-red-400 mb-1">Weaknesses</p>
                         {practiceFeedback.weaknesses.map((w, i) => (
-                          <div key={i} className="flex gap-2 text-sm"><X className="w-3.5 h-3.5 text-red-400 mt-0.5 shrink-0" />{w}</div>
+                          <div key={i} className="flex gap-5 text-sm"><X className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />{w}</div>
                         ))}
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-amber-400 mb-1">Suggestions</p>
                         {practiceFeedback.suggestions.map((s, i) => (
-                          <div key={i} className="flex gap-2 text-sm"><Star className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />{s}</div>
+                          <div key={i} className="flex gap-5 text-sm"><Star className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{s}</div>
                         ))}
                       </div>
                       {practiceFeedback.modelAnswer && (
                         <div>
                           <p className="text-xs font-semibold text-blue-400 mb-1">Model Answer</p>
-                          <p className="text-sm border rounded-lg p-3 bg-muted/30 whitespace-pre-line">{practiceFeedback.modelAnswer}</p>
+                          <p className="text-sm border rounded-xl p-5 bg-muted/30 whitespace-pre-line">{practiceFeedback.modelAnswer}</p>
                         </div>
                       )}
                     </CardContent>
@@ -555,26 +555,26 @@ export function InterviewPrepContent() {
 
         {/* ── MOCK INTERVIEW ── */}
         {tab === "mock" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {!currentMock ? (
               <Card>
                 <CardHeader><CardTitle className="text-sm">Configure Mock Interview</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-5">
                   <div>
-                    <label className="text-xs font-medium block mb-2">Categories</label>
-                    <div className="flex flex-wrap gap-2">
+                    <label className="text-xs font-medium block mb-3">Categories</label>
+                    <div className="flex flex-wrap gap-5">
                       {(Object.keys(CATEGORY_LABELS) as QuestionCategory[]).filter(c=>c!=="custom").map((cat) => (
                         <button key={cat} onClick={() => setMockCategories((prev) => prev.includes(cat) ? prev.filter(c=>c!==cat) : [...prev, cat])}
-                          className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${mockCategories.includes(cat) ? `${CATEGORY_COLORS[cat]} border-transparent` : "border-border text-muted-foreground"}`}>
+                          className={`px-4 py-2.5 text-sm rounded-md border transition-colors ${mockCategories.includes(cat) ? `${CATEGORY_COLORS[cat]} border-transparent` : "border-border text-muted-foreground"}`}>
                           {CATEGORY_LABELS[cat]}
                         </button>
                       ))}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs font-medium block mb-1">Difficulty</label>
-                      <select value={mockDifficulty} onChange={(e) => setMockDifficulty(e.target.value as Difficulty)} className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm">
+                      <select value={mockDifficulty} onChange={(e) => setMockDifficulty(e.target.value as Difficulty)} className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm">
                         {(["easy","medium","hard"] as Difficulty[]).map((d) => <option key={d}>{d}</option>)}
                       </select>
                     </div>
@@ -583,17 +583,17 @@ export function InterviewPrepContent() {
                       <Input type="number" min={2} max={10} value={mockTimeLimit} onChange={(e) => setMockTimeLimit(Number(e.target.value))} />
                     </div>
                   </div>
-                  <Button size="sm" onClick={startMock}><Clock className="w-3.5 h-3.5 mr-1" /> Start Mock Interview (5 questions)</Button>
+                  <Button size="sm" onClick={startMock}><Clock className="w-4 h-4 mr-1" /> Start Mock Interview (5 questions)</Button>
                   {store.mocks.length > 0 && (
-                    <div className="pt-4 border-t space-y-2">
+                    <div className="pt-4 border-t space-y-3">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Past Mock Interviews</p>
                       {store.mocks.slice(-5).reverse().map((m) => (
-                        <div key={m.id} className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/30" onClick={() => setCurrentMock(m)}>
+                        <div key={m.id} className="flex items-center gap-5 p-5 rounded-xl border cursor-pointer hover:bg-muted/30" onClick={() => setCurrentMock(m)}>
                           <div className="flex-1">
                             <p className="text-sm font-medium">{m.categories.map(c=>CATEGORY_LABELS[c]).join(", ")}</p>
                             <p className="text-xs text-muted-foreground">{new Date(m.startedAt).toLocaleDateString()}</p>
                           </div>
-                          {m.overallScore != null && <div className="text-lg font-bold text-amber-400">{m.overallScore}/10</div>}
+                          {m.overallScore != null && <div className="text-xl font-bold text-amber-400">{m.overallScore}/10</div>}
                         </div>
                       ))}
                     </div>
@@ -602,15 +602,15 @@ export function InterviewPrepContent() {
               </Card>
             ) : isCompleted ? (
               // Results view
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold">Mock Interview Results</h2>
-                  <Button size="sm" variant="outline" onClick={() => setCurrentMock(null)}><RefreshCw className="w-3.5 h-3.5 mr-1" /> New Mock</Button>
+                  <h2 className="text-3xl font-bold">Mock Interview Results</h2>
+                  <Button size="sm" variant="outline" onClick={() => setCurrentMock(null)}><RefreshCw className="w-4 h-4 mr-1" /> New Mock</Button>
                 </div>
                 {currentMock.overallScore != null && (
                   <Card className="border-amber-500/30">
                     <CardContent className="pt-4">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-5">
                         <div className="text-5xl font-black text-amber-400">{currentMock.overallScore}</div>
                         <div>
                           <p className="text-sm font-medium">Overall Score</p>
@@ -631,16 +631,16 @@ export function InterviewPrepContent() {
                   const fb = currentMock.feedback?.[qid]
                   return (
                     <Card key={qid}>
-                      <CardContent className="py-3 space-y-2">
-                        <div className="flex items-start justify-between gap-2">
+                      <CardContent className="py-4 space-y-3">
+                        <div className="flex items-start justify-between gap-5">
                           <p className="text-sm font-medium flex-1">Q{i+1}: {q?.question}</p>
                           {fb?.score != null && <span className="text-sm font-bold text-amber-400 shrink-0">{fb.score}/10</span>}
                         </div>
-                        <div className="bg-muted/30 rounded-lg p-2">
+                        <div className="bg-muted/30 rounded-xl p-5">
                           <p className="text-xs text-muted-foreground">{currentMock.answers[qid] || "(no answer)"}</p>
                         </div>
                         {fb && (
-                          <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="grid grid-cols-2 gap-5 text-xs">
                             <div>
                               <p className="text-green-400 font-medium mb-1">Strengths</p>
                               {fb.strengths.slice(0,2).map((s,j) => <p key={j} className="text-muted-foreground">• {s}</p>)}
@@ -658,19 +658,19 @@ export function InterviewPrepContent() {
               </div>
             ) : (
               // Active mock
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-5">
                     <span className="text-sm font-medium">Question {mockQuestionIdx+1} of {currentMock.questions.length}</span>
                     <Badge variant="secondary" className={`text-xs ${DIFFICULTY_COLORS[currentMock.difficulty]}`}>{currentMock.difficulty}</Badge>
                   </div>
-                  <div className={`flex items-center gap-1 font-mono font-bold ${mockTimeLeft < 60 ? "text-red-400" : "text-amber-400"}`}>
+                  <div className={`flex items-center gap-1.5 font-mono font-bold ${mockTimeLeft < 60 ? "text-red-400" : "text-amber-400"}`}>
                     <Clock className="w-4 h-4" />
                     {timerMins}:{String(timerSecs).padStart(2,"0")}
                   </div>
                 </div>
                 {/* Progress */}
-                <div className="flex gap-1">
+                <div className="flex gap-1.5">
                   {currentMock.questions.map((_, i) => (
                     <div key={i} className={`flex-1 h-1 rounded-full ${i < mockQuestionIdx ? "bg-amber-400" : i === mockQuestionIdx ? "bg-amber-400/60" : "bg-muted"}`} />
                   ))}
@@ -678,10 +678,10 @@ export function InterviewPrepContent() {
                 {currentMockQ && (
                   <Card className="border-amber-500/30">
                     <CardContent className="pt-4">
-                      <div className="flex gap-2 mb-2">
+                      <div className="flex gap-5 mb-3">
                         <Badge variant="secondary" className={`text-xs ${CATEGORY_COLORS[currentMockQ.category]}`}>{CATEGORY_LABELS[currentMockQ.category]}</Badge>
                       </div>
-                      <p className="text-lg font-semibold">{currentMockQ.question}</p>
+                      <p className="text-xl font-semibold">{currentMockQ.question}</p>
                     </CardContent>
                   </Card>
                 )}
@@ -693,11 +693,12 @@ export function InterviewPrepContent() {
                   }}
                   rows={8}
                   placeholder="Type your answer here..."
+                  className="leading-relaxed"
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-5">
                   <Button size="sm" onClick={nextMockQuestion} disabled={mockLoading}>
-                    {mockLoading ? <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />Evaluating...</> :
-                      mockQuestionIdx < currentMock.questions.length - 1 ? <>Next <ChevronRight className="w-3.5 h-3.5 ml-1" /></> : <><Check className="w-3.5 h-3.5 mr-1" />Submit & Evaluate</>}
+                    {mockLoading ? <><Loader2 className="w-4 h-4 animate-spin mr-1" />Evaluating...</> :
+                      mockQuestionIdx < currentMock.questions.length - 1 ? <>Next <ChevronRight className="w-4 h-4 ml-1" /></> : <><Check className="w-4 h-4 mr-1" />Submit & Evaluate</>}
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => { if(timerRef.current) clearInterval(timerRef.current); setCurrentMock(null) }}>Cancel</Button>
                 </div>
@@ -708,29 +709,29 @@ export function InterviewPrepContent() {
 
         {/* ── FLASHCARDS ── */}
         {tab === "flashcards" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold">Flashcard Mode</h2>
+                <h2 className="text-2xl font-bold">Flashcard Mode</h2>
                 <p className="text-sm text-muted-foreground">{dueFlashcards.length} cards due · SM-2 spaced repetition</p>
               </div>
-              <select value={fcCategory} onChange={(e) => { setFcCategory(e.target.value as QuestionCategory | "all"); setFlashIdx(0) }} className="h-8 rounded-md border border-input bg-background px-3 text-sm">
+              <select value={fcCategory} onChange={(e) => { setFcCategory(e.target.value as QuestionCategory | "all"); setFlashIdx(0) }} className="h-9 rounded-md border border-input bg-background px-4 text-sm">
                 <option value="all">All categories</option>
                 {(Object.keys(CATEGORY_LABELS) as QuestionCategory[]).map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
               </select>
             </div>
             {dueFlashcards.length === 0 ? (
               <div className="py-16 text-center text-muted-foreground">
-                <Zap className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <Zap className="w-12 h-12 mx-auto mb-5 opacity-20" />
                 <p className="font-medium text-foreground">No cards due!</p>
                 <p className="text-sm">Check back later or switch category</p>
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
-                  <Button variant="ghost" size="icon-sm" onClick={() => setFlashIdx(Math.max(0, flashIdx-1))} disabled={flashIdx === 0}><ChevronLeft className="w-4 h-4" /></Button>
+                <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
+                  <Button variant="ghost" size="icon" onClick={() => setFlashIdx(Math.max(0, flashIdx-1))} disabled={flashIdx === 0}><ChevronLeft className="w-4 h-4" /></Button>
                   <span>{flashIdx+1} / {dueFlashcards.length}</span>
-                  <Button variant="ghost" size="icon-sm" onClick={() => setFlashIdx(Math.min(dueFlashcards.length-1, flashIdx+1))} disabled={flashIdx === dueFlashcards.length-1}><ChevronRight className="w-4 h-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => setFlashIdx(Math.min(dueFlashcards.length-1, flashIdx+1))} disabled={flashIdx === dueFlashcards.length-1}><ChevronRight className="w-4 h-4" /></Button>
                 </div>
                 <FlashCard question={dueFlashcards[flashIdx]!} onRate={(c) => rateFlashcard(dueFlashcards[flashIdx]!, c)} />
               </>
@@ -740,14 +741,14 @@ export function InterviewPrepContent() {
 
         {/* ── COMPANY PREP ── */}
         {tab === "company" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <Card>
-              <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Building2 className="w-4 h-4 text-amber-400" />Company-Specific Prep</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex gap-2">
+              <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-5"><Building2 className="w-4 h-4 text-amber-400" />Company-Specific Prep</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-5">
                   <Input placeholder="Google, Meta, Stripe..." value={companyName} onChange={(e) => setCompanyName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && researchCompany()} className="flex-1" />
                   <Button size="sm" onClick={researchCompany} disabled={companyLoading}>
-                    {companyLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Sparkles className="w-3.5 h-3.5 mr-1" />Research</>}
+                    {companyLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Sparkles className="w-4 h-4 mr-1" />Research</>}
                   </Button>
                 </div>
               </CardContent>
@@ -755,9 +756,9 @@ export function InterviewPrepContent() {
 
             {/* Past research */}
             {store.companyResearch.length > 0 && !selectedResearch && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {store.companyResearch.map((r) => (
-                  <button key={r.id} onClick={() => setSelectedResearch(r)} className="w-full text-left p-3 rounded-lg border hover:bg-muted/30 transition-colors">
+                  <button key={r.id} onClick={() => setSelectedResearch(r)} className="w-full text-left p-5 rounded-xl border hover:bg-muted/30 transition-colors">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold">{r.company}</span>
                       <span className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</span>
@@ -768,9 +769,9 @@ export function InterviewPrepContent() {
             )}
 
             {selectedResearch && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold">{selectedResearch.company}</h2>
+                  <h2 className="text-3xl font-bold">{selectedResearch.company}</h2>
                   <Button size="sm" variant="ghost" onClick={() => setSelectedResearch(null)}>← Back</Button>
                 </div>
                 {selectedResearch.format && (
@@ -782,7 +783,7 @@ export function InterviewPrepContent() {
                 {selectedResearch.values && selectedResearch.values.length > 0 && (
                   <Card>
                     <CardHeader className="pb-2"><CardTitle className="text-sm">Company Values</CardTitle></CardHeader>
-                    <CardContent className="flex flex-wrap gap-2">
+                    <CardContent className="flex flex-wrap gap-5">
                       {selectedResearch.values.map((v, i) => <Badge key={i} variant="secondary" className="text-xs bg-amber-500/20 text-amber-400">{v}</Badge>)}
                     </CardContent>
                   </Card>
@@ -790,9 +791,9 @@ export function InterviewPrepContent() {
                 {selectedResearch.commonQuestions && selectedResearch.commonQuestions.length > 0 && (
                   <Card>
                     <CardHeader className="pb-2"><CardTitle className="text-sm">Reported Interview Questions</CardTitle></CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="space-y-3">
                       {selectedResearch.commonQuestions.map((q, i) => (
-                        <div key={i} className="flex items-start gap-2">
+                        <div key={i} className="flex items-start gap-5">
                           <span className="text-amber-400 font-bold text-sm shrink-0">{i+1}.</span>
                           <p className="text-sm">{q}</p>
                         </div>
@@ -803,10 +804,10 @@ export function InterviewPrepContent() {
                 {selectedResearch.talkingPoints && selectedResearch.talkingPoints.length > 0 && (
                   <Card>
                     <CardHeader className="pb-2"><CardTitle className="text-sm">Suggested Talking Points</CardTitle></CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="space-y-3">
                       {selectedResearch.talkingPoints.map((t, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <Star className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+                        <div key={i} className="flex items-start gap-5">
+                          <Star className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
                           <p className="text-sm">{t}</p>
                         </div>
                       ))}
@@ -820,8 +821,8 @@ export function InterviewPrepContent() {
 
         {/* ── PROGRESS ── */}
         {tab === "progress" && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Your Progress</h2>
+          <div className="space-y-5">
+            <h2 className="text-3xl font-bold">Your Progress</h2>
             <Card className="border-amber-500/30">
               <CardContent className="pt-4">
                 <div className="flex items-center gap-6">
@@ -829,7 +830,7 @@ export function InterviewPrepContent() {
                     <p className="text-5xl font-black text-amber-400">{progress.readinessScore}</p>
                     <p className="text-sm text-muted-foreground">Readiness Score</p>
                   </div>
-                  <div className="flex-1 space-y-2">
+                  <div className="flex-1 space-y-3">
                     <div className="h-3 rounded-full bg-muted overflow-hidden">
                       <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-300 transition-all" style={{ width: `${progress.readinessScore}%` }} />
                     </div>
@@ -840,16 +841,16 @@ export function InterviewPrepContent() {
                 </div>
               </CardContent>
             </Card>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-5">
               <Card><CardContent className="py-4 text-center"><p className="text-3xl font-bold">{progress.totalSessions}</p><p className="text-xs text-muted-foreground">Practice sessions</p></CardContent></Card>
               <Card><CardContent className="py-4 text-center"><p className="text-3xl font-bold">{store.mocks.length}</p><p className="text-xs text-muted-foreground">Mock interviews</p></CardContent></Card>
               <Card><CardContent className="py-4 text-center"><p className="text-3xl font-bold">{store.flashcards.length}</p><p className="text-xs text-muted-foreground">Cards reviewed</p></CardContent></Card>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {(Object.keys(CATEGORY_LABELS) as QuestionCategory[]).map((cat) => {
                 const stat = progress.byCategory[cat]
                 return (
-                  <div key={cat} className="flex items-center gap-3 p-3 rounded-lg border">
+                  <div key={cat} className="flex items-center gap-5 p-5 rounded-xl border">
                     <Badge variant="secondary" className={`text-xs ${CATEGORY_COLORS[cat]} w-32 justify-center`}>{CATEGORY_LABELS[cat]}</Badge>
                     <div className="flex-1">
                       <div className="flex justify-between text-xs text-muted-foreground mb-1">
@@ -869,22 +870,22 @@ export function InterviewPrepContent() {
 
         {/* ── RESOURCES ── */}
         {tab === "resources" && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Learning Resources</h2>
+          <div className="space-y-8">
+            <h2 className="text-3xl font-bold">Learning Resources</h2>
             {(Object.keys(RESOURCES) as QuestionCategory[]).filter(c => RESOURCES[c].length > 0).map((cat) => (
-              <div key={cat} className="space-y-2">
-                <div className="flex items-center gap-2">
+              <div key={cat} className="space-y-3">
+                <div className="flex items-center gap-5">
                   <Badge variant="secondary" className={`text-xs ${CATEGORY_COLORS[cat]}`}>{CATEGORY_LABELS[cat]}</Badge>
                   <div className="flex-1 h-px bg-border" />
                 </div>
                 {RESOURCES[cat].map((r, i) => (
                   <a key={i} href={r.url} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/30 transition-colors group">
+                    className="flex items-center gap-5 p-5 rounded-xl border hover:bg-muted/30 transition-colors group">
                     <div className="flex-1">
                       <p className="text-sm font-medium group-hover:text-amber-400 transition-colors">{r.title}</p>
                       <p className="text-xs text-muted-foreground">{r.desc}</p>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
                   </a>
                 ))}
               </div>

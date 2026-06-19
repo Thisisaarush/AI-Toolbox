@@ -211,41 +211,41 @@ export function NetWorthContent() {
         color="text-emerald-500"
         badge="Finance"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button variant="outline" size="sm" onClick={fetchRates} disabled={fxLoading}>
-              <RefreshCw className={`w-3.5 h-3.5 mr-1 ${fxLoading ? "animate-spin" : ""}`} /> Rates
+              <RefreshCw className={`w-4 h-4 mr-1 ${fxLoading ? "animate-spin" : ""}`} /> Rates
             </Button>
             <Button variant="outline" size="sm" onClick={takeSnapshot}>
               Save Snapshot
             </Button>
             <Button size="sm" onClick={() => setView("add-account")}>
-              <Plus className="w-3.5 h-3.5 mr-1" /> Add Account
+              <Plus className="w-4 h-4 mr-1" /> Add Account
             </Button>
           </div>
         }
       />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full space-y-6">
+      <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full space-y-8">
 
         {/* ── Add Account ── */}
         {view === "add-account" && (
-          <div className="max-w-lg mx-auto space-y-6">
-            <div className="flex items-center gap-3">
+          <div className="max-w-lg mx-auto space-y-8">
+            <div className="flex items-center gap-4">
               <Button variant="outline" size="sm" onClick={() => setView("dashboard")}>← Back</Button>
-              <h1 className="text-2xl font-bold">Add Account</h1>
+              <h1 className="text-3xl font-bold">Add Account</h1>
             </div>
             <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="flex gap-2">
+              <CardContent className="pt-6 space-y-5">
+                <div className="flex gap-3">
                   <button
                     onClick={() => { setAddIsAsset(true); setAddType("cash-savings") }}
-                    className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${addIsAsset ? "bg-emerald-600 text-white border-emerald-600" : "border-border hover:bg-muted/50"}`}
+                    className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-colors ${addIsAsset ? "bg-emerald-600 text-white border-emerald-600" : "border-border hover:bg-muted/50"}`}
                   >
                     Asset
                   </button>
                   <button
                     onClick={() => { setAddIsAsset(false); setAddType("mortgage") }}
-                    className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${!addIsAsset ? "bg-red-600 text-white border-red-600" : "border-border hover:bg-muted/50"}`}
+                    className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-colors ${!addIsAsset ? "bg-red-600 text-white border-red-600" : "border-border hover:bg-muted/50"}`}
                   >
                     Liability
                   </button>
@@ -264,7 +264,7 @@ export function NetWorthContent() {
                   <select
                     value={addType}
                     onChange={(e) => setAddType(e.target.value as AssetCategory | LiabilityCategory)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                    className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm"
                   >
                     {addIsAsset
                       ? Object.entries(ASSET_CATEGORY_META).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)
@@ -272,7 +272,7 @@ export function NetWorthContent() {
                     }
                   </select>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Balance *</label>
                     <Input type="number" placeholder="50000" value={addBalance} onChange={(e) => setAddBalance(e.target.value)} />
@@ -280,7 +280,7 @@ export function NetWorthContent() {
                   <div>
                     <label className="text-xs font-medium mb-1 block">Currency</label>
                     <select value={addCurrency} onChange={(e) => setAddCurrency(e.target.value)}
-                      className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm">
+                      className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm">
                       {COMMON_CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
@@ -297,10 +297,10 @@ export function NetWorthContent() {
         {view === "dashboard" && (
           <>
             {/* Net Worth hero */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
               <Card className="sm:col-span-1">
                 <CardContent className="py-6 text-center">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Net Worth</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">Net Worth</p>
                   <p className={`text-3xl font-bold ${computed.netWorth >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                     {formatUSD(computed.netWorth)}
                   </p>
@@ -309,14 +309,14 @@ export function NetWorthContent() {
               </Card>
               <Card>
                 <CardContent className="py-6 text-center">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Total Assets</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">Total Assets</p>
                   <p className="text-3xl font-bold text-emerald-500">{formatUSD(computed.totalAssets)}</p>
                   <p className="text-xs text-muted-foreground mt-1">{state.accounts.filter((a) => a.isAsset).length} accounts</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="py-6 text-center">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Total Liabilities</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">Total Liabilities</p>
                   <p className="text-3xl font-bold text-red-500">{formatUSD(computed.totalLiabilities)}</p>
                   <p className="text-xs text-muted-foreground mt-1">{state.accounts.filter((a) => !a.isAsset).length} accounts</p>
                 </CardContent>
@@ -326,9 +326,9 @@ export function NetWorthContent() {
             {state.accounts.length === 0 ? (
               <Card className="max-w-md mx-auto mt-8">
                 <CardContent className="py-16 text-center">
-                  <TrendingUp className="w-14 h-14 mx-auto mb-4 text-muted-foreground opacity-40" />
-                  <h2 className="text-xl font-semibold mb-2">Start tracking net worth</h2>
-                  <p className="text-muted-foreground text-sm mb-6">Add your assets and liabilities to get started.</p>
+                  <TrendingUp className="w-14 h-14 mx-auto mb-5 text-muted-foreground opacity-40" />
+                  <h2 className="text-2xl font-semibold mb-3">Start tracking net worth</h2>
+                  <p className="text-muted-foreground text-sm mb-8">Add your assets and liabilities to get started.</p>
                   <Button onClick={() => setView("add-account")}>
                     <Plus className="w-4 h-4 mr-1" /> Add First Account
                   </Button>
@@ -341,14 +341,14 @@ export function NetWorthContent() {
                   <Card>
                     <CardHeader><CardTitle className="text-sm">Asset Allocation</CardTitle></CardHeader>
                     <CardContent>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {(Object.entries(computed.assetsByCategory) as [AssetCategory, number][])
                           .sort(([, a], [, b]) => b - a)
                           .map(([cat, amt]) => {
                             const meta = ASSET_CATEGORY_META[cat]
                             const pct = (amt / computed.totalAssets) * 100
                             return (
-                              <div key={cat} className="flex items-center gap-3">
+                              <div key={cat} className="flex items-center gap-4">
                                 <span className={`text-xs font-medium w-32 shrink-0 ${meta.color}`}>{meta.label}</span>
                                 <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                                   <div className={`h-full rounded-full ${meta.barColor}`} style={{ width: `${pct}%` }} />
@@ -375,7 +375,7 @@ export function NetWorthContent() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex items-end gap-1.5 h-28">
+                      <div className="flex items-end gap-2 h-28">
                         {snapshotChartData.map((d, i) => {
                           const pct = Math.abs(d.netWorth) / maxSnapshotNW
                           const isPositive = d.netWorth >= 0
@@ -385,7 +385,7 @@ export function NetWorthContent() {
                                 className={`w-full rounded-t ${isPositive ? "bg-emerald-500/70" : "bg-red-500/70"}`}
                                 style={{ height: `${pct * 100}px` }}
                               />
-                              <span className="text-[9px] text-muted-foreground">{d.date}</span>
+                              <span className="text-[10px] text-muted-foreground">{d.date}</span>
                             </div>
                           )
                         })}
@@ -395,15 +395,15 @@ export function NetWorthContent() {
                 )}
 
                 {/* Accounts list */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {/* Assets */}
                   <div>
-                    <h2 className="text-sm font-semibold text-emerald-500 uppercase tracking-wider mb-3">Assets</h2>
-                    <div className="space-y-2">
+                    <h2 className="text-sm font-semibold text-emerald-500 uppercase tracking-wider mb-4">Assets</h2>
+                    <div className="space-y-3">
                       {computed.accounts.filter((a) => a.isAsset).map((a) => {
                         const meta = ASSET_CATEGORY_META[a.type as AssetCategory]
                         return (
-                          <div key={a.id} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/30 group">
+                          <div key={a.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-muted/30 group">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">{a.name}</p>
                               <p className="text-xs text-muted-foreground">{meta?.label}</p>
@@ -415,7 +415,7 @@ export function NetWorthContent() {
                               </p>
                             </div>
                             <button onClick={() => deleteAccount(a.id)} className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive">
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         )
@@ -428,12 +428,12 @@ export function NetWorthContent() {
 
                   {/* Liabilities */}
                   <div>
-                    <h2 className="text-sm font-semibold text-red-500 uppercase tracking-wider mb-3">Liabilities</h2>
-                    <div className="space-y-2">
+                    <h2 className="text-sm font-semibold text-red-500 uppercase tracking-wider mb-4">Liabilities</h2>
+                    <div className="space-y-3">
                       {computed.accounts.filter((a) => !a.isAsset).map((a) => {
                         const meta = LIABILITY_CATEGORY_META[a.type as LiabilityCategory]
                         return (
-                          <div key={a.id} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/30 group">
+                          <div key={a.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-muted/30 group">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">{a.name}</p>
                               <p className="text-xs text-muted-foreground">{meta?.label}</p>
@@ -444,7 +444,7 @@ export function NetWorthContent() {
                               </p>
                             </div>
                             <button onClick={() => deleteAccount(a.id)} className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive">
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         )
@@ -460,11 +460,11 @@ export function NetWorthContent() {
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm flex items-center gap-2">
+                      <CardTitle className="text-sm flex items-center gap-3">
                         <Sparkles className="w-4 h-4 text-emerald-500" /> AI Insights
                       </CardTitle>
                       <Button size="sm" variant="outline" onClick={getInsights} disabled={insightsLoading}>
-                        {insightsLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Analyze"}
+                        {insightsLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Analyze"}
                       </Button>
                     </div>
                   </CardHeader>
@@ -474,9 +474,9 @@ export function NetWorthContent() {
                         Click &quot;Analyze&quot; for AI-powered insights based on your current breakdown.
                       </p>
                     ) : (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {insights.map((ins, i) => (
-                          <div key={i} className={`p-3 rounded-lg border flex gap-3 ${
+                          <div key={i} className={`p-4 rounded-xl border flex gap-4 ${
                             ins.type === "warning" ? "border-amber-500/30 bg-amber-500/5" :
                             ins.type === "positive" ? "border-emerald-500/30 bg-emerald-500/5" :
                             "border-blue-500/30 bg-blue-500/5"
@@ -501,33 +501,33 @@ export function NetWorthContent() {
                 {/* Goals */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-sm flex items-center gap-2">
+                    <CardTitle className="text-sm flex items-center gap-3">
                       <Target className="w-4 h-4 text-blue-500" /> Net Worth Goals
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-3 gap-2">
+                  <CardContent className="space-y-5">
+                    <div className="grid grid-cols-3 gap-3">
                       <Input placeholder="Goal label" value={goalLabel} onChange={(e) => setGoalLabel(e.target.value)} />
                       <Input type="number" placeholder="Target ($)" value={goalTarget} onChange={(e) => setGoalTarget(e.target.value)} />
                       <Input type="date" value={goalDate} onChange={(e) => setGoalDate(e.target.value)} />
                     </div>
                     <Button size="sm" variant="outline" onClick={addGoal}>
-                      <Plus className="w-3.5 h-3.5 mr-1" /> Add Goal
+                      <Plus className="w-4 h-4 mr-1" /> Add Goal
                     </Button>
                     {state.goals.map((goal) => {
                       const pct = Math.min(100, (computed.netWorth / goal.targetAmount) * 100)
                       const monthsLeft = Math.max(0, Math.ceil((new Date(goal.targetDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30)))
                       const neededPerMonth = monthsLeft > 0 ? (goal.targetAmount - computed.netWorth) / monthsLeft : 0
                       return (
-                        <div key={goal.id} className="p-3 rounded-lg border space-y-2">
+                        <div key={goal.id} className="p-4 rounded-xl border space-y-3">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-medium">{goal.label}</p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                               <Badge variant={pct >= 100 ? "default" : neededPerMonth < 0 ? "default" : "secondary"}>
                                 {pct >= 100 ? "Achieved!" : `${pct.toFixed(0)}%`}
                               </Badge>
                               <button onClick={() => setState((prev) => ({ ...prev, goals: prev.goals.filter((g) => g.id !== goal.id) }))}>
-                                <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                                <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
                               </button>
                             </div>
                           </div>
@@ -546,14 +546,14 @@ export function NetWorthContent() {
 
                 {/* Plaid Teaser */}
                 <Card className="border-dashed">
-                  <CardContent className="py-5 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                  <CardContent className="py-5 flex items-center gap-5">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
                       <Building2 className="w-5 h-5 text-emerald-500" />
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <p className="text-sm font-medium">Connect Bank Accounts</p>
-                        <Badge variant="secondary" className="text-[10px]">Coming Soon</Badge>
+                        <Badge variant="secondary" className="text-xs">Coming Soon</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         Plaid integration will auto-sync balances from 12,000+ banks. Accounts update daily.

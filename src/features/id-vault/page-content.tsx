@@ -182,11 +182,11 @@ export function IdVaultContent() {
     return (
       <div className="min-h-screen flex flex-col">
         <ToolHeader title="ID Vault" icon={Shield} color="text-sky-500" badge="Personal" />
-        <main className="flex-1 flex items-center justify-center p-4">
+        <main className="flex-1 flex items-center justify-center p-5">
           <Card className="w-full max-w-sm">
-            <CardContent className="py-8 text-center space-y-4">
+            <CardContent className="py-8 text-center space-y-5">
               <Lock className="w-10 h-10 mx-auto text-sky-500" />
-              <h2 className="text-xl font-bold">Vault Locked</h2>
+              <h2 className="text-2xl font-bold">Vault Locked</h2>
               <p className="text-sm text-muted-foreground">Enter your PIN to access your documents.</p>
               <Input
                 type="password"
@@ -195,7 +195,7 @@ export function IdVaultContent() {
                 onChange={(e) => { setPinInput(e.target.value); setPinError("") }}
                 onKeyDown={(e) => e.key === "Enter" && verifyPin()}
                 maxLength={8}
-                className="text-center text-lg tracking-widest"
+                className="text-center text-xl tracking-widest"
               />
               {pinError && <p className="text-sm text-destructive">{pinError}</p>}
               <Button className="w-full" onClick={verifyPin}>Unlock Vault</Button>
@@ -214,21 +214,21 @@ export function IdVaultContent() {
         color="text-sky-500"
         badge="Personal"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {view !== "vault" ? (
               <Button variant="outline" size="sm" onClick={() => setView("vault")}>← Back</Button>
             ) : (
               <>
                 <Button variant="outline" size="sm" onClick={() => setView("emergency-card")}>
-                  <Printer className="w-3.5 h-3.5 mr-1" /> Emergency Card
+                  <Printer className="w-4 h-4 mr-1" /> Emergency Card
                 </Button>
                 {!vaultState.pinHash && (
                   <Button variant="outline" size="sm" onClick={() => setView("setup-pin")}>
-                    <Lock className="w-3.5 h-3.5 mr-1" /> Set PIN
+                    <Lock className="w-4 h-4 mr-1" /> Set PIN
                   </Button>
                 )}
                 <Button size="sm" onClick={() => setView("add-doc")}>
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Document
+                  <Plus className="w-4 h-4 mr-1" /> Add Document
                 </Button>
               </>
             )}
@@ -240,10 +240,10 @@ export function IdVaultContent() {
 
         {/* ── Setup PIN ── */}
         {view === "setup-pin" && (
-          <div className="max-w-sm mx-auto space-y-6">
-            <h1 className="text-2xl font-bold">Set Vault PIN</h1>
+          <div className="max-w-sm mx-auto space-y-8">
+            <h1 className="text-3xl font-bold">Set Vault PIN</h1>
             <Card>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="pt-6 space-y-5">
                 <p className="text-sm text-muted-foreground">
                   Your PIN is used to encrypt document numbers. It&apos;s hashed with SHA-256 and stored locally — never sent to any server.
                 </p>
@@ -255,7 +255,7 @@ export function IdVaultContent() {
                     value={newPin}
                     onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ""))}
                     maxLength={8}
-                    className="text-center text-lg tracking-widest"
+                    className="text-center text-xl tracking-widest"
                   />
                 </div>
                 <div>
@@ -266,7 +266,7 @@ export function IdVaultContent() {
                     value={confirmPin}
                     onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ""))}
                     maxLength={8}
-                    className="text-center text-lg tracking-widest"
+                    className="text-center text-xl tracking-widest"
                   />
                 </div>
                 <Button className="w-full" onClick={setupPin}>
@@ -279,16 +279,16 @@ export function IdVaultContent() {
 
         {/* ── Add Document ── */}
         {view === "add-doc" && (
-          <div className="max-w-lg mx-auto space-y-6">
-            <h1 className="text-2xl font-bold">Add Document</h1>
+          <div className="max-w-lg mx-auto space-y-8">
+            <h1 className="text-3xl font-bold">Add Document</h1>
             <Card>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="pt-6 space-y-5">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Document Type</label>
                   <select
                     value={addType}
                     onChange={(e) => setAddType(e.target.value as DocumentType)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                    className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm"
                   >
                     {(Object.entries(DOC_TYPE_META) as [DocumentType, typeof DOC_TYPE_META[DocumentType]][]).map(([k, v]) => (
                       <option key={k} value={k}>{v.label}</option>
@@ -299,7 +299,7 @@ export function IdVaultContent() {
                   <label className="text-xs font-medium mb-1 block">Document Name *</label>
                   <Input placeholder="My Passport, Travel Visa..." value={addName} onChange={(e) => setAddName(e.target.value)} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Issuing Authority</label>
                     <Input placeholder="US Dept of State" value={addAuthority} onChange={(e) => setAddAuthority(e.target.value)} />
@@ -321,7 +321,7 @@ export function IdVaultContent() {
                     disabled={!vaultState.pinHash}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Issue Date</label>
                     <Input type="date" value={addIssueDate} onChange={(e) => setAddIssueDate(e.target.value)} />
@@ -337,13 +337,13 @@ export function IdVaultContent() {
                 </div>
                 <div>
                   <label className="text-xs font-medium mb-1 block">Notes</label>
-                  <Textarea rows={2} placeholder="Any additional notes..." value={addNotes} onChange={(e) => setAddNotes(e.target.value)} />
+                  <Textarea rows={2} placeholder="Any additional notes..." value={addNotes} onChange={(e) => setAddNotes(e.target.value)} className="leading-relaxed" />
                 </div>
                 <div>
                   <label className="text-xs font-medium mb-1 block">Photo / Scan (optional)</label>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-3 items-center">
                     <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-                      <Upload className="w-3.5 h-3.5 mr-1" /> Upload
+                      <Upload className="w-4 h-4 mr-1" /> Upload
                     </Button>
                     {addPhoto && <span className="text-xs text-green-600">Photo attached</span>}
                     <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
@@ -363,14 +363,14 @@ export function IdVaultContent() {
 
         {/* ── Vault Dashboard ── */}
         {view === "vault" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">ID Vault</h1>
+                <h1 className="text-3xl font-bold">ID Vault</h1>
                 <p className="text-muted-foreground text-sm">{vaultState.documents.length} documents · {isPinUnlocked ? "Unlocked" : "Locked"}</p>
               </div>
               {!vaultState.pinHash && (
-                <div className="flex items-center gap-2 text-amber-500 text-sm">
+                <div className="flex items-center gap-3 text-amber-500 text-sm">
                   <AlertTriangle className="w-4 h-4" />
                   <span>Set a PIN to encrypt document numbers</span>
                 </div>
@@ -381,7 +381,7 @@ export function IdVaultContent() {
             {expiringSoon.length > 0 && (
               <Card className="border-amber-500/30 bg-amber-500/5">
                 <CardContent className="py-4">
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-3 mb-4">
                     <AlertTriangle className="w-4 h-4 text-amber-500" />
                     <p className="text-sm font-medium text-amber-700 dark:text-amber-300">Documents expiring soon</p>
                   </div>
@@ -405,9 +405,9 @@ export function IdVaultContent() {
             {vaultState.documents.length === 0 ? (
               <Card className="max-w-md mx-auto mt-12">
                 <CardContent className="py-16 text-center">
-                  <Shield className="w-14 h-14 mx-auto mb-4 text-muted-foreground opacity-40" />
-                  <h2 className="text-xl font-semibold mb-2">Empty vault</h2>
-                  <p className="text-muted-foreground text-sm mb-6">Add your IDs, passports, and important documents.</p>
+                  <Shield className="w-14 h-14 mx-auto mb-5 text-muted-foreground opacity-40" />
+                  <h2 className="text-2xl font-semibold mb-3">Empty vault</h2>
+                  <p className="text-muted-foreground text-sm mb-8">Add your IDs, passports, and important documents.</p>
                   <Button onClick={() => setView("add-doc")}>
                     <Plus className="w-4 h-4 mr-1" /> Add First Document
                   </Button>
@@ -425,16 +425,16 @@ export function IdVaultContent() {
                       className="cursor-pointer hover:shadow-md transition-shadow group"
                       onClick={() => { setSelectedDocId(doc.id); setView("doc-detail") }}
                     >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <span className={`text-xs font-medium px-2 py-1 rounded-full ${meta.bg} ${meta.color}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-4">
+                          <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${meta.bg} ${meta.color}`}>
                             {meta.label}
                           </span>
                           <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                         {doc.photoBase64 && (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={doc.photoBase64} alt="" className="w-full h-20 object-cover rounded mb-2" />
+                          <img src={doc.photoBase64} alt="" className="w-full h-20 object-cover rounded mb-3" />
                         )}
                         <p className="font-medium text-sm">{doc.name}</p>
                         {doc.issuingCountry && <p className="text-xs text-muted-foreground">{doc.issuingCountry}</p>}
@@ -445,8 +445,8 @@ export function IdVaultContent() {
                           </p>
                         )}
                         {doc.reminderDate && (
-                          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                            <Bell className="w-3 h-3" />
+                          <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
+                            <Bell className="w-4 h-4" />
                             Reminder: {new Date(doc.reminderDate).toLocaleDateString()}
                           </div>
                         )}
@@ -460,13 +460,13 @@ export function IdVaultContent() {
             {/* Google Drive Teaser */}
             <Card className="border-dashed">
               <CardContent className="py-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shrink-0">
                   <Cloud className="w-5 h-5 text-sky-500" />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <p className="text-sm font-medium">Import from Google Drive</p>
-                    <Badge variant="secondary" className="text-[10px]">Coming Soon</Badge>
+                    <Badge variant="secondary" className="text-xs">Coming Soon</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     OCR your ID photos stored in Google Drive and auto-fill document details.
@@ -479,18 +479,18 @@ export function IdVaultContent() {
 
         {/* ── Document Detail ── */}
         {view === "doc-detail" && selectedDoc && (
-          <div className="max-w-lg mx-auto space-y-4">
+          <div className="max-w-lg mx-auto space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">{selectedDoc.name}</h1>
+                <h1 className="text-3xl font-bold">{selectedDoc.name}</h1>
                 <p className="text-muted-foreground text-sm">{DOC_TYPE_META[selectedDoc.type].label}</p>
               </div>
               <Button variant="destructive" size="sm" onClick={() => deleteDoc(selectedDoc.id)}>
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </Button>
             </div>
             <Card>
-              <CardContent className="pt-5 space-y-3">
+              <CardContent className="pt-5 space-y-4">
                 {selectedDoc.photoBase64 && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={selectedDoc.photoBase64} alt="Document" className="w-full max-h-48 object-contain rounded" />
@@ -501,16 +501,16 @@ export function IdVaultContent() {
                   { label: "Issue Date", value: selectedDoc.issueDate && new Date(selectedDoc.issueDate).toLocaleDateString() },
                   { label: "Expiry Date", value: selectedDoc.expiryDate && new Date(selectedDoc.expiryDate).toLocaleDateString() },
                 ].filter((f) => f.value).map((f) => (
-                  <div key={f.label} className="flex justify-between text-sm py-1 border-b last:border-0">
+                  <div key={f.label} className="flex justify-between text-sm py-1.5 border-b last:border-0">
                     <span className="text-muted-foreground">{f.label}</span>
                     <span className="font-medium">{f.value}</span>
                   </div>
                 ))}
 
                 {selectedDoc.documentNumber && (
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-2.5">
                     <span className="text-sm text-muted-foreground">Document Number</span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <span className="text-sm font-mono font-medium">{getDocNumber(selectedDoc)}</span>
                       <button
                         onClick={() => revealedDocs.has(selectedDoc.id)
@@ -536,7 +536,7 @@ export function IdVaultContent() {
                 )}
 
                 {selectedDoc.reminderDate && (
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-3 text-sm">
                     <Bell className="w-4 h-4 text-sky-500" />
                     <span>Reminder set for {new Date(selectedDoc.reminderDate).toLocaleDateString()}</span>
                   </div>
@@ -548,22 +548,22 @@ export function IdVaultContent() {
 
         {/* ── Emergency Card ── */}
         {view === "emergency-card" && (
-          <div className="max-w-lg mx-auto space-y-6">
+          <div className="max-w-lg mx-auto space-y-8">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Emergency Card</h1>
+              <h1 className="text-3xl font-bold">Emergency Card</h1>
               <Button variant="outline" size="sm" onClick={printEmergencyCard}>
-                <Printer className="w-3.5 h-3.5 mr-1" /> Print
+                <Printer className="w-4 h-4 mr-1" /> Print
               </Button>
             </div>
             <Card>
-              <CardContent className="pt-5 space-y-4">
+              <CardContent className="pt-5 space-y-5">
                 <Input placeholder="Full Name" value={ec.name} onChange={(e) => setEc({ ...ec, name: e.target.value })} />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <Input placeholder="Blood Type (A+, O-...)" value={ec.bloodType ?? ""} onChange={(e) => setEc({ ...ec, bloodType: e.target.value })} />
                   <Input placeholder="Allergies" value={ec.allergies ?? ""} onChange={(e) => setEc({ ...ec, allergies: e.target.value })} />
                 </div>
                 {ec.emergencyContacts.map((contact, i) => (
-                  <div key={i} className="grid grid-cols-3 gap-2">
+                  <div key={i} className="grid grid-cols-3 gap-3">
                     <Input placeholder="Contact Name" value={contact.name} onChange={(e) => {
                       const c = [...ec.emergencyContacts]; c[i] = { ...c[i]!, name: e.target.value }
                       setEc({ ...ec, emergencyContacts: c })
@@ -572,7 +572,7 @@ export function IdVaultContent() {
                       const c = [...ec.emergencyContacts]; c[i] = { ...c[i]!, phone: e.target.value }
                       setEc({ ...ec, emergencyContacts: c })
                     }} />
-                    <div className="flex gap-1">
+                    <div className="flex gap-1.5">
                       <Input placeholder="Relation" value={contact.relationship} onChange={(e) => {
                         const c = [...ec.emergencyContacts]; c[i] = { ...c[i]!, relationship: e.target.value }
                         setEc({ ...ec, emergencyContacts: c })
@@ -586,7 +586,7 @@ export function IdVaultContent() {
                   </div>
                 ))}
                 <Button size="sm" variant="ghost" onClick={() => setEc({ ...ec, emergencyContacts: [...ec.emergencyContacts, { name: "", phone: "", relationship: "" }] })}>
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Contact
+                  <Plus className="w-4 h-4 mr-1" /> Add Contact
                 </Button>
                 <Input placeholder="Insurance Card Number" value={ec.insuranceNumber ?? ""} onChange={(e) => setEc({ ...ec, insuranceNumber: e.target.value })} />
                 <Input placeholder="Doctor Contact" value={ec.doctorContact ?? ""} onChange={(e) => setEc({ ...ec, doctorContact: e.target.value })} />
@@ -599,11 +599,11 @@ export function IdVaultContent() {
               <div className="print:block">
                 <Card className="border-2 border-red-500">
                   <CardHeader>
-                    <CardTitle className="text-red-500 flex items-center gap-2">
+                    <CardTitle className="text-red-500 flex items-center gap-3">
                       🆘 IN CASE OF EMERGENCY — {vaultState.emergencyCard.name}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 text-sm">
+                  <CardContent className="space-y-3 text-sm">
                     {vaultState.emergencyCard.bloodType && <p><strong>Blood Type:</strong> {vaultState.emergencyCard.bloodType}</p>}
                     {vaultState.emergencyCard.allergies && <p><strong>Allergies:</strong> {vaultState.emergencyCard.allergies}</p>}
                     <p><strong>Emergency Contacts:</strong></p>

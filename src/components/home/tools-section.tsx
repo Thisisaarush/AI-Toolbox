@@ -7,6 +7,7 @@ import { ArrowRight, Star, Search, X,
   Dumbbell, CheckCircle2, TrendingUp, Shield, Users, Plane,
   BookOpen, List, MessageSquare, Briefcase, Calendar, FileSignature,
   Scroll, Palette, Layout, Eye, Hammer, Sparkles, Brain, UserCheck,
+  Braces,
 } from "lucide-react"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -49,6 +50,7 @@ const categories: Category[] = [
       { name: "Stalkr", description: "Research any brand or company. Score their name, sentiment, SEO keywords, HN mentions, and get actionable improvements.", icon: Eye, href: "/tools/stalkr", badge: "Research", color: "text-teal-500", bgColor: "bg-teal-50 dark:bg-teal-950", borderColor: "border-t-teal-500" },
       { name: "Build or Skip", description: "Pitch your idea and get a brutally honest verdict. For, against, risks, prediction, and pivot suggestions.", icon: Hammer, href: "/tools/build-or-skip", badge: "Research", color: "text-rose-500", bgColor: "bg-rose-50 dark:bg-rose-950", borderColor: "border-t-rose-500" },
       { name: "User Voice", description: "Simulate fake user interviews. Get 5 personas with honest reactions, feature requests, and willingness to pay.", icon: UserCheck, href: "/tools/user-voice", badge: "Research", color: "text-violet-500", bgColor: "bg-violet-50 dark:bg-violet-950", borderColor: "border-t-violet-500" },
+      { name: "JSON Studio", description: "Full-featured JSON editor with tree view, diff checker, schema generator, CSV converter, and deep search.", icon: Braces, href: "/tools/json-studio", badge: "Dev Tool", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
     ],
   },
   {

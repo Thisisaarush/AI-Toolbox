@@ -36,7 +36,7 @@ function VerdictBadge({ verdict }: { verdict: Verdict }) {
     PIVOT: <RefreshCw className="w-4 h-4" />,
   }
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${colors[verdict]}`}>
+    <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold ${colors[verdict]}`}>
       {icons[verdict]} {verdict}
     </span>
   )
@@ -90,22 +90,23 @@ export function BuildOrSkipContent() {
   return (
     <>
       <ToolHeader title="Build or Skip" icon={Hammer} color="text-rose-500" badge="Research" />
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-8">
 
         {/* Input form */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Textarea
             placeholder="Describe your idea in detail..."
             value={input.idea}
             onChange={(e) => setInput({ ...input, idea: e.target.value })}
             rows={4}
+            className="leading-relaxed"
           />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-4">
             <Input placeholder="Time available (e.g. evenings/weekends)" value={input.timeAvailable} onChange={(e) => setInput({ ...input, timeAvailable: e.target.value })} />
             <Input placeholder="Your skills (e.g. React, Python)" value={input.skills} onChange={(e) => setInput({ ...input, skills: e.target.value })} />
             <Input placeholder="What you want (e.g. $5k/mo, learn)" value={input.goal} onChange={(e) => setInput({ ...input, goal: e.target.value })} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button onClick={judge} disabled={loading || !input.idea.trim()}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Hammer className="w-4 h-4" />}
               Judge My Idea
@@ -125,7 +126,7 @@ export function BuildOrSkipContent() {
         {loading && (
           <Card>
             <CardContent className="py-8 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-muted-foreground" />
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground italic">{loadingMsg}</p>
             </CardContent>
           </Card>
@@ -133,19 +134,19 @@ export function BuildOrSkipContent() {
 
         {/* Result */}
         {result && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Verdict */}
             <Card className={`border-t-4 ${result.verdict === "BUILD" ? "border-t-green-500" : result.verdict === "SKIP" ? "border-t-red-500" : "border-t-amber-500"}`}>
               <CardContent className="py-6 text-center">
                 <VerdictBadge verdict={result.verdict} />
-                <h2 className="text-2xl font-bold mt-3">{result.headline}</h2>
-                <div className="flex items-center justify-center gap-2 mt-3 text-sm text-muted-foreground italic">
-                  <Quote className="w-3.5 h-3.5" />
+                <h2 className="text-3xl font-bold mt-3">{result.headline}</h2>
+                <div className="flex items-center justify-center gap-3 mt-3 text-sm text-muted-foreground italic">
+                  <Quote className="w-4 h-4" />
                   &ldquo;{result.snarkyQuote}&rdquo;
                 </div>
                 <div className="mt-4">
                   <span className="text-xs text-muted-foreground">Confidence: </span>
-                  <span className="text-lg font-bold">{result.confidence}%</span>
+                  <span className="text-xl font-bold">{result.confidence}%</span>
                   <div className="max-w-xs mx-auto h-2 bg-muted rounded-full mt-1">
                     <div
                       className={`h-full rounded-full ${result.confidence >= 70 ? "bg-green-500" : result.confidence >= 40 ? "bg-amber-500" : "bg-red-500"}`}
@@ -159,7 +160,7 @@ export function BuildOrSkipContent() {
             {/* For / Against */}
             <div className="grid grid-cols-2 gap-4">
               <Card>
-                <CardHeader><CardTitle className="text-green-600 flex items-center gap-1.5"><ThumbsUp className="w-4 h-4" /> For</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-green-600 flex items-center gap-2"><ThumbsUp className="w-4 h-4" /> For</CardTitle></CardHeader>
                 <CardContent>
                   <ul className="space-y-1">
                     {result.for.map((f, i) => <li key={i} className="text-xs">✓ {f}</li>)}
@@ -167,7 +168,7 @@ export function BuildOrSkipContent() {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-red-600 flex items-center gap-1.5"><ThumbsDown className="w-4 h-4" /> Against</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-red-600 flex items-center gap-2"><ThumbsDown className="w-4 h-4" /> Against</CardTitle></CardHeader>
                 <CardContent>
                   <ul className="space-y-1">
                     {result.against.map((a, i) => <li key={i} className="text-xs">✗ {a}</li>)}
@@ -178,7 +179,7 @@ export function BuildOrSkipContent() {
 
             {/* Risks */}
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-1.5"><AlertTriangle className="w-4 h-4 text-amber-500" /> Risks</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-amber-500" /> Risks</CardTitle></CardHeader>
               <CardContent>
                 <ul className="space-y-1">
                   {result.risks.map((r, i) => <li key={i} className="text-xs">⚠ {r}</li>)}
@@ -188,7 +189,7 @@ export function BuildOrSkipContent() {
 
             {/* Prediction */}
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-1.5"><TrendingUp className="w-4 h-4" /> Prediction</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Prediction</CardTitle></CardHeader>
               <CardContent>
                 <p className="text-sm">{result.prediction}</p>
               </CardContent>
@@ -197,7 +198,7 @@ export function BuildOrSkipContent() {
             {/* Pivot */}
             {result.pivotSuggestion && (
               <Card className="border-t-2 border-t-amber-500">
-                <CardHeader><CardTitle className="flex items-center gap-1.5"><Lightbulb className="w-4 h-4 text-amber-500" /> Pivot Suggestion</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="flex items-center gap-2"><Lightbulb className="w-4 h-4 text-amber-500" /> Pivot Suggestion</CardTitle></CardHeader>
                 <CardContent>
                   <p className="text-sm">{result.pivotSuggestion}</p>
                 </CardContent>
@@ -210,18 +211,18 @@ export function BuildOrSkipContent() {
         {showHistory && records.length > 0 && (
           <Card>
             <CardHeader><CardTitle>Past Judgments</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-3">
               {records.map((r) => (
                 <button
                   key={r.id}
                   onClick={() => loadRecord(r)}
-                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-muted text-left transition-colors"
+                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted text-left transition-colors"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">{r.input.idea}</p>
                     <p className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <VerdictBadge verdict={r.result.verdict} />
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </div>
@@ -230,6 +231,13 @@ export function BuildOrSkipContent() {
             </CardContent>
           </Card>
         )}
+        {/* Tip banner */}
+        <div className="bg-muted/30 border border-border rounded-xl p-4 flex items-center gap-3">
+          <Lightbulb className="w-5 h-5 text-muted-foreground shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            <strong>Remember:</strong> Past judgments are saved in your history. Be honest about your skills and time available for the most accurate verdict.
+          </p>
+        </div>
       </div>
     </>
   )

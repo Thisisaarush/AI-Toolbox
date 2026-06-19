@@ -547,7 +547,7 @@ export function InvoiceZeroContent() {
             <Button variant="outline" size="sm" onClick={() => setView("list")}>← Back</Button>
           ) : (
             <Button size="sm" onClick={startCreate}>
-              <Plus className="w-3.5 h-3.5 mr-1" /> New Invoice
+              <Plus className="w-4 h-4 mr-1" /> New Invoice
             </Button>
           )
         }
@@ -557,7 +557,7 @@ export function InvoiceZeroContent() {
 
         {/* ── LIST ───────────────────────────────────────────────────────── */}
         {view === "list" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="flex items-end justify-between">
               <div>
                 <h1 className="text-3xl font-bold mb-1">Invoice Zero</h1>
@@ -565,14 +565,14 @@ export function InvoiceZeroContent() {
               </div>
               {invoices.length > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  Press <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">N</kbd> to create new
+                  Press <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-xs">N</kbd> to create new
                 </p>
               )}
             </div>
 
             {/* Stats */}
             {invoices.filter((i) => !i.isTemplate).length > 0 && (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                 <StatCard label="Total Invoiced" value={formatCurrency(stats.total, "USD")} icon={<DollarSign className="w-4 h-4" />} color="text-foreground" />
                 <StatCard
                   label="Paid"
@@ -588,38 +588,38 @@ export function InvoiceZeroContent() {
 
             {/* Extended stats row */}
             {stats.count >= 2 && (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                 <MiniStatCard
                   label="Avg invoice"
                   value={formatCurrency(stats.avgValue, "USD")}
-                  icon={<BarChart3 className="w-3.5 h-3.5" />}
+                  icon={<BarChart3 className="w-4 h-4" />}
                 />
                 <MiniStatCard
                   label="Collection rate"
                   value={`${stats.collectionRate.toFixed(0)}%`}
-                  icon={stats.collectionRate >= 80 ? <TrendingUp className="w-3.5 h-3.5 text-green-500" /> : <TrendingDown className="w-3.5 h-3.5 text-red-500" />}
+                  icon={stats.collectionRate >= 80 ? <TrendingUp className="w-4 h-4 text-green-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />}
                 />
                 <MiniStatCard
                   label="Avg days to pay"
                   value={stats.avgDays !== null ? `${stats.avgDays}d` : "—"}
-                  icon={<Clock className="w-3.5 h-3.5" />}
+                  icon={<Clock className="w-4 h-4" />}
                 />
                 <MiniStatCard
                   label="Longest overdue"
                   value={stats.longestOverdue > 0 ? `${stats.longestOverdue}d` : "None"}
-                  icon={<AlertCircle className="w-3.5 h-3.5 text-red-500" />}
+                  icon={<AlertCircle className="w-4 h-4 text-red-500" />}
                 />
               </div>
             )}
 
             {/* Overdue-soon warnings */}
             {overdueSoon.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {overdueSoon.map((inv) => {
                   const totals = calculateInvoiceTotals(inv)
                   const daysLeft = Math.ceil((new Date(inv.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
                   return (
-                    <div key={inv.id} className="flex items-center gap-3 p-3 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50/50 dark:bg-amber-950/20">
+                    <div key={inv.id} className="flex items-center gap-5 p-5 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50/50 dark:bg-amber-950/20">
                       <Bell className="w-4 h-4 text-amber-500 shrink-0" />
                       <p className="text-sm flex-1">
                         <span className="font-medium">{inv.invoiceNumber}</span> ({inv.client.name}) —{" "}
@@ -629,7 +629,7 @@ export function InvoiceZeroContent() {
                         )}
                       </p>
                       <Button variant="outline" size="sm" onClick={() => sendReminder(inv)}>
-                        <Bell className="w-3 h-3 mr-1" /> Send reminder
+                        <Bell className="w-4 h-4 mr-1" /> Send reminder
                       </Button>
                     </div>
                   )
@@ -638,18 +638,18 @@ export function InvoiceZeroContent() {
             )}
 
             {/* Tab bar */}
-            <div className="flex gap-1 p-1 bg-muted/50 rounded-lg w-fit flex-wrap">
+            <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl w-fit flex-wrap">
               {([
-                { key: "invoices" as MainTab, label: "Invoices", icon: <FileText className="w-3.5 h-3.5" /> },
-                { key: "clients" as MainTab, label: "Clients", icon: <Users className="w-3.5 h-3.5" /> },
-                { key: "expenses" as MainTab, label: "Expenses", icon: <Receipt className="w-3.5 h-3.5" /> },
-                { key: "aging" as MainTab, label: "Aging", icon: <BarChart3 className="w-3.5 h-3.5" /> },
-                { key: "templates" as MainTab, label: "Templates", icon: <LayoutTemplate className="w-3.5 h-3.5" /> },
+                { key: "invoices" as MainTab, label: "Invoices", icon: <FileText className="w-4 h-4" /> },
+                { key: "clients" as MainTab, label: "Clients", icon: <Users className="w-4 h-4" /> },
+                { key: "expenses" as MainTab, label: "Expenses", icon: <Receipt className="w-4 h-4" /> },
+                { key: "aging" as MainTab, label: "Aging", icon: <BarChart3 className="w-4 h-4" /> },
+                { key: "templates" as MainTab, label: "Templates", icon: <LayoutTemplate className="w-4 h-4" /> },
               ] satisfies { key: MainTab; label: string; icon: React.ReactNode }[]).map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => { setMainTab(tab.key); setClientFilter(null) }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
+                  className={`flex items-center gap-4 px-4 py-2.5 text-sm rounded-md font-medium transition-colors ${
                     mainTab === tab.key
                       ? "bg-background shadow-sm text-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -667,7 +667,7 @@ export function InvoiceZeroContent() {
                   <EmptyState onAction={startCreate} />
                 ) : (
                   <>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-5">
                       <div className="relative flex-1 min-w-48">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input placeholder="Search invoices..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
@@ -675,7 +675,7 @@ export function InvoiceZeroContent() {
                       <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value as InvoiceStatus | "all")}
-                        className="h-8 rounded-md border border-input bg-background px-3 text-sm"
+                        className="h-9 rounded-md border border-input bg-background px-4 text-sm"
                       >
                         <option value="all">All statuses</option>
                         {(["draft", "sent", "paid", "overdue"] as InvoiceStatus[]).map((s) => (
@@ -684,16 +684,16 @@ export function InvoiceZeroContent() {
                       </select>
                       {(search || filterStatus !== "all" || clientFilter) && (
                         <Button variant="ghost" size="sm" onClick={() => { setSearch(""); setFilterStatus("all"); setClientFilter(null) }}>
-                          <X className="w-3.5 h-3.5 mr-1" /> Clear
+                          <X className="w-4 h-4 mr-1" /> Clear
                         </Button>
                       )}
                     </div>
                     {clientFilter && (
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-5 text-sm">
                         <span className="text-muted-foreground">Filtered by client:</span>
                         <span className="font-medium">{clientFilter}</span>
                         <button onClick={() => setClientFilter(null)} className="text-muted-foreground hover:text-foreground">
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
                     )}
@@ -725,10 +725,10 @@ export function InvoiceZeroContent() {
 
             {/* ── Clients tab ── */}
             {mainTab === "clients" && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {clientStats.length === 0 ? (
                   <div className="py-12 text-center text-muted-foreground text-sm">
-                    <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <Users className="w-10 h-11 mx-auto mb-5 opacity-30" />
                     <p>No clients yet. Create your first invoice to see client data.</p>
                   </div>
                 ) : (
@@ -737,7 +737,7 @@ export function InvoiceZeroContent() {
                       <CardContent className="py-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-5">
                               <p className="font-semibold text-sm">{cs.client.name}</p>
                               {cs.client.company && (
                                 <span className="text-xs text-muted-foreground">{cs.client.company}</span>
@@ -774,7 +774,7 @@ export function InvoiceZeroContent() {
                                 setMainTab("invoices")
                               }}
                             >
-                              View <ChevronRight className="w-3 h-3 ml-1" />
+                              View <ChevronRight className="w-4 h-4 ml-1" />
                             </Button>
                           </div>
                         </div>
@@ -787,31 +787,31 @@ export function InvoiceZeroContent() {
 
             {/* ── Expenses tab ── */}
             {mainTab === "expenses" && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {/* Profit overview */}
-                <div className="grid grid-cols-3 gap-4">
-                  <MiniStatCard label="Total expenses" value={formatCurrency(stats.totalExpenses, "USD")} icon={<Receipt className="w-3.5 h-3.5 text-red-500" />} />
-                  <MiniStatCard label="Total paid" value={formatCurrency(stats.paid, "USD")} icon={<DollarSign className="w-3.5 h-3.5 text-green-500" />} />
+                <div className="grid grid-cols-3 gap-5">
+                  <MiniStatCard label="Total expenses" value={formatCurrency(stats.totalExpenses, "USD")} icon={<Receipt className="w-4 h-4 text-red-500" />} />
+                  <MiniStatCard label="Total paid" value={formatCurrency(stats.paid, "USD")} icon={<DollarSign className="w-4 h-4 text-green-500" />} />
                   <MiniStatCard
                     label="Est. profit"
                     value={formatCurrency(stats.estimatedProfit, "USD")}
                     icon={stats.estimatedProfit >= 0
-                      ? <ArrowUpRight className="w-3.5 h-3.5 text-green-500" />
-                      : <ArrowDownRight className="w-3.5 h-3.5 text-red-500" />}
+                      ? <ArrowUpRight className="w-4 h-4 text-green-500" />
+                      : <ArrowDownRight className="w-4 h-4 text-red-500" />}
                   />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold">Expenses</h2>
                   <Button size="sm" variant="outline" onClick={() => setShowExpenseForm(!showExpenseForm)}>
-                    <Plus className="w-3 h-3 mr-1" /> Log Expense
+                    <Plus className="w-4 h-4 mr-1" /> Log Expense
                   </Button>
                 </div>
 
                 {showExpenseForm && (
                   <Card>
-                    <CardContent className="pt-4 space-y-3">
-                      <div className="grid grid-cols-2 gap-3">
+                    <CardContent className="pt-4 space-y-4">
+                      <div className="grid grid-cols-2 gap-5">
                         <div>
                           <label className="text-xs font-medium mb-1 block">Description *</label>
                           <Input placeholder="AWS monthly bill" value={expenseDesc} onChange={(e) => setExpenseDesc(e.target.value)} />
@@ -821,7 +821,7 @@ export function InvoiceZeroContent() {
                           <Input type="number" min={0} placeholder="49.99" value={expenseAmount} onChange={(e) => setExpenseAmount(e.target.value)} />
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-5">
                         <div>
                           <label className="text-xs font-medium mb-1 block">Date</label>
                           <Input type="date" value={expenseDate} onChange={(e) => setExpenseDate(e.target.value)} />
@@ -831,7 +831,7 @@ export function InvoiceZeroContent() {
                           <select
                             value={expenseCategory}
                             onChange={(e) => setExpenseCategory(e.target.value)}
-                            className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
                           >
                             {EXPENSE_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                           </select>
@@ -841,8 +841,8 @@ export function InvoiceZeroContent() {
                           <Input placeholder="Optional" value={expenseProject} onChange={(e) => setExpenseProject(e.target.value)} />
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" onClick={addExpense}><Check className="w-3 h-3 mr-1" /> Save</Button>
+                      <div className="flex gap-5">
+                        <Button size="sm" onClick={addExpense}><Check className="w-4 h-4 mr-1" /> Save</Button>
                         <Button size="sm" variant="ghost" onClick={() => setShowExpenseForm(false)}>Cancel</Button>
                       </div>
                     </CardContent>
@@ -851,13 +851,13 @@ export function InvoiceZeroContent() {
 
                 {expenses.length === 0 ? (
                   <div className="py-12 text-center text-muted-foreground text-sm">
-                    <Receipt className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <Receipt className="w-10 h-11 mx-auto mb-5 opacity-30" />
                     <p>No expenses logged yet.</p>
                   </div>
                 ) : (
                   <div className="rounded-xl border overflow-hidden divide-y">
                     {expenses.map((e) => (
-                      <div key={e.id} className="flex items-center gap-4 px-4 py-3 hover:bg-muted/30 group">
+                      <div key={e.id} className="flex items-center gap-5 px-4 py-4 hover:bg-muted/30 group">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium">{e.description}</p>
                           <p className="text-xs text-muted-foreground">
@@ -868,11 +868,11 @@ export function InvoiceZeroContent() {
                         <p className="text-sm font-semibold text-red-600 shrink-0">{formatCurrency(e.amount, "USD")}</p>
                         <Button
                           variant="ghost"
-                          size="icon-sm"
+                          size="icon"
                           onClick={() => deleteExpense(e.id)}
                           className="text-muted-foreground hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     ))}
@@ -883,11 +883,11 @@ export function InvoiceZeroContent() {
 
             {/* ── Aging tab ── */}
             {mainTab === "aging" && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <p className="text-sm text-muted-foreground">Outstanding invoices grouped by age past due date.</p>
                 {aging.every((b) => b.invoices.length === 0) ? (
                   <div className="py-12 text-center text-muted-foreground text-sm">
-                    <Check className="w-10 h-10 mx-auto mb-3 text-green-500" />
+                    <Check className="w-10 h-11 mx-auto mb-5 text-green-500" />
                     <p className="font-medium text-foreground">No outstanding invoices!</p>
                   </div>
                 ) : (
@@ -906,7 +906,7 @@ export function InvoiceZeroContent() {
                       </CardHeader>
                       {bucket.invoices.length > 0 && (
                         <CardContent>
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             {bucket.invoices.map((inv) => {
                               const totals = calculateInvoiceTotals(inv)
                               return (
@@ -915,11 +915,11 @@ export function InvoiceZeroContent() {
                                     <span className="font-medium">{inv.invoiceNumber}</span>
                                     <span className="text-muted-foreground ml-2">{inv.client.name}</span>
                                   </div>
-                                  <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-5">
                                     <span className="font-semibold">{formatCurrency(totals.total, inv.currency)}</span>
                                     <span className="text-xs text-muted-foreground">Due {inv.dueDate}</span>
                                     <Button size="sm" variant="outline" onClick={() => sendReminder(inv)}>
-                                      <Bell className="w-3 h-3 mr-1" /> Remind
+                                      <Bell className="w-4 h-4 mr-1" /> Remind
                                     </Button>
                                   </div>
                                 </div>
@@ -936,7 +936,7 @@ export function InvoiceZeroContent() {
 
             {/* ── Templates tab ── */}
             {mainTab === "templates" && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">Recurring invoice templates. Click generate to create a new invoice from a template.</p>
                   <Button size="sm" variant="outline" onClick={() => {
@@ -944,12 +944,12 @@ export function InvoiceZeroContent() {
                     setEditingInvoice(null)
                     setView("create")
                   }}>
-                    <Plus className="w-3 h-3 mr-1" /> New Template
+                    <Plus className="w-4 h-4 mr-1" /> New Template
                   </Button>
                 </div>
                 {templates.length === 0 ? (
                   <div className="py-12 text-center text-muted-foreground text-sm">
-                    <LayoutTemplate className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <LayoutTemplate className="w-10 h-11 mx-auto mb-5 opacity-30" />
                     <p className="font-medium text-foreground">No templates yet</p>
                     <p className="text-xs mt-1">Create an invoice and toggle &quot;Save as recurring template&quot;.</p>
                   </div>
@@ -967,15 +967,15 @@ export function InvoiceZeroContent() {
                                 {tmpl.recurringInterval ? ` · ${tmpl.recurringInterval}` : ""}
                               </p>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-5">
                               <Button size="sm" variant="outline" onClick={() => startEdit(tmpl)}>
-                                <Edit3 className="w-3 h-3 mr-1" /> Edit
+                                <Edit3 className="w-4 h-4 mr-1" /> Edit
                               </Button>
                               <Button size="sm" onClick={() => generateFromTemplate(tmpl)}>
-                                <Files className="w-3 h-3 mr-1" /> Generate
+                                <Files className="w-4 h-4 mr-1" /> Generate
                               </Button>
                               <Button size="sm" variant="ghost" onClick={() => deleteInvoice(tmpl.id)} className="text-muted-foreground hover:text-destructive">
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
                           </div>
@@ -991,10 +991,10 @@ export function InvoiceZeroContent() {
 
         {/* ── CREATE / EDIT ──────────────────────────────────────────────── */}
         {(view === "create" || view === "edit") && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">
+                <h1 className="text-3xl font-bold">
                   {form.isTemplate
                     ? (view === "create" ? "New Template" : `Edit Template`)
                     : (view === "create" ? "New Invoice" : `Edit ${form.invoiceNumber}`)}
@@ -1004,14 +1004,14 @@ export function InvoiceZeroContent() {
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setShowAiPanel(!showAiPanel)}>
-                <Sparkles className="w-3.5 h-3.5 mr-1" /> AI Fill
+                <Sparkles className="w-4 h-4 mr-1" /> AI Fill
               </Button>
             </div>
 
             {/* AI panel */}
             {showAiPanel && (
               <Card className="border-emerald-200 dark:border-emerald-800">
-                <CardContent className="pt-4 space-y-3">
+                <CardContent className="pt-4 space-y-4">
                   <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Generate invoice from description</p>
                   <Textarea
                     placeholder='e.g. "I built a landing page for Acme Corp, 3 revisions, $2500 total, payment due in 14 days"'
@@ -1019,9 +1019,9 @@ export function InvoiceZeroContent() {
                     onChange={(e) => setAiInput(e.target.value)}
                     rows={3}
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-5">
                     <Button size="sm" onClick={handleAiGenerate} disabled={aiLoading}>
-                      {aiLoading ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Generating...</> : <><Sparkles className="w-3.5 h-3.5 mr-1" /> Fill Form</>}
+                      {aiLoading ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4 mr-1" /> Fill Form</>}
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => setShowAiPanel(false)}>Cancel</Button>
                   </div>
@@ -1031,14 +1031,14 @@ export function InvoiceZeroContent() {
 
             {/* Template / recurring toggle */}
             <Card className="border-dashed">
-              <CardContent className="py-3">
+              <CardContent className="py-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium">Recurring template</p>
                     <p className="text-xs text-muted-foreground">Save as a reusable template to quickly generate new invoices</p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                  <div className="flex items-center gap-5">
+                    <label className="flex items-center gap-5 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={form.isTemplate ?? false}
@@ -1051,7 +1051,7 @@ export function InvoiceZeroContent() {
                       <select
                         value={form.recurringInterval ?? "monthly"}
                         onChange={(e) => setForm((p) => ({ ...p, recurringInterval: e.target.value as RecurringInterval }))}
-                        className="h-8 rounded-md border border-input bg-background px-3 text-sm"
+                        className="h-9 rounded-md border border-input bg-background px-4 text-sm"
                       >
                         <option value="weekly">Weekly</option>
                         <option value="monthly">Monthly</option>
@@ -1065,11 +1065,11 @@ export function InvoiceZeroContent() {
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Left column */}
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {/* Business info */}
                 <Card>
                   <CardHeader className="pb-3"><CardTitle className="text-sm">Your Business</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-4">
                     <LabelInput label="Business name" value={form.businessName} onChange={(v) => setForm((p) => ({ ...p, businessName: v }))} placeholder="Acme Freelance" />
                     <LabelInput label="Email" value={form.businessEmail} onChange={(v) => setForm((p) => ({ ...p, businessEmail: v }))} placeholder="you@yourco.com" />
                     <LabelInput label="Address" value={form.businessAddress} onChange={(v) => setForm((p) => ({ ...p, businessAddress: v }))} placeholder="123 Main St, City, Country" />
@@ -1079,7 +1079,7 @@ export function InvoiceZeroContent() {
                 {/* Client info */}
                 <Card>
                   <CardHeader className="pb-3"><CardTitle className="text-sm">Bill To</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-4">
                     <div>
                       <label className="text-xs font-medium mb-1 block">Client name *</label>
                       <Input
@@ -1101,31 +1101,31 @@ export function InvoiceZeroContent() {
                 {/* Invoice details */}
                 <Card>
                   <CardHeader className="pb-3"><CardTitle className="text-sm">Invoice Details</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-5">
                       <LabelInput label="Invoice #" value={form.invoiceNumber} onChange={(v) => setForm((p) => ({ ...p, invoiceNumber: v }))} />
                       <div>
                         <label className="text-xs font-medium mb-1 block">Currency</label>
                         <select
                           value={form.currency}
                           onChange={(e) => setForm((p) => ({ ...p, currency: e.target.value as Currency }))}
-                          className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm"
+                          className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm"
                         >
                           {CURRENCIES.map((c) => <option key={c} value={c}>{c} ({CURRENCY_SYMBOLS[c]})</option>)}
                         </select>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-5">
                       <LabelInput label="Issue date" type="date" value={form.issueDate} onChange={(v) => setForm((p) => ({ ...p, issueDate: v }))} />
                       <LabelInput label="Due date" type="date" value={form.dueDate} onChange={(v) => setForm((p) => ({ ...p, dueDate: v }))} />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-5">
                       <div>
                         <label className="text-xs font-medium mb-1 block">Status</label>
                         <select
                           value={form.status}
                           onChange={(e) => setForm((p) => ({ ...p, status: e.target.value as InvoiceStatus }))}
-                          className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm"
+                          className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm"
                         >
                           {(["draft", "sent", "paid", "overdue"] as InvoiceStatus[]).map((s) => (
                             <option key={s} value={s}>{STATUS_META[s].label}</option>
@@ -1137,7 +1137,7 @@ export function InvoiceZeroContent() {
                         <select
                           value={form.template ?? "classic"}
                           onChange={(e) => setForm((p) => ({ ...p, template: e.target.value as InvoiceTemplate }))}
-                          className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm"
+                          className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm"
                         >
                           {TEMPLATES.map((t) => (
                             <option key={t.value} value={t.value}>{t.label}</option>
@@ -1150,18 +1150,18 @@ export function InvoiceZeroContent() {
               </div>
 
               {/* Right column */}
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {/* Line items */}
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">Line Items</CardTitle>
-                      <Button variant="outline" size="sm" onClick={addLineItem}><Plus className="w-3 h-3 mr-1" /> Add</Button>
+                      <Button variant="outline" size="sm" onClick={addLineItem}><Plus className="w-4 h-4 mr-1" /> Add</Button>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-4">
                     {form.lineItems.map((li, idx) => (
-                      <div key={li.id} className="grid grid-cols-12 gap-2 items-start">
+                      <div key={li.id} className="grid grid-cols-12 gap-5 items-start">
                         <div className="col-span-5">
                           {idx === 0 && <label className="text-xs text-muted-foreground mb-1 block">Description</label>}
                           <Input placeholder="Web design" value={li.description} onChange={(e) => updateLineItem(idx, "description", e.target.value)} />
@@ -1176,8 +1176,8 @@ export function InvoiceZeroContent() {
                         </div>
                         <div className="col-span-1 flex items-end pb-0.5">
                           {idx === 0 && <div className="mb-1 h-4" />}
-                          <Button variant="ghost" size="icon-sm" onClick={() => removeLineItem(idx)} disabled={form.lineItems.length === 1}>
-                            <X className="w-3 h-3" />
+                          <Button variant="ghost" size="icon" onClick={() => removeLineItem(idx)} disabled={form.lineItems.length === 1}>
+                            <X className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
@@ -1188,14 +1188,14 @@ export function InvoiceZeroContent() {
                 {/* Taxes & discounts */}
                 <Card>
                   <CardHeader className="pb-3"><CardTitle className="text-sm">Discount & Tax</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-5">
                       <div>
                         <label className="text-xs font-medium mb-1 block">Discount type</label>
                         <select
                           value={form.discountType}
                           onChange={(e) => setForm((p) => ({ ...p, discountType: e.target.value as "percentage" | "flat" }))}
-                          className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm"
+                          className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm"
                         >
                           <option value="percentage">Percentage (%)</option>
                           <option value="flat">Flat amount</option>
@@ -1209,7 +1209,7 @@ export function InvoiceZeroContent() {
 
                 {/* Live totals */}
                 <Card className="bg-muted/30">
-                  <CardContent className="pt-4 space-y-2">
+                  <CardContent className="pt-4 space-y-3">
                     <TotalRow label="Subtotal" value={formatCurrency(formTotals.subtotal, form.currency)} />
                     {formTotals.discountAmount > 0 && <TotalRow label={`Discount ${form.discountType === "percentage" ? `(${form.discountValue}%)` : ""}`} value={`-${formatCurrency(formTotals.discountAmount, form.currency)}`} />}
                     {formTotals.taxAmount > 0 && <TotalRow label={`Tax (${form.taxRate}%)`} value={formatCurrency(formTotals.taxAmount, form.currency)} />}
@@ -1222,7 +1222,7 @@ export function InvoiceZeroContent() {
                 {/* Notes */}
                 <Card>
                   <CardHeader className="pb-3"><CardTitle className="text-sm">Notes & Terms</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-4">
                     <div>
                       <label className="text-xs font-medium mb-1 block">Notes</label>
                       <Textarea placeholder="Thank you for your business!" value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} rows={2} />
@@ -1236,9 +1236,9 @@ export function InvoiceZeroContent() {
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-5">
               <Button onClick={saveInvoice} className="flex-1 sm:flex-none sm:px-8">
-                <Check className="w-3.5 h-3.5 mr-1" /> {view === "create" ? (form.isTemplate ? "Create Template" : "Create Invoice") : "Save Changes"}
+                <Check className="w-4 h-4 mr-1" /> {view === "create" ? (form.isTemplate ? "Create Template" : "Create Invoice") : "Save Changes"}
               </Button>
               <Button variant="outline" onClick={() => setView("list")}>Cancel</Button>
             </div>
@@ -1266,11 +1266,11 @@ function StatCard({ label, value, icon, color, highlight, sub }: {
   return (
     <Card className={highlight ? "border-red-300 dark:border-red-800" : ""}>
       <CardContent>
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-5 mb-1">
           <span className={color}>{icon}</span>
           <span className="text-xs text-muted-foreground">{label}</span>
         </div>
-        <p className={`text-xl font-bold ${color}`}>{value}</p>
+        <p className={`text-2xl font-bold ${color}`}>{value}</p>
         {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
       </CardContent>
     </Card>
@@ -1279,8 +1279,8 @@ function StatCard({ label, value, icon, color, highlight, sub }: {
 
 function MiniStatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
-      <div className="flex items-center gap-2">
+    <div className="flex items-center justify-between p-5 rounded-xl border bg-card">
+      <div className="flex items-center gap-5">
         {icon}
         <span className="text-xs text-muted-foreground">{label}</span>
       </div>
@@ -1293,11 +1293,11 @@ function EmptyState({ onAction }: { onAction: () => void }) {
   return (
     <Card className="max-w-lg mx-auto mt-8">
       <CardContent className="py-16 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center">
-          <FileText className="w-8 h-8 text-emerald-500" />
+        <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center">
+          <FileText className="w-8 h-9 text-emerald-500" />
         </div>
-        <h2 className="text-xl font-semibold mb-2">No invoices yet</h2>
-        <p className="text-muted-foreground text-sm mb-6">
+        <h2 className="text-2xl font-semibold mb-3">No invoices yet</h2>
+        <p className="text-muted-foreground text-sm mb-8">
           Create professional invoices in seconds. Press <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-xs">N</kbd> or click below.
         </p>
         <Button onClick={onAction}><Plus className="w-4 h-4 mr-1" /> Create Invoice</Button>
@@ -1328,17 +1328,17 @@ function InvoiceRow({
   })()
 
   return (
-    <div className={`flex items-center gap-4 px-0 py-0 hover:bg-muted/40 transition-colors group border-l-4 ${meta.borderColor}`}>
-      <div className="flex items-center gap-4 px-4 py-3.5 flex-1 min-w-0">
+    <div className={`flex items-center gap-5 px-0 py-0 hover:bg-muted/40 transition-colors group border-l-4 ${meta.borderColor}`}>
+      <div className="flex items-center gap-5 px-4 py-4.5 flex-1 min-w-0">
         {/* Left */}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-0.5">
+          <div className="flex items-center gap-5 mb-0.5">
             <span className="text-sm font-semibold">{inv.invoiceNumber}</span>
-            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+            <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
               {meta.label}
             </span>
             {isDueSoon && (
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+              <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                 Due soon
               </span>
             )}
@@ -1352,15 +1352,15 @@ function InvoiceRow({
         {/* Center */}
         <div className="text-right shrink-0">
           <p className="text-sm font-semibold tabular-nums">{formatCurrency(totals.total, inv.currency)}</p>
-          <p className="text-[11px] text-muted-foreground">Due {inv.dueDate}</p>
+          <p className="text-xs text-muted-foreground">Due {inv.dueDate}</p>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1.5 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           {inv.status !== "paid" && (
             <Button
               variant="ghost"
-              size="xs"
+              size="sm"
               className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/40"
               onClick={onMarkPaid}
             >
@@ -1368,35 +1368,35 @@ function InvoiceRow({
             </Button>
           )}
           {isDueSoon && (
-            <Button variant="ghost" size="icon-sm" onClick={onSendReminder} title="Send reminder">
-              <Bell className="w-3.5 h-3.5 text-amber-500" />
+            <Button variant="ghost" size="icon" onClick={onSendReminder} title="Send reminder">
+              <Bell className="w-4 h-4 text-amber-500" />
             </Button>
           )}
-          <Button variant="ghost" size="icon-sm" onClick={onPreview} title="Preview">
-            <Eye className="w-3.5 h-3.5" />
+          <Button variant="ghost" size="icon" onClick={onPreview} title="Preview">
+            <Eye className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon-sm" onClick={onEdit} title="Edit">
-            <Edit3 className="w-3.5 h-3.5" />
+          <Button variant="ghost" size="icon" onClick={onEdit} title="Edit">
+            <Edit3 className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon-sm" onClick={onPrint} title="Print / Save PDF">
-            <Download className="w-3.5 h-3.5" />
+          <Button variant="ghost" size="icon" onClick={onPrint} title="Print / Save PDF">
+            <Download className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon-sm" onClick={onDuplicate} title="Duplicate">
-            <Files className="w-3.5 h-3.5" />
+          <Button variant="ghost" size="icon" onClick={onDuplicate} title="Duplicate">
+            <Files className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon-sm" onClick={onCopy} title="Copy summary">
+          <Button variant="ghost" size="icon" onClick={onCopy} title="Copy summary">
             {copiedId === inv.id
-              ? <CopyCheck className="w-3.5 h-3.5 text-green-500" />
-              : <Copy className="w-3.5 h-3.5" />}
+              ? <CopyCheck className="w-4 h-4 text-green-500" />
+              : <Copy className="w-4 h-4" />}
           </Button>
           <Button
             variant="ghost"
-            size="icon-sm"
+            size="icon"
             onClick={onDelete}
             className="text-muted-foreground hover:text-destructive"
             title="Delete"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       </div>
@@ -1432,10 +1432,10 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-6 no-print">
+      <div className="flex items-center gap-5 mb-8 no-print">
         <Button variant="outline" size="sm" onClick={onBack}>← Back</Button>
-        <Button size="sm" onClick={onPrint}><Download className="w-3.5 h-3.5 mr-1" /> Print / Save PDF</Button>
-        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>{meta.label}</span>
+        <Button size="sm" onClick={onPrint}><Download className="w-4 h-4 mr-1" /> Print / Save PDF</Button>
+        <span className={`text-xs font-medium px-4 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>{meta.label}</span>
         <span className="text-xs text-muted-foreground capitalize">{tmpl} template</span>
       </div>
 
@@ -1450,8 +1450,8 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
             </div>
             <div className="text-right">
               <p className="text-3xl font-bold text-emerald-600">INVOICE</p>
-              <p className="text-lg font-semibold mt-1">{invoice.invoiceNumber}</p>
-              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>{meta.label}</span>
+              <p className="text-xl font-semibold mt-1">{invoice.invoiceNumber}</p>
+              <span className={`text-xs font-medium px-4 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>{meta.label}</span>
             </div>
           </div>
           <InvoiceBody invoice={invoice} totals={totals} meta={meta} />
@@ -1463,13 +1463,13 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
         <div id="invoice-print-root" className="bg-background text-foreground print:bg-white print:text-gray-900 rounded-xl shadow-lg max-w-3xl mx-auto print:shadow-none print:rounded-none overflow-hidden">
           <div className="bg-emerald-600 print:bg-emerald-600 text-white p-8 flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold">{invoice.businessName || "Your Business"}</h1>
+              <h1 className="text-3xl font-bold">{invoice.businessName || "Your Business"}</h1>
               <p className="text-sm text-emerald-100 mt-1 whitespace-pre-line">{invoice.businessAddress}</p>
               {invoice.businessEmail && <p className="text-sm text-emerald-100">{invoice.businessEmail}</p>}
             </div>
             <div className="text-right">
               <p className="text-4xl font-black tracking-tight">INVOICE</p>
-              <p className="text-xl font-semibold mt-1">{invoice.invoiceNumber}</p>
+              <p className="text-2xl font-semibold mt-1">{invoice.invoiceNumber}</p>
             </div>
           </div>
           <div className="p-8">
@@ -1483,13 +1483,13 @@ function InvoicePreview({ invoice, onBack, onPrint }: { invoice: Invoice; onBack
         <div id="invoice-print-root" className="bg-background text-foreground print:bg-white print:text-gray-900 p-10 max-w-3xl mx-auto print:p-8">
           <div className="flex justify-between items-end mb-12 border-b pb-6">
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Invoice from</p>
-              <h1 className="text-xl font-bold">{invoice.businessName || "Your Business"}</h1>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">Invoice from</p>
+              <h1 className="text-2xl font-bold">{invoice.businessName || "Your Business"}</h1>
               {invoice.businessEmail && <p className="text-sm text-muted-foreground">{invoice.businessEmail}</p>}
             </div>
             <div className="text-right">
-              <p className="text-lg font-mono font-bold">{invoice.invoiceNumber}</p>
-              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>{meta.label}</span>
+              <p className="text-xl font-mono font-bold">{invoice.invoiceNumber}</p>
+              <span className={`text-xs font-medium px-4 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>{meta.label}</span>
             </div>
           </div>
           <InvoiceBody invoice={invoice} totals={totals} meta={meta} minimal />
@@ -1513,7 +1513,7 @@ function InvoiceBody({
       {/* Bill to + dates */}
       <div className="grid grid-cols-2 gap-8 mb-10">
         <div>
-          <p className="text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider mb-2">Bill To</p>
+          <p className="text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider mb-3">Bill To</p>
           <p className="font-semibold">{invoice.client.name}</p>
           {invoice.client.company && <p className="text-sm text-muted-foreground print:text-gray-600">{invoice.client.company}</p>}
           {invoice.client.email && <p className="text-sm text-muted-foreground print:text-gray-600">{invoice.client.email}</p>}
@@ -1543,19 +1543,19 @@ function InvoiceBody({
       <table className="w-full mb-8">
         <thead>
           <tr className={`border-b-2 ${minimal ? "border-foreground/20 print:border-gray-200" : "border-border print:border-gray-200"}`}>
-            <th className="text-left py-2 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider">Description</th>
-            <th className="text-right py-2 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-20">Qty</th>
-            <th className="text-right py-2 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-32">Unit Price</th>
-            <th className="text-right py-2 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-32">Amount</th>
+            <th className="text-left py-2.5 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider">Description</th>
+            <th className="text-right py-2.5 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-20">Qty</th>
+            <th className="text-right py-2.5 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-32">Unit Price</th>
+            <th className="text-right py-2.5 text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider w-32">Amount</th>
           </tr>
         </thead>
         <tbody>
           {invoice.lineItems.map((li) => (
             <tr key={li.id} className="border-b border-border/50 print:border-gray-100">
-              <td className="py-3 text-sm">{li.description}</td>
-              <td className="py-3 text-sm text-right text-muted-foreground print:text-gray-600">{li.quantity}</td>
-              <td className="py-3 text-sm text-right text-muted-foreground print:text-gray-600">{formatCurrency(li.unitPrice, invoice.currency)}</td>
-              <td className="py-3 text-sm text-right font-medium">{formatCurrency(li.quantity * li.unitPrice, invoice.currency)}</td>
+              <td className="py-4 text-sm">{li.description}</td>
+              <td className="py-4 text-sm text-right text-muted-foreground print:text-gray-600">{li.quantity}</td>
+              <td className="py-4 text-sm text-right text-muted-foreground print:text-gray-600">{formatCurrency(li.unitPrice, invoice.currency)}</td>
+              <td className="py-4 text-sm text-right font-medium">{formatCurrency(li.quantity * li.unitPrice, invoice.currency)}</td>
             </tr>
           ))}
         </tbody>
@@ -1563,7 +1563,7 @@ function InvoiceBody({
 
       {/* Totals */}
       <div className="flex justify-end mb-8">
-        <div className="w-64 space-y-2">
+        <div className="w-64 space-y-3">
           <div className="flex justify-between text-sm text-muted-foreground print:text-gray-600">
             <span>Subtotal</span><span>{formatCurrency(totals.subtotal, invoice.currency)}</span>
           </div>
@@ -1577,7 +1577,7 @@ function InvoiceBody({
               <span>Tax ({invoice.taxRate}%)</span><span>{formatCurrency(totals.taxAmount, invoice.currency)}</span>
             </div>
           )}
-          <div className="border-t-2 border-foreground print:border-gray-900 pt-2 flex justify-between font-bold text-lg">
+          <div className="border-t-2 border-foreground print:border-gray-900 pt-2 flex justify-between font-bold text-xl">
             <span>Total</span><span>{formatCurrency(totals.total, invoice.currency)}</span>
           </div>
         </div>
@@ -1585,7 +1585,7 @@ function InvoiceBody({
 
       {/* Notes & terms */}
       {(invoice.notes || invoice.paymentTerms) && (
-        <div className="border-t border-border/50 print:border-gray-200 pt-6 space-y-3">
+        <div className="border-t border-border/50 print:border-gray-200 pt-6 space-y-4">
           {invoice.notes && (
             <div>
               <p className="text-xs font-semibold text-muted-foreground print:text-gray-400 uppercase tracking-wider mb-1">Notes</p>

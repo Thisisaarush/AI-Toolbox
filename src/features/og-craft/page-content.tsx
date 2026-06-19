@@ -424,18 +424,18 @@ export const metadata: Metadata = {
     <div className="min-h-screen flex flex-col">
       <ToolHeader title="OG Craft" icon={Image} color="text-violet-500" badge="SEO" />
       <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full">
-        <div className="mb-6">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold mb-1">OG Craft</h1>
-          <p className="text-muted-foreground">Preview, design, and generate Open Graph meta tags.</p>
+          <p className="text-muted-foreground leading-relaxed">Preview, design, and generate Open Graph meta tags.</p>
         </div>
 
         {/* Pill tabs */}
-        <div className="flex gap-1.5 mb-6 p-1 bg-muted/60 rounded-xl w-fit flex-wrap">
+        <div className="flex gap-2 mb-8 p-1 bg-muted/60 rounded-xl w-fit flex-wrap">
           {TABS.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === t.id ? "bg-background text-foreground shadow-sm ring-1 ring-foreground/10" : "text-muted-foreground hover:text-foreground"}`}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${tab === t.id ? "bg-background text-foreground shadow-sm ring-1 ring-foreground/10" : "text-muted-foreground hover:text-foreground"}`}
             >
               {t.label}
             </button>
@@ -444,9 +444,9 @@ export const metadata: Metadata = {
 
         {/* ── URL CHECKER ─────────────────────────────────────────────────── */}
         {tab === "checker" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Prominent search box */}
-            <div className="relative flex items-center gap-2">
+            <div className="relative flex items-center gap-3">
               <div className="relative flex-1">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 <Input
@@ -469,11 +469,11 @@ export const metadata: Metadata = {
             {/* AI copy generator */}
             {showAiCopy && (
               <Card className="border-violet-200 dark:border-violet-800">
-                <CardContent className="pt-4 space-y-3">
-                  <p className="text-sm font-medium text-violet-700 dark:text-violet-300 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" /> AI OG Copy Generator
+                <CardContent className="pt-4 space-y-4">
+                  <p className="text-sm font-medium text-violet-700 dark:text-violet-300 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" /> AI OG Copy Generator
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Input
                       placeholder="Describe your product or page..."
                       value={aiDesc}
@@ -481,11 +481,11 @@ export const metadata: Metadata = {
                       className="flex-1"
                     />
                     <Button size="sm" onClick={handleAiCopy} disabled={aiLoading}>
-                      {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                     </Button>
                   </div>
                   {aiResult && (
-                    <div className="grid sm:grid-cols-2 gap-3 pt-1">
+                    <div className="grid sm:grid-cols-2 gap-4 pt-1">
                       {[
                         { label: "og:title", value: aiResult.ogTitle, key: "ogt" },
                         { label: "og:description", value: aiResult.ogDescription, key: "ogd" },
@@ -494,10 +494,10 @@ export const metadata: Metadata = {
                       ].map((item) => (
                         <div key={item.key} className="group relative">
                           <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-                          <div className="flex items-start gap-2 bg-muted/50 rounded p-2">
+                          <div className="flex items-start gap-3 bg-muted/50 rounded p-3">
                             <p className="text-sm flex-1">{item.value}</p>
                             <button onClick={() => copyText(item.value, item.key)} className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                              {copiedKey === item.key ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+                              {copiedKey === item.key ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
                             </button>
                           </div>
                         </div>
@@ -509,14 +509,14 @@ export const metadata: Metadata = {
             )}
 
             {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg border border-red-200 bg-red-50 dark:bg-red-950 text-red-600 text-sm">
+              <div className="flex items-center gap-3 p-4 rounded-lg border border-red-200 bg-red-50 dark:bg-red-950 text-red-600 text-sm">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
             {loading && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <Skeleton className="h-16 rounded-xl" />
                 <Skeleton className="h-48 rounded-xl" />
                 <div className="grid grid-cols-2 gap-4">
@@ -527,11 +527,11 @@ export const metadata: Metadata = {
             )}
 
             {ogData && !loading && (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {/* Score + favicon bar */}
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/40 border">
+                <div className="flex items-center gap-4 p-5 rounded-xl bg-muted/40 border">
                   {ogData.favicon && (
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-4 shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={ogData.favicon}
@@ -544,12 +544,12 @@ export const metadata: Metadata = {
                         size="sm"
                         onClick={() => downloadFavicon(ogData.favicon)}
                       >
-                        <Download className="w-3 h-3 mr-1" /> Favicon
+                        <Download className="w-4 h-4 mr-1" /> Favicon
                       </Button>
                     </div>
                   )}
                   {ogScore && (
-                    <div className="flex items-center gap-2 ml-auto">
+                    <div className="flex items-center gap-3 ml-auto">
                       <span className="text-xs text-muted-foreground">OG Score</span>
                       <span className={`text-sm font-bold px-2.5 py-0.5 rounded-full ${scoreColor(ogScore.score)}`}>
                         {ogScore.score}/100
@@ -560,9 +560,9 @@ export const metadata: Metadata = {
                     href={ogData.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 shrink-0"
+                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 shrink-0"
                   >
-                    <ExternalLink className="w-3 h-3" />
+                    <ExternalLink className="w-4 h-4" />
                     {(() => { try { return new URL(ogData.url).hostname } catch { return ogData.url } })()}
                   </a>
                 </div>
@@ -571,7 +571,7 @@ export const metadata: Metadata = {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center justify-between">
-                      <span className="flex items-center gap-2"><Globe className="w-4 h-4" /> Extracted Meta Tags</span>
+                      <span className="flex items-center gap-3"><Globe className="w-4 h-4" /> Extracted Meta Tags</span>
                       <Button
                         variant="outline" size="sm"
                         onClick={() => {
@@ -579,13 +579,13 @@ export const metadata: Metadata = {
                           copyText(tags, "all-tags")
                         }}
                       >
-                        {copiedKey === "all-tags" ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                        {copiedKey === "all-tags" ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                         Copy all
                       </Button>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid sm:grid-cols-2 gap-2">
+                    <div className="grid sm:grid-cols-2 gap-3">
                       {[
                         { label: "og:title", value: ogData.title },
                         { label: "og:description", value: ogData.description },
@@ -598,14 +598,14 @@ export const metadata: Metadata = {
                         { label: "twitter:description", value: ogData.twitterDescription },
                         { label: "twitter:image", value: ogData.twitterImage },
                       ].map((tag) => (
-                        <div key={tag.label} className="group flex items-start gap-2 p-2 rounded border bg-muted/30">
+                        <div key={tag.label} className="group flex items-start gap-3 p-3 rounded border bg-muted/30">
                           <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-mono text-muted-foreground">{tag.label}</p>
+                            <p className="text-xs font-mono text-muted-foreground">{tag.label}</p>
                             <p className="text-xs truncate">{tag.value || <span className="italic text-muted-foreground">not set</span>}</p>
                           </div>
                           {tag.value && (
                             <button onClick={() => copyText(tag.value, tag.label)} className="opacity-0 group-hover:opacity-100 shrink-0">
-                              {copiedKey === tag.label ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
+                              {copiedKey === tag.label ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
                             </button>
                           )}
                         </div>
@@ -619,10 +619,10 @@ export const metadata: Metadata = {
                   <button className="w-full text-left" onClick={() => setShowValidate(!showValidate)}>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm flex items-center justify-between">
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-3">
                           <Check className="w-4 h-4 text-violet-500" /> Meta Tag Validator
                           {ogScore && (
-                            <span className={`ml-2 text-xs font-bold px-2 py-0.5 rounded-full ${scoreColor(ogScore.score)}`}>
+                            <span className={`ml-2 text-xs font-bold px-3 py-0.5 rounded-full ${scoreColor(ogScore.score)}`}>
                               {ogScore.score}/100
                             </span>
                           )}
@@ -632,9 +632,9 @@ export const metadata: Metadata = {
                     </CardHeader>
                   </button>
                   {showValidate && (
-                    <CardContent className="pt-0 space-y-2">
+                    <CardContent className="pt-0 space-y-3">
                       {validationItems.map((item) => (
-                        <div key={item.label} className="flex items-start gap-3 text-sm">
+                        <div key={item.label} className="flex items-start gap-4 text-sm">
                           <span className={`mt-0.5 shrink-0 text-base ${item.pass ? "text-green-500" : "text-red-500"}`}>
                             {item.pass ? "✅" : "❌"}
                           </span>
@@ -650,7 +650,7 @@ export const metadata: Metadata = {
 
                 {/* Platform previews — 2×3 grid */}
                 <div>
-                  <p className="text-sm font-medium mb-3">Platform Previews</p>
+                  <p className="text-sm font-medium mb-4">Platform Previews</p>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {(Object.entries(PLATFORMS) as [Platform, typeof PLATFORMS[Platform]][]).map(([platform, meta]) => (
                       <PlatformPreview key={platform} platform={platform} meta={meta} ogData={ogData} />
@@ -663,17 +663,17 @@ export const metadata: Metadata = {
             {/* Recent Checks Timeline — last 5 as mini cards */}
             {history.length > 0 && !loading && (
               <div>
-                <p className="text-sm font-medium mb-3 text-muted-foreground flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5" /> Recent Checks
+                <p className="text-sm font-medium mb-4 text-muted-foreground flex items-center gap-3">
+                  <Clock className="w-4 h-4" /> Recent Checks
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {history.slice(0, 5).map((h) => {
                     const score = computeOGScore(h.ogData)
                     return (
                       <button
                         key={h.url}
                         onClick={() => { setUrlInput(h.url); setOgData(h.ogData) }}
-                        className="w-full text-left flex items-center gap-3 p-3 rounded-xl border hover:bg-muted/50 transition-colors group"
+                        className="w-full text-left flex items-center gap-4 p-4 rounded-xl border hover:bg-muted/50 transition-colors group"
                       >
                         {h.ogData.image ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -692,7 +692,7 @@ export const metadata: Metadata = {
                           <p className="text-sm font-medium truncate">{h.ogData.title || (() => { try { return new URL(h.url).hostname } catch { return h.url } })()}</p>
                           <p className="text-xs text-muted-foreground truncate">{(() => { try { return new URL(h.url).hostname } catch { return h.url } })()}</p>
                         </div>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${scoreColor(score.score)}`}>
+                        <span className={`text-xs font-bold px-3 py-0.5 rounded-full shrink-0 ${scoreColor(score.score)}`}>
                           {score.score}
                         </span>
                       </button>
@@ -706,15 +706,15 @@ export const metadata: Metadata = {
 
         {/* ── OG DESIGNER ─────────────────────────────────────────────────── */}
         {tab === "designer" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="grid lg:grid-cols-[1fr_1.2fr] gap-6">
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <Card>
-                  <CardHeader className="pb-3"><CardTitle className="text-sm flex items-center gap-2"><Palette className="w-4 h-4" /> Design Controls</CardTitle></CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardHeader className="pb-3"><CardTitle className="text-sm flex items-center gap-3"><Palette className="w-4 h-4" /> Design Controls</CardTitle></CardHeader>
+                  <CardContent className="space-y-5">
                     {/* Size preset */}
                     <div>
-                      <label className="text-xs font-medium mb-2 block">Canvas Size</label>
+                      <label className="text-xs font-medium mb-3 block">Canvas Size</label>
                       <select
                         value={selectedSizeId}
                         onChange={(e) => {
@@ -723,7 +723,7 @@ export const metadata: Metadata = {
                           const preset = CANVAS_SIZES.find((s) => s.id === id)
                           if (preset) setDesign((d) => ({ ...d, canvasSize: { width: preset.width, height: preset.height } }))
                         }}
-                        className="w-full h-8 text-xs rounded-md border border-input bg-background px-2"
+                        className="w-full h-9 text-xs rounded-md border border-input bg-background px-3"
                       >
                         {CANVAS_SIZES.map((s) => (
                           <option key={s.id} value={s.id}>{s.label}</option>
@@ -733,8 +733,8 @@ export const metadata: Metadata = {
 
                     {/* Templates */}
                     <div>
-                      <label className="text-xs font-medium mb-2 block">Template</label>
-                      <div className="grid grid-cols-4 gap-2">
+                      <label className="text-xs font-medium mb-3 block">Template</label>
+                      <div className="grid grid-cols-4 gap-3">
                         {OG_TEMPLATES.map((t) => (
                           <button
                             key={t.id}
@@ -757,24 +757,24 @@ export const metadata: Metadata = {
                       <label className="text-xs font-medium mb-1 block">Subheadline / Byline</label>
                       <Input value={design.subheadline} onChange={(e) => setDesign((d) => ({ ...d, subheadline: e.target.value }))} />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-medium mb-1 block">Logo / Brand text</label>
                         <Input value={design.logoText} onChange={(e) => setDesign((d) => ({ ...d, logoText: e.target.value }))} />
                       </div>
                       <div>
                         <label className="text-xs font-medium mb-1 block">Accent color</label>
-                        <input type="color" value={design.customColor} onChange={(e) => setDesign((d) => ({ ...d, customColor: e.target.value }))} className="w-full h-8 rounded-md border border-input cursor-pointer" />
+                        <input type="color" value={design.customColor} onChange={(e) => setDesign((d) => ({ ...d, customColor: e.target.value }))} className="w-full h-9 rounded-md border border-input cursor-pointer" />
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-medium mb-2 block">Font size</label>
-                      <div className="flex gap-1.5">
+                      <label className="text-xs font-medium mb-3 block">Font size</label>
+                      <div className="flex gap-2">
                         {(["sm", "md", "lg", "xl"] as const).map((s) => (
                           <button
                             key={s}
                             onClick={() => setDesign((d) => ({ ...d, fontSize: s }))}
-                            className={`px-3 py-1 rounded-lg text-sm border transition-colors flex-1 ${design.fontSize === s ? "bg-violet-500 text-white border-violet-500" : "border-border hover:bg-muted"}`}
+                            className={`px-4 py-1.5 rounded-lg text-sm border transition-colors flex-1 ${design.fontSize === s ? "bg-violet-500 text-white border-violet-500" : "border-border hover:bg-muted"}`}
                           >
                             {s.toUpperCase()}
                           </button>
@@ -790,7 +790,7 @@ export const metadata: Metadata = {
               </div>
 
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-2">
+                <p className="text-xs font-medium text-muted-foreground mb-3">
                   Preview ({design.canvasSize.width}×{design.canvasSize.height})
                 </p>
                 <canvas
@@ -805,11 +805,11 @@ export const metadata: Metadata = {
 
         {/* ── META GENERATOR ────────────────────────────────────────────────── */}
         {tab === "generator" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="grid lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader className="pb-3"><CardTitle className="text-sm">Page Details</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Title <span className="text-muted-foreground">({genTitle.length}/60)</span></label>
                     <Input placeholder="My Awesome Product" value={genTitle} onChange={(e) => setGenTitle(e.target.value)} maxLength={100} />
@@ -831,26 +831,26 @@ export const metadata: Metadata = {
                 </CardContent>
               </Card>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium flex items-center gap-2"><Code className="w-4 h-4" /> Generated Tags</p>
+                  <p className="text-sm font-medium flex items-center gap-3"><Code className="w-4 h-4" /> Generated Tags</p>
                   <Button variant="outline" size="sm" onClick={() => copyText(metaTagBlock, "meta-block")}>
-                    {copiedKey === "meta-block" ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                    {copiedKey === "meta-block" ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                     Copy all
                   </Button>
                 </div>
-                <pre className="text-xs bg-muted/50 p-4 rounded-xl border overflow-auto max-h-96 font-mono whitespace-pre-wrap">
+                <pre className="text-xs bg-muted/50 p-5 rounded-xl border overflow-auto max-h-96 font-mono whitespace-pre-wrap">
                   {metaTagBlock}
                 </pre>
 
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-sm font-medium flex items-center gap-2"><Code className="w-4 h-4" /> Next.js <code className="text-xs bg-muted px-1 rounded">metadata</code> export</p>
+                  <p className="text-sm font-medium flex items-center gap-3"><Code className="w-4 h-4" /> Next.js <code className="text-xs bg-muted px-1 rounded">metadata</code> export</p>
                   <Button variant="outline" size="sm" onClick={() => copyText(nextjsMetaBlock, "nextjs-block")}>
-                    {copiedKey === "nextjs-block" ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                    {copiedKey === "nextjs-block" ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                     Copy
                   </Button>
                 </div>
-                <pre className="text-xs bg-muted/50 p-4 rounded-xl border overflow-auto max-h-64 font-mono whitespace-pre-wrap">
+                <pre className="text-xs bg-muted/50 p-5 rounded-xl border overflow-auto max-h-64 font-mono whitespace-pre-wrap">
                   {nextjsMetaBlock}
                 </pre>
               </div>
@@ -860,12 +860,12 @@ export const metadata: Metadata = {
 
         {/* ── BATCH CHECK ───────────────────────────────────────────────────── */}
         {tab === "batch" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm">Batch URL Checker</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
                 <Textarea
                   placeholder={"https://example.com\nhttps://myproduct.io\nhttps://startup.dev"}
                   value={batchInput}
@@ -874,20 +874,20 @@ export const metadata: Metadata = {
                 />
                 <Button onClick={handleBatchCheck} disabled={batchLoading}>
                   {batchLoading
-                    ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Checking {batchProgress}/{batchInput.split("\n").filter((u) => u.trim()).length}...</>
-                    : <><Search className="w-3.5 h-3.5 mr-1" /> Check All</>}
+                    ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Checking {batchProgress}/{batchInput.split("\n").filter((u) => u.trim()).length}...</>
+                    : <><Search className="w-4 h-4 mr-1" /> Check All</>}
                 </Button>
               </CardContent>
             </Card>
 
             {batchResults.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {batchResults.map((r, i) => {
                   const score = r.status === "ok" && r.ogData ? computeOGScore(r.ogData) : null
                   return (
                     <Card key={i} className={r.status === "error" ? "border-red-200" : ""}>
-                      <CardContent className="py-3">
-                        <div className="flex items-start gap-3">
+                      <CardContent className="py-4">
+                        <div className="flex items-start gap-4">
                           <div className="mt-0.5">
                             {r.status === "pending" && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
                             {r.status === "ok" && (r.ogData?.image ? <Check className="w-4 h-4 text-green-500" /> : <AlertCircle className="w-4 h-4 text-amber-500" />)}
@@ -904,15 +904,15 @@ export const metadata: Metadata = {
                             )}
                             {r.status === "error" && <p className="text-xs text-red-500">{r.error}</p>}
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             {score && (
-                              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${scoreColor(score.score)}`}>
+                              <span className={`text-xs font-bold px-3 py-0.5 rounded-full ${scoreColor(score.score)}`}>
                                 {score.score}
                               </span>
                             )}
                             {r.status === "ok" && r.ogData && (
                               <Button variant="ghost" size="sm" onClick={() => { setUrlInput(r.url); setOgData(r.ogData!); setTab("checker") }}>
-                                <RefreshCw className="w-3.5 h-3.5 mr-1" /> View
+                                <RefreshCw className="w-4 h-4 mr-1" /> View
                               </Button>
                             )}
                           </div>
@@ -928,13 +928,13 @@ export const metadata: Metadata = {
 
         {/* ── BULK GENERATE ─────────────────────────────────────────────────── */}
         {tab === "bulk" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <h2 className="text-lg font-semibold mb-1">Bulk OG Generator</h2>
+              <h2 className="text-xl font-semibold mb-1">Bulk OG Generator</h2>
               <p className="text-sm text-muted-foreground">Paste page paths and a base URL — AI generates OG title and description for each.</p>
             </div>
             <Card>
-              <CardContent className="pt-5 space-y-4">
+              <CardContent className="pt-5 space-y-5">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Base URL</label>
                   <Input
@@ -955,20 +955,20 @@ export const metadata: Metadata = {
                 </div>
                 <Button onClick={handleBulkGenerate} disabled={bulkLoading}>
                   {bulkLoading
-                    ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Generating...</>
-                    : <><Sparkles className="w-3.5 h-3.5 mr-1" /> Generate OG Copy</>}
+                    ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating...</>
+                    : <><Sparkles className="w-4 h-4 mr-1" /> Generate OG Copy</>}
                 </Button>
               </CardContent>
             </Card>
 
             {bulkResults.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium flex items-center gap-2">
+                  <p className="text-sm font-medium flex items-center gap-3">
                     <List className="w-4 h-4" /> Results ({bulkResults.length} pages)
                   </p>
                   <Button variant="outline" size="sm" onClick={copyBulkAsJSON}>
-                    {copiedKey === "bulk-json" ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                    {copiedKey === "bulk-json" ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                     Copy all as JSON
                   </Button>
                 </div>
@@ -987,33 +987,33 @@ export const metadata: Metadata = {
                         <tr key={i} className="border-b last:border-0 hover:bg-muted/20 group">
                           <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground truncate max-w-0 w-[25%]">{row.path}</td>
                           <td className="px-4 py-2.5">
-                            <div className="flex items-start gap-2">
+                            <div className="flex items-start gap-3">
                               <span className="truncate">{row.title}</span>
                               <button
                                 onClick={() => copyText(row.title, `bulk-title-${i}`)}
                                 className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                               >
-                                {copiedKey === `bulk-title-${i}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
+                                {copiedKey === `bulk-title-${i}` ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
                               </button>
                             </div>
                           </td>
                           <td className="px-4 py-2.5 text-muted-foreground text-xs">
-                            <div className="flex items-start gap-2">
+                            <div className="flex items-start gap-3">
                               <span className="line-clamp-2">{row.description}</span>
                               <button
                                 onClick={() => copyText(row.description, `bulk-desc-${i}`)}
                                 className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                               >
-                                {copiedKey === `bulk-desc-${i}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
+                                {copiedKey === `bulk-desc-${i}` ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
                               </button>
                             </div>
                           </td>
-                          <td className="px-2">
+                          <td className="px-3">
                             <button
                               onClick={() => copyText(JSON.stringify({ url: `${bulkBaseUrl}${row.path}`, title: row.title, description: row.description }), `bulk-row-${i}`)}
                               className="opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              {copiedKey === `bulk-row-${i}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
+                              {copiedKey === `bulk-row-${i}` ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
                             </button>
                           </td>
                         </tr>
@@ -1133,8 +1133,8 @@ function PlatformPreview({ platform, meta, ogData }: { platform: Platform; meta:
               <p className="text-xs text-muted-foreground italic">No image</p>
             </div>
           )}
-          <div className="p-3">
-            <p className="text-[10px] text-muted-foreground uppercase">{domain}</p>
+          <div className="p-4">
+            <p className="text-xs text-muted-foreground uppercase">{domain}</p>
             <p className="text-sm font-semibold line-clamp-1 mt-0.5">
               {title.slice(0, meta.maxTitleLen)}
             </p>

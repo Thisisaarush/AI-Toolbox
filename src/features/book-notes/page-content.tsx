@@ -432,18 +432,18 @@ export function BookNotesContent() {
           </div>
           {card && (
             <Card className="min-h-64">
-              <CardContent className="py-8 space-y-6 text-center">
-                <p className="text-lg font-medium">{card.question}</p>
+              <CardContent className="py-8 space-y-8 text-center">
+                <p className="text-xl font-medium">{card.question}</p>
                 {!showAnswer ? (
                   <Button onClick={() => setShowAnswer(true)}>Show Answer</Button>
                 ) : (
                   <>
-                    <div className="p-4 rounded-lg bg-muted/50 text-left">
+                    <div className="p-5 rounded-xl bg-muted/50 text-left">
                       <p className="text-sm">{card.answer}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">How well did you know this?</p>
-                      <div className="flex gap-2 justify-center flex-wrap">
+                      <p className="text-xs text-muted-foreground mb-4">How well did you know this?</p>
+                      <div className="flex gap-3 justify-center flex-wrap">
                         {[
                           { r: 1, label: "Blackout", color: "bg-red-500 hover:bg-red-600" },
                           { r: 2, label: "Wrong", color: "bg-orange-500 hover:bg-orange-600" },
@@ -454,7 +454,7 @@ export function BookNotesContent() {
                           <button
                             key={r}
                             onClick={() => rateCard(r)}
-                            className={`px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors ${color}`}
+                            className={`px-4 py-2.5 rounded-xl text-white text-sm font-medium transition-colors ${color}`}
                           >
                             {r} — {label}
                           </button>
@@ -479,7 +479,7 @@ export function BookNotesContent() {
         color="text-violet-500"
         badge="Education"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {view === "book-detail" ? (
               <Button variant="outline" size="sm" onClick={() => { setView("library"); setSelectedBookId(null) }}>
                 ← Library
@@ -489,15 +489,15 @@ export function BookNotesContent() {
             ) : (
               <>
                 <Button variant="outline" size="sm" onClick={() => setView("add-book")}>
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Book
+                  <Plus className="w-4 h-4 mr-1" /> Add Book
                 </Button>
                 {books.length > 0 && (
                   <>
                     <Button variant="ghost" size="sm" onClick={exportMarkdown}>
-                      <Download className="w-3.5 h-3.5 mr-1" /> MD
+                      <Download className="w-4 h-4 mr-1" /> MD
                     </Button>
                     <Button variant="ghost" size="sm" onClick={exportJson}>
-                      <Download className="w-3.5 h-3.5 mr-1" /> JSON
+                      <Download className="w-4 h-4 mr-1" /> JSON
                     </Button>
                   </>
                 )}
@@ -511,13 +511,13 @@ export function BookNotesContent() {
 
         {/* ── Add book ── */}
         {view === "add-book" && (
-          <div className="max-w-lg mx-auto space-y-6">
+          <div className="max-w-lg mx-auto space-y-8">
             <div>
-              <h1 className="text-2xl font-bold mb-1">Add Book</h1>
+              <h1 className="text-3xl font-bold mb-1">Add Book</h1>
               <p className="text-muted-foreground text-sm">Search by title or fill in manually.</p>
             </div>
             <Card>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="pt-6 space-y-5">
                 <div className="relative">
                   <label className="text-xs font-medium mb-1 block">Title *</label>
                   <Input
@@ -531,12 +531,12 @@ export function BookNotesContent() {
                     </div>
                   )}
                   {olResults.length > 0 && (
-                    <div className="absolute z-10 mt-1 w-full bg-background border rounded-lg shadow-lg overflow-hidden">
+                    <div className="absolute z-10 mt-1 w-full bg-background border rounded-xl shadow-lg overflow-hidden">
                       {olResults.slice(0, 6).map((r, i) => (
                         <button
                           key={i}
                           onClick={() => pickOLResult(r)}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors text-sm border-b last:border-0"
+                          className="w-full flex items-center gap-4 px-4 py-2.5 text-left hover:bg-muted/50 transition-colors text-sm border-b last:border-0"
                         >
                           {r.cover_i && (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -558,7 +558,7 @@ export function BookNotesContent() {
                   <label className="text-xs font-medium mb-1 block">Author</label>
                   <Input placeholder="Author name" value={addAuthor} onChange={(e) => setAddAuthor(e.target.value)} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium mb-1 block">Year</label>
                     <Input type="number" placeholder="2024" value={addYear} onChange={(e) => setAddYear(e.target.value)} />
@@ -573,7 +573,7 @@ export function BookNotesContent() {
                   <select
                     value={addStatus}
                     onChange={(e) => setAddStatus(e.target.value as ReadingStatus)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                    className="w-full h-10 rounded-md border border-input bg-background px-4 text-sm"
                   >
                     {(Object.entries(STATUS_META) as [ReadingStatus, typeof STATUS_META[ReadingStatus]][]).map(([k, v]) => (
                       <option key={k} value={k}>{v.label}</option>
@@ -594,17 +594,17 @@ export function BookNotesContent() {
 
         {/* ── Library ── */}
         {view === "library" && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">Book Library</h1>
+                <h1 className="text-3xl font-bold">Book Library</h1>
                 <p className="text-muted-foreground text-sm mt-0.5">{books.length} books tracked</p>
               </div>
             </div>
 
             {/* Stats bar */}
             {books.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
                   { label: "Read this year", value: String(stats.booksThisYear), icon: BookMarked, color: "text-violet-500" },
                   { label: "Avg days/book", value: stats.avgDaysToFinish > 0 ? String(stats.avgDaysToFinish) : "—", icon: Clock, color: "text-blue-500" },
@@ -612,10 +612,10 @@ export function BookNotesContent() {
                   { label: "Total highlights", value: String(stats.totalHighlights), icon: Star, color: "text-amber-500" },
                 ].map((s) => (
                   <Card key={s.label} size="sm">
-                    <CardContent className="py-3 flex items-center gap-3">
+                    <CardContent className="py-4 flex items-center gap-4">
                       <s.icon className={`w-4 h-4 ${s.color} shrink-0`} />
                       <div>
-                        <p className="text-lg font-bold leading-none">{s.value}</p>
+                        <p className="text-xl font-bold leading-none">{s.value}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
                       </div>
                     </CardContent>
@@ -640,9 +640,9 @@ export function BookNotesContent() {
             {books.length === 0 ? (
               <Card className="max-w-md mx-auto mt-16">
                 <CardContent className="py-16 text-center">
-                  <BookOpen className="w-14 h-14 mx-auto mb-4 text-muted-foreground opacity-40" />
-                  <h2 className="text-xl font-semibold mb-2">No books yet</h2>
-                  <p className="text-muted-foreground text-sm mb-6">
+                  <BookOpen className="w-14 h-14 mx-auto mb-5 text-muted-foreground opacity-40" />
+                  <h2 className="text-2xl font-semibold mb-3">No books yet</h2>
+                  <p className="text-muted-foreground text-sm mb-8">
                     Add your first book to start tracking highlights, notes, and summaries.
                   </p>
                   <Button onClick={() => setView("add-book")}>
@@ -662,7 +662,7 @@ export function BookNotesContent() {
                       className="cursor-pointer hover:shadow-md transition-shadow group"
                       onClick={() => { setSelectedBookId(book.id); setView("book-detail") }}
                     >
-                      <CardContent className="p-4 flex gap-3">
+                      <CardContent className="p-5 flex gap-4">
                         {book.coverUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={book.coverUrl} alt="Cover" className="w-12 h-16 object-cover rounded shadow shrink-0" />
@@ -674,15 +674,15 @@ export function BookNotesContent() {
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm leading-snug line-clamp-2">{book.title}</p>
                           <p className="text-xs text-muted-foreground mt-0.5 truncate">{book.author}</p>
-                          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${sm.bg} ${sm.color}`}>
+                          <div className="flex items-center gap-2 mt-2 flex-wrap">
+                            <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${sm.bg} ${sm.color}`}>
                               {sm.label}
                             </span>
                             {book.highlights.length > 0 && (
-                              <span className="text-[10px] text-muted-foreground">{book.highlights.length} highlights</span>
+                              <span className="text-xs text-muted-foreground">{book.highlights.length} highlights</span>
                             )}
                             {due > 0 && (
-                              <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">{due} cards due</span>
+                              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">{due} cards due</span>
                             )}
                           </div>
                         </div>
@@ -699,9 +699,9 @@ export function BookNotesContent() {
               <Card>
                 <CardHeader><CardTitle className="text-sm">Genre Breakdown</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {Object.entries(stats.genreBreakdown).sort(([,a],[,b]) => b - a).map(([genre, count]) => (
-                      <div key={genre} className="flex items-center gap-3">
+                      <div key={genre} className="flex items-center gap-4">
                         <span className="text-xs w-28 truncate">{genre}</span>
                         <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                           <div className="h-full bg-violet-500 rounded-full" style={{ width: `${(count / books.length) * 100}%` }} />
@@ -720,9 +720,9 @@ export function BookNotesContent() {
         {view === "book-detail" && selectedBook && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left: book info */}
-            <div className="space-y-4">
+            <div className="space-y-5">
               <Card>
-                <CardContent className="pt-5 space-y-4">
+                <CardContent className="pt-5 space-y-5">
                   <div className="flex gap-4">
                     {selectedBook.coverUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -737,7 +737,7 @@ export function BookNotesContent() {
                       <p className="text-sm text-muted-foreground">{selectedBook.author}</p>
                       {selectedBook.year && <p className="text-xs text-muted-foreground">{selectedBook.year}</p>}
                       {selectedBook.genre && (
-                        <Badge variant="secondary" className="text-[10px] mt-1">{selectedBook.genre}</Badge>
+                        <Badge variant="secondary" className="text-xs mt-1">{selectedBook.genre}</Badge>
                       )}
                     </div>
                   </div>
@@ -747,7 +747,7 @@ export function BookNotesContent() {
                     <select
                       value={selectedBook.status}
                       onChange={(e) => updateBookStatus(selectedBook.id, e.target.value as ReadingStatus)}
-                      className="w-full h-8 rounded-md border border-input bg-background px-3 text-sm"
+                      className="w-full h-9 rounded-md border border-input bg-background px-4 text-sm"
                     >
                       {(Object.entries(STATUS_META) as [ReadingStatus, typeof STATUS_META[ReadingStatus]][]).map(([k, v]) => (
                         <option key={k} value={k}>{v.label}</option>
@@ -768,7 +768,7 @@ export function BookNotesContent() {
                     className="w-full"
                     onClick={() => deleteBook(selectedBook.id)}
                   >
-                    <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove Book
+                    <Trash2 className="w-4 h-4 mr-1" /> Remove Book
                   </Button>
                 </CardContent>
               </Card>
@@ -776,12 +776,12 @@ export function BookNotesContent() {
               {/* Flashcards card */}
               <Card>
                 <CardHeader><CardTitle className="text-sm">Flashcards</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{bookFlashcards.length} cards</span>
                     {dueDueCount > 0 && <span className="text-amber-500 font-medium">{dueDueCount} due</span>}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Button
                       size="sm"
                       variant="outline"
@@ -789,7 +789,7 @@ export function BookNotesContent() {
                       onClick={generateFlashcards}
                       disabled={aiLoading || selectedBook.highlights.length === 0}
                     >
-                      {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
+                      {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />}
                       Generate
                     </Button>
                     {bookFlashcards.length > 0 && (
@@ -798,7 +798,7 @@ export function BookNotesContent() {
                         className="flex-1"
                         onClick={() => startReview(selectedBook.id)}
                       >
-                        <RotateCcw className="w-3.5 h-3.5 mr-1" />
+                        <RotateCcw className="w-4 h-4 mr-1" />
                         Review {dueDueCount > 0 ? `(${dueDueCount})` : ""}
                       </Button>
                     )}
@@ -808,18 +808,19 @@ export function BookNotesContent() {
             </div>
 
             {/* Right: highlights + AI summary */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="lg:col-span-2 space-y-5">
               {/* Add highlight */}
               <Card>
                 <CardHeader><CardTitle className="text-sm">Add Highlight</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-4">
                   <Textarea
                     placeholder="Paste the highlight text..."
                     value={hlText}
                     onChange={(e) => setHlText(e.target.value)}
                     rows={3}
+                    className="leading-relaxed"
                   />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <Input
                       type="number"
                       placeholder="Page number (optional)"
@@ -832,16 +833,16 @@ export function BookNotesContent() {
                       onChange={(e) => setHlNote(e.target.value)}
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Button onClick={addHighlight} disabled={!hlText.trim()}>
-                      <Plus className="w-3.5 h-3.5 mr-1" /> Save Highlight
+                      <Plus className="w-4 h-4 mr-1" /> Save Highlight
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setShowRwForm((v) => !v)}>
-                      <ExternalLink className="w-3.5 h-3.5 mr-1" /> Connect Readwise
+                      <ExternalLink className="w-4 h-4 mr-1" /> Connect Readwise
                     </Button>
                   </div>
                   {showRwForm && (
-                    <div className="p-3 border rounded-lg space-y-3 bg-muted/30">
+                    <div className="p-4 border rounded-xl space-y-4 bg-muted/30">
                       <TokenConnect
                         serviceName="Readwise"
                         storageKey="readwise-token"
@@ -854,7 +855,7 @@ export function BookNotesContent() {
                       />
                       <Input placeholder="Readwise Book ID" value={rwBookId} onChange={(e) => setRwBookId(e.target.value)} />
                       <Button size="sm" onClick={fetchReadwise} disabled={rwLoading}>
-                        {rwLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : null}
+                        {rwLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
                         Import Highlights
                       </Button>
                     </div>
@@ -873,14 +874,14 @@ export function BookNotesContent() {
                       onClick={generateSummary}
                       disabled={aiLoading || selectedBook.highlights.length === 0}
                     >
-                      {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
+                      {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />}
                       {selectedBook.aiSummary ? "Regenerate" : "Generate"}
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
                   {selectedBook.aiSummary ? (
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                       {[
                         { title: "Key Themes", items: selectedBook.aiSummary.keyThemes },
                         { title: "Main Arguments", items: selectedBook.aiSummary.mainArguments },
@@ -891,7 +892,7 @@ export function BookNotesContent() {
                           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">{title}</p>
                           <ul className="space-y-1">
                             {items.map((item, i) => (
-                              <li key={i} className="flex gap-2 text-sm">
+                              <li key={i} className="flex gap-3 text-sm">
                                 <span className="text-violet-500 mt-0.5 shrink-0">•</span>
                                 <span>{item}</span>
                               </li>
@@ -899,7 +900,7 @@ export function BookNotesContent() {
                           </ul>
                         </div>
                       ))}
-                      <p className="text-[10px] text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         Generated {new Date(selectedBook.aiSummary.generatedAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -922,29 +923,29 @@ export function BookNotesContent() {
                   {selectedBook.highlights.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-6">No highlights yet.</p>
                   ) : (
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                    <div className="space-y-4 max-h-96 overflow-y-auto">
                       {selectedBook.highlights.map((hl) => (
-                        <div key={hl.id} className="p-3 rounded-lg border bg-muted/20 group">
-                          <div className="flex gap-2 justify-between">
+                        <div key={hl.id} className="p-4 rounded-xl border bg-muted/20 group">
+                          <div className="flex gap-3 justify-between">
                             <p className="text-sm italic flex-1">&ldquo;{hl.text}&rdquo;</p>
-                            <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => { navigator.clipboard.writeText(hl.text); toast.success("Copied") }}
                                 className="p-1 hover:text-foreground text-muted-foreground"
                               >
-                                <Copy className="w-3.5 h-3.5" />
+                                <Copy className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => deleteHighlight(selectedBook.id, hl.id)}
                                 className="p-1 hover:text-destructive text-muted-foreground"
                               >
-                                <X className="w-3.5 h-3.5" />
+                                <X className="w-4 h-4" />
                               </button>
                             </div>
                           </div>
-                          <div className="flex gap-3 mt-1.5 text-xs text-muted-foreground">
+                          <div className="flex gap-4 mt-1.5 text-xs text-muted-foreground">
                             {hl.page && <span>p.{hl.page}</span>}
-                            {hl.source === "readwise" && <Badge variant="secondary" className="text-[9px] py-0">Readwise</Badge>}
+                            {hl.source === "readwise" && <Badge variant="secondary" className="text-xs py-0">Readwise</Badge>}
                             <span>{new Date(hl.createdAt).toLocaleDateString()}</span>
                           </div>
                           {hl.note && <p className="text-xs text-muted-foreground mt-1 border-l-2 border-violet-500/30 pl-2">{hl.note}</p>}
@@ -957,6 +958,13 @@ export function BookNotesContent() {
             </div>
           </div>
         )}
+        {/* Tip banner */}
+        <div className="bg-muted/30 border border-border rounded-xl p-4 flex items-center gap-3">
+          <Sparkles className="w-5 h-5 text-muted-foreground shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            <strong>Pro tip:</strong> Connect Readwise to auto-import highlights, or use AI to generate summaries and flashcards from your saved highlights.
+          </p>
+        </div>
       </main>
     </div>
   )

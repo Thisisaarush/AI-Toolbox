@@ -62,8 +62,8 @@ function SectionContent({ title, children }: { title: string; children: React.Re
 
 function CopyButton({ text, id, copiedKey, setCopiedKey }: { text: string; id: string; copiedKey: string; setCopiedKey: (k: string) => void }) {
   return (
-    <Button variant="ghost" size="xs" onClick={() => { navigator.clipboard.writeText(text); setCopiedKey(id); setTimeout(() => setCopiedKey(""), 1500) }}>
-      {copiedKey === id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+    <Button variant="ghost" size="sm" onClick={() => { navigator.clipboard.writeText(text); setCopiedKey(id); setTimeout(() => setCopiedKey(""), 1500) }}>
+      {copiedKey === id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
     </Button>
   )
 }
@@ -208,14 +208,14 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
   return (
     <>
       <ToolHeader title="Landing Page Builder" icon={Layout} color="text-purple-500" badge="Launch" />
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-5 py-6">
         {/* Tab bar */}
-        <div className="flex gap-1 border-b border-border mb-6">
+        <div className="flex gap-1.5 border-b border-border mb-8">
           {(["form", "output", "history"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setMainTab(t)}
-              className={`px-3 py-2 text-xs font-medium border-b-2 transition-all ${
+              className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${
                 mainTab === t ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -227,7 +227,7 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
         {/* ── Form Tab ──────────────────────────────────────────────────── */}
         {mainTab === "form" && (
           <div className="max-w-2xl space-y-5">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-5">
               <div>
                 <label className="text-xs font-medium mb-1 block">Product Name *</label>
                 <Input value={form.productName} onChange={(e) => setForm({ ...form, productName: e.target.value })} placeholder="LaunchPilot" />
@@ -245,33 +245,33 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
             {/* Features */}
             <div>
-              <label className="text-xs font-medium mb-2 block">Key Features</label>
-              <div className="space-y-2">
+              <label className="text-xs font-medium mb-3 block">Key Features</label>
+              <div className="space-y-3">
                 {form.features.map((f, i) => (
-                  <div key={i} className="flex gap-2">
+                  <div key={i} className="flex gap-4">
                     <Input
                       value={f}
                       onChange={(e) => updateFeature(i, e.target.value)}
                       placeholder={`Feature ${i + 1}`}
                     />
                     {form.features.length > 1 && (
-                      <Button variant="ghost" size="icon-xs" onClick={() => removeFeature(i)}>
-                        <Trash2 className="w-3 h-3 text-destructive" />
+                      <Button variant="ghost" size="icon" onClick={() => removeFeature(i)}>
+                        <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     )}
                   </div>
                 ))}
-                <Button variant="ghost" size="xs" onClick={addFeature}><Plus className="w-3 h-3" /> Add feature</Button>
+                <Button variant="ghost" size="sm" onClick={addFeature}><Plus className="w-4 h-4" /> Add feature</Button>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-5">
               <div>
                 <label className="text-xs font-medium mb-1 block">Pricing Type</label>
                 <select
                   value={form.pricingType}
                   onChange={(e) => setForm({ ...form, pricingType: e.target.value as PricingType })}
-                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+                  className="w-full h-9 rounded-xl border border-input bg-transparent px-2.5 text-sm"
                 >
                   {Object.entries(PRICING_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
@@ -281,7 +281,7 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
                 <select
                   value={form.tone}
                   onChange={(e) => setForm({ ...form, tone: e.target.value as LandingTone })}
-                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+                  className="w-full h-9 rounded-xl border border-input bg-transparent px-2.5 text-sm"
                 >
                   {Object.entries(TONE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
@@ -301,14 +301,14 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
         {/* ── Output Tab ─────────────────────────────────────────────────── */}
         {mainTab === "output" && currentOutput && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="flex items-center justify-between">
-              <div className="flex gap-1 border-b border-border flex-1 overflow-x-auto">
+              <div className="flex gap-1.5 border-b border-border flex-1 overflow-x-auto">
                 {OUTPUT_TABS.map((t) => (
                   <button
                     key={t.id}
                     onClick={() => setOutputTab(t.id)}
-                    className={`px-3 py-2 text-xs font-medium border-b-2 transition-all whitespace-nowrap ${
+                    className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-all whitespace-nowrap ${
                       outputTab === t.id ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -317,14 +317,14 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
                 ))}
               </div>
               <Button variant="outline" size="sm" onClick={exportHTML} className="ml-2 shrink-0">
-                <Download className="w-3.5 h-3.5" /> Export HTML
+                <Download className="w-4 h-4" /> Export HTML
               </Button>
             </div>
 
             <div className="max-w-2xl">
               {/* Hero */}
               {outputTab === "hero" && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <SectionContent title="Headline">
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-bold">{currentOutput.hero.headline}</span>
@@ -332,12 +332,12 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
                     </div>
                   </SectionContent>
                   <SectionContent title="Subheadline">
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-4">
                       <span>{currentOutput.hero.subheadline}</span>
                       <CopyButton text={currentOutput.hero.subheadline} id="hero-s" copiedKey={copiedKey} setCopiedKey={setCopiedKey} />
                     </div>
                   </SectionContent>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <SectionContent title="Primary CTA">
                       <div className="flex items-center justify-between">
                         <Badge variant="secondary">{currentOutput.hero.ctaPrimary}</Badge>
@@ -362,10 +362,10 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
               {/* Features */}
               {outputTab === "features" && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {currentOutput.features.map((f, i) => (
                     <SectionContent key={i} title={`${f.icon} ${f.title}`}>
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-4">
                         <span>{f.description}</span>
                         <CopyButton text={`${f.title}: ${f.description}`} id={`feat-${i}`} copiedKey={copiedKey} setCopiedKey={setCopiedKey} />
                       </div>
@@ -376,10 +376,10 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
               {/* How It Works */}
               {outputTab === "howItWorks" && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {currentOutput.howItWorks.map((s) => (
                     <SectionContent key={s.step} title={`Step ${s.step}: ${s.title}`}>
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-4">
                         <span>{s.description}</span>
                         <CopyButton text={`Step ${s.step}: ${s.title} — ${s.description}`} id={`how-${s.step}`} copiedKey={copiedKey} setCopiedKey={setCopiedKey} />
                       </div>
@@ -390,10 +390,10 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
               {/* Testimonials */}
               {outputTab === "testimonials" && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {currentOutput.testimonials.map((t, i) => (
                     <SectionContent key={i} title={`${t.author} — ${t.role}, ${t.company}`}>
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-4">
                         <span className="italic text-muted-foreground">&ldquo;{t.quote}&rdquo;</span>
                         <CopyButton text={`"${t.quote}" — ${t.author}, ${t.role} at ${t.company}`} id={`test-${i}`} copiedKey={copiedKey} setCopiedKey={setCopiedKey} />
                       </div>
@@ -404,15 +404,15 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
               {/* Pricing */}
               {outputTab === "pricing" && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {currentOutput.pricing.map((p, i) => (
                     <SectionContent key={i} title={`${p.name} — ${p.price}${p.highlighted ? " (Featured)" : ""}`}>
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-sm mb-1">{p.description}</p>
                           <p className="text-xs text-muted-foreground">CTA: {p.cta}</p>
-                          <div className="flex flex-wrap gap-1 mt-1.5">
-                            {p.features.map((f, fi) => <Badge key={fi} variant="secondary" className="text-[10px]">{f}</Badge>)}
+                          <div className="flex flex-wrap gap-1.5 mt-1.5">
+                            {p.features.map((f, fi) => <Badge key={fi} variant="secondary" className="text-xs">{f}</Badge>)}
                           </div>
                         </div>
                         <CopyButton text={`${p.name}: ${p.price} — ${p.description}`} id={`price-${i}`} copiedKey={copiedKey} setCopiedKey={setCopiedKey} />
@@ -424,10 +424,10 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
               {/* FAQ */}
               {outputTab === "faq" && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {currentOutput.faq.map((q, i) => (
                     <SectionContent key={i} title={q.question}>
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-4">
                         <span>{q.answer}</span>
                         <CopyButton text={`${q.question}\n\n${q.answer}`} id={`faq-${i}`} copiedKey={copiedKey} setCopiedKey={setCopiedKey} />
                       </div>
@@ -438,9 +438,9 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
               {/* SEO */}
               {outputTab === "seo" && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <SectionContent title="Closing CTA">
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="font-bold">{currentOutput.cta.headline}</p>
                         <p className="text-sm text-muted-foreground mt-1">{currentOutput.cta.subtext}</p>
@@ -450,14 +450,14 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
                     </div>
                   </SectionContent>
                   <SectionContent title="SEO Meta">
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-3 text-sm">
                       <div><span className="font-medium">Title:</span> {currentOutput.seo.metaTitle}</div>
                       <div><span className="font-medium">Description:</span> {currentOutput.seo.metaDescription}</div>
-                      <div className="flex flex-wrap gap-1 mt-1">{currentOutput.seo.keywords.map((k) => <Badge key={k} variant="secondary" className="text-[10px]">{k}</Badge>)}</div>
+                      <div className="flex flex-wrap gap-1.5 mt-1">{currentOutput.seo.keywords.map((k) => <Badge key={k} variant="secondary" className="text-xs">{k}</Badge>)}</div>
                     </div>
                   </SectionContent>
                   <SectionContent title="Open Graph">
-                    <div className="space-y-1 text-sm">
+                    <div className="space-y-1.5 text-sm">
                       <div><span className="font-medium">OG Title:</span> {currentOutput.seo.ogTitle}</div>
                       <div><span className="font-medium">OG Description:</span> {currentOutput.seo.ogDescription}</div>
                     </div>
@@ -472,7 +472,7 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
               onClick={() => regenerateSection(outputTab)}
               disabled={regenLoading}
             >
-              {regenLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+              {regenLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
               Regenerate {OUTPUT_TABS.find((t) => t.id === outputTab)?.label}
             </Button>
           </div>
@@ -480,24 +480,24 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
 
         {mainTab === "output" && !currentOutput && (
           <div className="text-center py-20">
-            <Layout className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <Layout className="w-12 h-12 text-muted-foreground mx-auto mb-5" />
             <p className="text-muted-foreground">No landing page generated yet. Create one to get started.</p>
-            <Button variant="ghost" size="sm" className="mt-3" onClick={() => setMainTab("form")}>Create your first</Button>
+            <Button variant="ghost" size="sm" className="mt-4" onClick={() => setMainTab("form")}>Create your first</Button>
           </div>
         )}
 
         {/* ── History Tab ─────────────────────────────────────────────────── */}
         {mainTab === "history" && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {records.length === 0 && (
               <div className="text-center py-20">
-                <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-5" />
                 <p className="text-muted-foreground">No history yet.</p>
               </div>
             )}
             {records.map((r) => (
               <Card key={r.id} className="cursor-pointer hover:shadow-md transition-all" onClick={() => loadRecord(r)}>
-                <CardContent className="flex items-center justify-between py-3">
+                <CardContent className="flex items-center justify-between py-4">
                   <div>
                     <p className="text-sm font-medium">{r.input.productName}</p>
                     <p className="text-xs text-muted-foreground">{r.input.oneLiner || "No tagline"} · {r.input.tone} · {new Date(r.createdAt).toLocaleDateString()}</p>
