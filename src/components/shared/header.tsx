@@ -4,6 +4,7 @@ import Link from "next/link"
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
+import { Settings } from "lucide-react"
 
 export function Header() {
   const { isSignedIn } = useUser()
@@ -14,14 +15,28 @@ export function Header() {
         <Link href="/" className="text-base font-bold tracking-tight">
           Toolbox
         </Link>
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-1">
           <ThemeToggle />
+          <Link href="/settings">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Settings"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+          </Link>
           {!isSignedIn ? (
-            <SignInButton mode="modal">
-              <Button variant="outline" size="sm">Sign In</Button>
-            </SignInButton>
+            <div className="ml-1">
+              <SignInButton mode="modal">
+                <Button variant="outline" size="sm">Sign In</Button>
+              </SignInButton>
+            </div>
           ) : (
-            <UserButton />
+            <div className="ml-1">
+              <UserButton />
+            </div>
           )}
         </nav>
       </div>
