@@ -6,6 +6,7 @@ import { ArrowRight,
   CreditCard, FileText, Image, Rocket, Target, GitBranch, Globe, KeyRound,
   Dumbbell, CheckCircle2, TrendingUp, Shield, Users, Plane,
   BookOpen, List, MessageSquare, Briefcase, Calendar, FileSignature,
+  Scroll, Palette, Layout, Eye, Hammer, Sparkles, Brain, UserCheck,
 } from "lucide-react"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -42,6 +43,9 @@ const categories: Category[] = [
       { name: "Changelog AI", description: "Paste your git log or fetch from GitHub. AI writes user-facing release notes grouped by type.", icon: GitBranch, href: "/tools/changelog-ai", badge: "Dev Tool", color: "text-cyan-500", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
       { name: "DNS Desk", description: "All your domains in one dashboard. Visual DNS editor, expiry alerts, propagation checker, health monitor.", icon: Globe, href: "/tools/dns-desk", badge: "Dev Tool", color: "text-sky-500", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
       { name: "Env Manager", description: "Manage environment variables across projects and environments. Sync to Vercel, Railway, and Fly.io in one click.", icon: KeyRound, href: "/tools/env-manager", badge: "Dev Tool", color: "text-indigo-500", bgColor: "bg-indigo-50 dark:bg-indigo-950", borderColor: "border-t-indigo-500" },
+      { name: "Stalkr", description: "Research any brand or company. Score their name, sentiment, SEO keywords, HN mentions, and get actionable improvements.", icon: Eye, href: "/tools/stalkr", badge: "Research", color: "text-teal-500", bgColor: "bg-teal-50 dark:bg-teal-950", borderColor: "border-t-teal-500" },
+      { name: "Build or Skip", description: "Pitch your idea and get a brutally honest verdict. For, against, risks, prediction, and pivot suggestions.", icon: Hammer, href: "/tools/build-or-skip", badge: "Research", color: "text-rose-500", bgColor: "bg-rose-50 dark:bg-rose-950", borderColor: "border-t-rose-500" },
+      { name: "User Voice", description: "Simulate fake user interviews. Get 5 personas with honest reactions, feature requests, and willingness to pay.", icon: UserCheck, href: "/tools/user-voice", badge: "Research", color: "text-violet-500", bgColor: "bg-violet-50 dark:bg-violet-950", borderColor: "border-t-violet-500" },
     ],
   },
   {
@@ -55,6 +59,8 @@ const categories: Category[] = [
       { name: "ID Vault", description: "Store passport numbers, license IDs, and document expiry dates. Encrypted client-side, never leaves your device.", icon: Shield, href: "/tools/id-vault", badge: "Personal", color: "text-sky-500", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
       { name: "Expense Splitter", description: "Split bills between friends and groups. Multi-currency, tracks who owes what, and generates settlement summaries.", icon: Users, href: "/tools/expense-splitter", badge: "Finance", color: "text-lime-600", bgColor: "bg-lime-50 dark:bg-lime-950", borderColor: "border-t-lime-500" },
       { name: "Travel Docs", description: "Organize travel documents, visa requirements, and packing lists. Never miss a document for any trip.", icon: Plane, href: "/tools/travel-docs", badge: "Personal", color: "text-cyan-600", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
+      { name: "Dev Health", description: "Pomodoro timer, daily health log, streak tracker, and weekly heatmap. Monitor sleep, energy, mood, and exercise.", icon: Brain, href: "/tools/dev-health", badge: "Personal", color: "text-indigo-400", bgColor: "bg-indigo-50 dark:bg-indigo-950", borderColor: "border-t-indigo-400" },
+      { name: "Ship Tracker", description: "Create challenges, track daily progress, build streaks, and hold yourself accountable. With shame cards for missed days.", icon: Rocket, href: "/tools/ship-tracker", badge: "Personal", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-950", borderColor: "border-t-amber-500" },
     ],
   },
   {
@@ -73,6 +79,7 @@ const categories: Category[] = [
     legendColor: "bg-blue-600",
     tools: [
       { name: "Job Tracker", description: "Track job applications through every stage. Notes, contacts, follow-up reminders, and a Kanban-style pipeline.", icon: Briefcase, href: "/tools/job-tracker", badge: "Career", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
+      { name: "Resume Builder", description: "Build, preview, and score resumes. ATS analysis, job tailoring, cover letter generation, and bullet rewriting powered by AI.", icon: Scroll, href: "/tools/resume-builder", badge: "Career", color: "text-sky-600", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
     ],
   },
   {
@@ -81,6 +88,9 @@ const categories: Category[] = [
     legendColor: "bg-fuchsia-500",
     tools: [
       { name: "Content Calendar", description: "Plan and schedule content across channels. Publish directly to Ghost. Visual week and month views.", icon: Calendar, href: "/tools/content-calendar", badge: "Creator", color: "text-fuchsia-500", bgColor: "bg-fuchsia-50 dark:bg-fuchsia-950", borderColor: "border-t-fuchsia-500" },
+      { name: "Logo Maker", description: "Design app logos with icon picker, color presets, shape options, and SVG/PNG download. AI suggests matching icons.", icon: Palette, href: "/tools/logo-maker", badge: "Creative", color: "text-pink-500", bgColor: "bg-pink-50 dark:bg-pink-950", borderColor: "border-t-pink-500" },
+      { name: "Landing Page Builder", description: "Generate complete landing page copy with hero, features, pricing, FAQ, and SEO. Export as HTML or regenerate individual sections.", icon: Layout, href: "/tools/landing-builder", badge: "Launch", color: "text-purple-500", bgColor: "bg-purple-50 dark:bg-purple-950", borderColor: "border-t-purple-500" },
+      { name: "Viral Post Studio", description: "Generate platform-optimized viral posts in 8 formats. Engagement scoring, hook alternatives, and thread versions.", icon: Sparkles, href: "/tools/viral-post", badge: "Creator", color: "text-yellow-500", bgColor: "bg-yellow-50 dark:bg-yellow-950", borderColor: "border-t-yellow-500" },
     ],
   },
   {
