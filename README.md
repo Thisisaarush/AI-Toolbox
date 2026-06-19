@@ -2,15 +2,21 @@
 
 A growing collection of focused, purpose-built tools for developers, builders, and makers. Each tool does one thing well — no bloat, no subscriptions, no noise.
 
+**20+ tools · 6 categories · Dark mode default · OAuth integrations · Auto currency detection**
+
 ---
 
 ## Overview
 
-Toolbox is a Next.js app that packages standalone tools under one roof. Every tool is self-contained (its own `page-content.tsx` + `api-handler.ts`), persists state locally in `localStorage`, and — where relevant — integrates with real third-party APIs for data that actually matters.
+Toolbox is a Next.js app that packages standalone tools under one roof. Every tool is self-contained (its own `page-content.tsx` + `api-handler.ts`), persists state locally in `localStorage`, and — where relevant — integrates with real third-party APIs via proper OAuth (no manual token pasting).
 
-The goal is a toolkit you reach for weekly: invoicing a client, validating an idea, generating a changelog, tracking your workouts, or splitting a bill with friends.
+**Key design decisions:**
+- **Dark mode by default** via `next-themes`, toggleable in every header
+- **Currency auto-detection** from user's IP country on first visit (stored in localStorage for subsequent visits)
+- **OAuth flows** for GitHub and Strava — "Connect" buttons redirect to provider login, no API keys copied by hand
+- **API token services** (Readwise) use a clean connect panel — password input, stored in localStorage, never transmitted except to the relevant API
 
----
+
 
 ## Tools
 
@@ -276,11 +282,33 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable | Required | Description |
 |---|---|---|
-| `GEMINI_API_KEY` | Yes | Google Gemini API key (Changelog AI, Idea Sniper, Launch Pad) |
+| `GEMINI_API_KEY` | Yes | Google Gemini API key — powers all AI features |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes | Clerk publishable key for auth |
 | `CLERK_SECRET_KEY` | Yes | Clerk secret key for server-side auth |
 | `NEXT_PUBLIC_APP_URL` | Yes | Public URL of the app (e.g. `https://yourdomain.com`) |
+| `GITHUB_CLIENT_ID` | No | GitHub OAuth app client ID — enables "Connect GitHub" in Changelog AI |
+| `GITHUB_CLIENT_SECRET` | No | GitHub OAuth app client secret |
+| `STRAVA_CLIENT_ID` | No | Strava OAuth app client ID — enables "Connect Strava" in Workout Log |
+| `STRAVA_CLIENT_SECRET` | No | Strava OAuth app client secret |
 | `DATABASE_URL` | No | Database connection string (for future DB persistence — not currently used) |
+
+### Setting up GitHub OAuth
+1. Go to [github.com/settings/developers](https://github.com/settings/developers) → **New OAuth App**
+2. Set **Authorization callback URL** to `{NEXT_PUBLIC_APP_URL}/api/oauth/github/callback`
+3. Copy Client ID and Client Secret to `.env.local`
+
+### Setting up Strava OAuth
+1. Go to [strava.com/settings/api](https://www.strava.com/settings/api) → create an app
+2. Set **Authorization Callback Domain** to your domain (e.g. `localhost:3000` for dev)
+3. Copy Client ID and Client Secret to `.env.local`
+
+### Currency Auto-detection
+No setup required. The app detects the user's country from:
+1. `x-vercel-ip-country` header (when deployed on Vercel — zero latency)
+2. `cf-ipcountry` header (when behind Cloudflare)
+3. `ipapi.co` fallback for other hosts
+
+The detected currency is stored in `localStorage` and used across all finance tools. Users can also override it manually.
 
 ---
 

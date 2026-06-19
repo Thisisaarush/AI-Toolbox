@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ThemeProvider } from "next-themes"
+import { CurrencyProvider } from "@/lib/currency-context"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "sonner"
 import "./globals.css"
@@ -54,10 +55,12 @@ export default function RootLayout({
             storageKey="toolbox-theme"
             disableTransitionOnChange
           >
-            <TooltipProvider>
-              {children}
-              <Toaster position="bottom-right" richColors />
-            </TooltipProvider>
+            <CurrencyProvider>
+              <TooltipProvider>
+                {children}
+                <Toaster position="bottom-right" richColors />
+              </TooltipProvider>
+            </CurrencyProvider>
           </ThemeProvider>
         </body>
       </html>

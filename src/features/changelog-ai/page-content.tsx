@@ -18,6 +18,7 @@ import {
   CHANGE_TYPE_META, generateMarkdown, generateHTML, generateGitHubRelease, generateEmailHtml,
   bumpVersion, computeReleaseStats,
 } from "./types"
+import { ConnectButton } from "@/components/shared/connect-button"
 
 const STORAGE_KEY = "changelog-ai-v1"
 const GH_TOKEN_STORAGE_KEY = "changelog-ai-github-token"
@@ -645,20 +646,20 @@ pqr1234 perf: 40% faster load times via lazy loading`}
                     {/* ── GitHub tab ── */}
                     {inputTab === "github" && (
                       <div className="space-y-4">
-                        <div>
-                          <label className="text-xs font-medium mb-1.5 block">
-                            GitHub PAT{" "}
-                            <span className="text-muted-foreground font-normal">— only <code className="text-[10px] bg-muted px-1 rounded">repo</code> or <code className="text-[10px] bg-muted px-1 rounded">public_repo</code> scope needed</span>
-                          </label>
-                          <Input
-                            type="password"
-                            placeholder="ghp_xxxxxxxxxxxx (leave empty for public repos)"
-                            value={ghToken}
-                            onChange={(e) => setGhToken(e.target.value)}
-                            className="font-mono text-sm"
-                          />
-                          <p className="text-[10px] text-muted-foreground mt-1">Stored in localStorage. Never sent to the AI — only to the GitHub API.</p>
-                        </div>
+                        <ConnectButton
+                          provider="github"
+                          returnTo="/tools/changelog-ai"
+                          storageKey="changelog-ai-github-token"
+                          onConnected={(token) => {
+                            setGhToken(token)
+                            localStorage.setItem(GH_TOKEN_STORAGE_KEY, token)
+                          }}
+                          onDisconnected={() => {
+                            setGhToken("")
+                            localStorage.removeItem(GH_TOKEN_STORAGE_KEY)
+                          }}
+                          description="Grants read access to your repositories to fetch commit history."
+                        />
                         <div>
                           <label className="text-xs font-medium mb-1.5 block">Repository</label>
                           <Input

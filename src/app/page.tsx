@@ -326,35 +326,44 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative bg-[#0a0a0a] text-white overflow-hidden">
-          {/* Subtle grid background */}
+        <section className="relative bg-[#0a0a0a] dark:bg-[#0a0a0a] overflow-hidden">
+          {/* Subtle grid background — adapts color per theme */}
           <div
-            className="absolute inset-0 opacity-[0.03]"
+            className="absolute inset-0 opacity-[0.04] dark:opacity-[0.03]"
+            style={{
+              backgroundImage: `linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)`,
+              backgroundSize: "72px 72px",
+              color: "oklch(0.145 0 0)",
+            }}
+          />
+          {/* Grid override for dark */}
+          <div
+            className="absolute inset-0 hidden dark:block opacity-[0.03]"
             style={{
               backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
               backgroundSize: "72px 72px",
             }}
           />
           {/* Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-white/[0.03] rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-black/[0.02] dark:bg-white/[0.03] rounded-full blur-3xl" />
 
           <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-40 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/50 mb-8">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-3 py-1 text-xs font-medium text-black/50 dark:text-white/50 mb-8">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-green-400 animate-pulse" />
               Tools that slot into your workflow
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.05]">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.05] text-black dark:text-white">
               Every tool you need.{" "}
-              <span className="text-white/30">Nothing you don&rsquo;t.</span>
+              <span className="text-black/25 dark:text-white/30">Nothing you don&rsquo;t.</span>
             </h1>
 
-            <p className="text-base md:text-lg text-white/40 max-w-xl mx-auto mb-10 leading-relaxed">
+            <p className="text-base md:text-lg text-black/50 dark:text-white/40 max-w-xl mx-auto mb-10 leading-relaxed">
               Purpose-built tools for developers, builders, and makers. Subscriptions, invoices, fitness, documents, learning, and more.
             </p>
 
             {/* Single stat */}
-            <p className="text-sm font-medium text-white/30 mb-8 tracking-wider">
+            <p className="text-sm font-medium text-black/30 dark:text-white/30 mb-8 tracking-wider">
               {allToolCount}+ tools across {categories.length} categories
             </p>
 
@@ -363,7 +372,7 @@ export default function Home() {
               {categories.map((cat) => (
                 <span
                   key={cat.id}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/50"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-3 py-1 text-xs font-medium text-black/50 dark:text-white/50"
                 >
                   <span className={`w-2 h-2 rounded-full ${cat.legendColor}`} />
                   {cat.label}

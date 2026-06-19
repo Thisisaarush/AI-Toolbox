@@ -16,6 +16,7 @@ import { toast } from "sonner"
 import type {
   Book, BookHighlight, Flashcard, ReadingStatus, OpenLibraryResult, ReadingStats,
 } from "./types"
+import { TokenConnect } from "@/components/shared/connect-button"
 
 const STORAGE_KEY = "book-notes-v1"
 const FLASHCARD_KEY = "book-notes-flashcards-v1"
@@ -134,7 +135,11 @@ export function BookNotesContent() {
   const [reviewIdx, setReviewIdx] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
 
-  useEffect(() => { setBooks(loadBooks()); setFlashcards(loadFlashcards()) }, [])
+  useEffect(() => {
+    setBooks(loadBooks()); setFlashcards(loadFlashcards())
+    const stored = localStorage.getItem("readwise-token")
+    if (stored) setRwToken(stored)
+  }, [])
   useEffect(() => { saveBooks(books) }, [books])
   useEffect(() => { saveFlashcards(flashcards) }, [flashcards])
 
@@ -837,8 +842,16 @@ export function BookNotesContent() {
                   </div>
                   {showRwForm && (
                     <div className="p-3 border rounded-lg space-y-3 bg-muted/30">
-                      <p className="text-xs text-muted-foreground">Enter your Readwise API token and book ID to import highlights.</p>
-                      <Input placeholder="Readwise API Token" value={rwToken} onChange={(e) => setRwToken(e.target.value)} type="password" />
+                      <TokenConnect
+                        serviceName="Readwise"
+                        storageKey="readwise-token"
+                        placeholder="Paste Readwise access token"
+                        helpUrl="https://readwise.io/access_token"
+                        helpText="Get your Readwise access token"
+                        onConnected={(token) => setRwToken(token)}
+                        onDisconnected={() => setRwToken("")}
+                        description="Import your book highlights from Readwise automatically."
+                      />
                       <Input placeholder="Readwise Book ID" value={rwBookId} onChange={(e) => setRwBookId(e.target.value)} />
                       <Button size="sm" onClick={fetchReadwise} disabled={rwLoading}>
                         {rwLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : null}

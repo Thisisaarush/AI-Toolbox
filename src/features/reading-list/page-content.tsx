@@ -16,6 +16,7 @@ import {
   type ReadingItem, type ReadingStore, type ReadingStatus,
   STATUS_LABELS, STATUS_COLORS, estimateReadingTime, extractDomain, faviconUrl,
 } from "./types"
+import { TokenConnect } from "@/components/shared/connect-button"
 
 const STORAGE_KEY = "reading-list-v1"
 
@@ -60,7 +61,8 @@ export function ReadingListContent() {
   useEffect(() => {
     const s = loadStore()
     setStore(s)
-    if (s.readwiseToken) setReadwiseToken(s.readwiseToken)
+    const storedToken = localStorage.getItem("readwise-token") || s.readwiseToken || ""
+    if (storedToken) setReadwiseToken(storedToken)
     // Pick 3 unread for today (stable per day via date seed)
     const unread = s.items.filter((i) => i.status === "unread")
     if (unread.length > 0) {
@@ -495,26 +497,24 @@ export function ReadingListContent() {
 
         {/* Readwise */}
         <Card className="border-dashed">
-          <CardContent className="py-3">
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs bg-amber-500/20 text-amber-400">Readwise</Badge>
-                <p className="text-sm font-medium">Sync highlights from Readwise</p>
-              </div>
-              <div className="flex items-center gap-2 ml-auto flex-wrap">
-                <Input
-                  type="password"
-                  placeholder="Readwise access token"
-                  value={readwiseToken}
-                  onChange={(e) => setReadwiseToken(e.target.value)}
-                  className="w-48 h-7 text-xs"
-                />
-                <Button size="sm" onClick={syncReadwise} disabled={rwLoading || !readwiseToken}>
-                  {rwLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Zap className="w-3.5 h-3.5 mr-1" />Sync</>}
-                </Button>
-              </div>
+          <CardContent className="py-3 space-y-3">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-xs bg-amber-500/20 text-amber-400">Readwise</Badge>
+              <p className="text-sm font-medium">Sync highlights from Readwise</p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Get your token at readwise.io/access_token · Imports articles you&apos;ve highlighted</p>
+            <TokenConnect
+              serviceName="Readwise"
+              storageKey="readwise-token"
+              placeholder="Paste Readwise access token"
+              helpUrl="https://readwise.io/access_token"
+              helpText="Get your Readwise access token"
+              onConnected={(token) => setReadwiseToken(token)}
+              onDisconnected={() => setReadwiseToken("")}
+              description="Import articles you've highlighted in Readwise Reader."
+            />
+            <Button size="sm" onClick={syncReadwise} disabled={rwLoading || !readwiseToken}>
+              {rwLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Zap className="w-3.5 h-3.5 mr-1" />Sync</>}
+            </Button>
           </CardContent>
         </Card>
 

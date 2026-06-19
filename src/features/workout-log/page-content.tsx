@@ -19,6 +19,7 @@ import type {
 } from "./types"
 import { PRESET_EXERCISES } from "./exercises"
 import { MUSCLE_GROUP_COLORS } from "./types"
+import { ConnectButton } from "@/components/shared/connect-button"
 
 const STORAGE_KEY = "workout-log-v1"
 const PROGRAM_KEY = "workout-programs-v1"
@@ -239,11 +240,12 @@ export function WorkoutLogContent() {
   }
 
   async function importStrava() {
-    if (!stravaToken.trim()) { toast.error("Enter Strava access token"); return }
+    const token = stravaToken.trim() || localStorage.getItem("workout-strava-token") || ""
+    if (!token) { toast.error("Connect Strava first"); return }
     setStravaLoading(true)
     try {
       const res = await fetch("https://www.strava.com/api/v3/athlete/activities?per_page=50", {
-        headers: { Authorization: `Bearer ${stravaToken}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (!res.ok) throw new Error("Strava API error — check your token")
       const activities = await res.json() as { id: number; name: string; type: string; start_date: string; distance: number; moving_time: number }[]
@@ -512,14 +514,13 @@ export function WorkoutLogContent() {
                 </div>
                 {showStravaForm && (
                   <div className="space-y-3">
-                    <p className="text-xs text-muted-foreground">
-                      Paste your Strava access token to import your last 50 activities as cardio sessions.
-                    </p>
-                    <Input
-                      type="password"
-                      placeholder="Strava Access Token"
-                      value={stravaToken}
-                      onChange={(e) => setStravaToken(e.target.value)}
+                    <ConnectButton
+                      provider="strava"
+                      returnTo="/tools/workout-log"
+                      storageKey="workout-strava-token"
+                      onConnected={(token) => setStravaToken(token)}
+                      onDisconnected={() => setStravaToken("")}
+                      description="Allows read access to your Strava activities (runs, rides, swims, etc.)."
                     />
                     <Button size="sm" onClick={importStrava} disabled={stravaLoading}>
                       {stravaLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : null}
