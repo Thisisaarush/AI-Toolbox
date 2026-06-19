@@ -74,6 +74,8 @@ export async function POST(req: Request) {
           twitterDescription: extractMeta("twitter:description"),
           twitterImage: extractMeta("twitter:image"),
           favicon,
+          ogType: extractMeta("og:type"),
+          ogUrl: extractMeta("og:url"),
           fetchedAt: new Date().toISOString(),
         }
 
@@ -123,6 +125,54 @@ Only return JSON, no markdown.`
             twitterDescription: "The tool that helps you get more done.",
           },
         })
+      }
+    }
+
+    if (action === "bulk-generate") {
+      const { allowed } = aiLimiter.check(`og-craft-bulk:${uid}:${ip}`)
+      if (!allowed) throw new ApiError("AI rate limit exceeded (5/min)", 429)
+      const { paths, baseUrl } = body as { paths: string[]; baseUrl: string }
+      if (!paths || !Array.isArray(paths) || paths.length === 0) throw new ApiError("paths required", 400)
+      if (paths.length > 20) throw new ApiError("Max 20 paths at once", 400)
+      if (!baseUrl) throw new ApiError("baseUrl required", 400)
+
+      const key = process.env.GEMINI_API_KEY
+      if (!key) throw new ApiError("AI not configured", 503)
+
+      const genAI = new GoogleGenerativeAI(key)
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
+
+      const prompt = `You are an SEO expert. Generate OG title and description for each page path below.
+Base URL: ${baseUrl}
+Paths:
+${paths.map((p, i) => `${i + 1}. ${p}`).join("\n")}
+
+For each path, infer the page purpose from the URL pattern and generate:
+- title: max 60 chars, compelling, specific to that page
+- description: max 155 chars, includes value prop
+
+Return JSON array (same order as input):
+[
+  { "path": "/blog/post-1", "title": "...", "description": "..." },
+  ...
+]
+
+Only return valid JSON array, no markdown.`
+
+      try {
+        const result = await model.generateContent(prompt)
+        const text = result.response.text().replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+        const items = JSON.parse(text)
+        return NextResponse.json({ ok: true, items })
+      } catch {
+        // Fallback: generate basic titles from paths
+        const items = paths.map((p) => {
+          const parts = p.split("/").filter(Boolean)
+          const last = parts[parts.length - 1] ?? p
+          const title = last.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+          return { path: p, title: title.slice(0, 60), description: `Learn more about ${title} on ${baseUrl}`.slice(0, 155) }
+        })
+        return NextResponse.json({ ok: true, items })
       }
     }
 

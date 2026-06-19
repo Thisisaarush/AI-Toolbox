@@ -12,6 +12,11 @@ export type Category =
   | "finance"
   | "other"
 
+export interface PriceHistoryEntry {
+  amount: number
+  date: string // ISO date string
+}
+
 export interface Subscription {
   id: string
   name: string
@@ -26,6 +31,9 @@ export interface Subscription {
   startDate?: string      // ISO date
   notes?: string
   cancelUrl?: string
+  roiNote?: string        // What value / ROI the user gets from this
+  tags?: string[]         // Custom tags: "work-reimbursed", "side-project", etc.
+  priceHistory?: PriceHistoryEntry[] // Track price changes over time
   createdAt: string
   updatedAt: string
 }

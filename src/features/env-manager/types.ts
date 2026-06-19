@@ -1,5 +1,12 @@
 export type VarType = "string" | "secret" | "url" | "number" | "boolean"
 
+export type ValidationType = "url" | "email" | "uuid" | "jwt" | "none"
+
+export interface VarValidation {
+  type: ValidationType
+  required: boolean
+}
+
 export interface EnvVar {
   id: string
   key: string
@@ -8,6 +15,9 @@ export interface EnvVar {
   description: string
   createdAt: string
   updatedAt: string
+  rotationInterval?: number | null   // days
+  lastRotatedAt?: string | null
+  validation?: VarValidation | null
 }
 
 export type EnvironmentName = "development" | "staging" | "production" | "preview" | string
@@ -16,6 +26,8 @@ export interface Environment {
   id: string
   name: EnvironmentName
   vars: EnvVar[]
+  inheritsFrom?: string | null   // envId
+  exampleContent?: string        // stored .env.example text
 }
 
 export interface Project {
@@ -27,12 +39,14 @@ export interface Project {
   updatedAt: string
 }
 
+export type AuditAction = "created" | "updated" | "deleted" | "rotated"
+
 export interface AuditEntry {
   id: string
   projectId: string
   environmentId: string
   varKey: string
-  action: "created" | "updated" | "deleted"
+  action: AuditAction
   timestamp: string
 }
 
@@ -65,7 +79,6 @@ export function parseEnvFile(content: string): Pick<EnvVar, "key" | "value" | "t
     if (eqIdx === -1) continue
     const key = trimmed.slice(0, eqIdx).trim()
     let value = trimmed.slice(eqIdx + 1).trim()
-    // Remove surrounding quotes
     if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
       value = value.slice(1, -1)
     }
@@ -91,7 +104,7 @@ function inferType(key: string, value: string): VarType {
 
 export function generateEnvFile(vars: EnvVar[], maskSecrets = false): string {
   return vars.map((v) => {
-    const val = maskSecrets && v.type === "secret" ? "***" : v.value
+    const val = maskSecrets && v.type === "secret" ? "" : v.value
     const needsQuotes = val.includes(" ") || val.includes("#") || val.includes("$")
     const quoted = needsQuotes ? `"${val}"` : val
     const comment = v.description ? `# ${v.description}\n` : ""
@@ -125,6 +138,35 @@ export function diffEnvironments(envA: Environment, envB: Environment): {
     }
   }
   return { onlyInA, onlyInB, changed, same }
+}
+
+// Validation helpers
+export function validateVarValue(value: string, validation: VarValidation | null | undefined): boolean | null {
+  if (!validation || validation.type === "none") return null
+  if (validation.required && !value.trim()) return false
+
+  switch (validation.type) {
+    case "url":
+      try { new URL(value); return true } catch { return false }
+    case "email":
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+    case "uuid":
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+    case "jwt": {
+      const parts = value.split(".")
+      return parts.length === 3 && parts.every((p) => p.length > 0)
+    }
+    default:
+      return null
+  }
+}
+
+// Check rotation due
+export function isRotationDue(v: EnvVar): boolean {
+  if (!v.rotationInterval || !v.lastRotatedAt) return false
+  const lastRotated = new Date(v.lastRotatedAt)
+  const dueDate = new Date(lastRotated.getTime() + v.rotationInterval * 24 * 60 * 60 * 1000)
+  return dueDate <= new Date()
 }
 
 export const VAR_TEMPLATES: Array<{ category: string; vars: string[] }> = [

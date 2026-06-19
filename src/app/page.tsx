@@ -11,116 +11,97 @@ import {
   GitBranch,
   Globe,
   KeyRound,
+  ArrowRight,
 } from "lucide-react"
 
 const tools = [
   {
-    num: "01",
     name: "Sub Sheriff",
-    description: "Scan your email for every subscription you're paying for. Find forgotten charges, duplicates, and what to cancel. One screen, full picture.",
+    description: "Scan your email for every subscription you're paying for. Find forgotten charges, duplicates, and what to cancel.",
     icon: CreditCard,
     href: "/tools/sub-sheriff",
     badge: "Finance",
     color: "text-red-500",
     bgColor: "bg-red-50 dark:bg-red-950",
     borderColor: "border-t-red-500",
-    status: "live",
   },
   {
-    num: "02",
     name: "Invoice Zero",
-    description: "Freelance invoice in 60 seconds. Quote → PDF → Stripe payment link → paid. No accounting bloat.",
+    description: "Create and send professional invoices in under 60 seconds. Track payments, manage clients, download PDFs.",
     icon: FileText,
     href: "/tools/invoice-zero",
     badge: "Finance",
     color: "text-green-500",
     bgColor: "bg-green-50 dark:bg-green-950",
     borderColor: "border-t-green-500",
-    status: "live",
   },
   {
-    num: "03",
     name: "OG Craft",
-    description: "Design OG images and preview exactly how any URL looks when shared on Twitter, LinkedIn, Discord, WhatsApp, and iMessage.",
+    description: "Design OG images and preview how any URL looks when shared on Twitter, LinkedIn, Discord, WhatsApp, and more.",
     icon: Image,
     href: "/tools/og-craft",
     badge: "Launch",
     color: "text-purple-500",
     bgColor: "bg-purple-50 dark:bg-purple-950",
     borderColor: "border-t-purple-500",
-    status: "live",
   },
   {
-    num: "04",
     name: "Launch Pad",
-    description: "Describe your product once. Get a PH listing, HN post, tweet thread, Reddit post, and cold email — all ready to copy-paste.",
+    description: "Describe your product once. Get a PH listing, HN post, tweet thread, Reddit post, LinkedIn post, and cold email.",
     icon: Rocket,
     href: "/tools/launch-pad",
     badge: "Launch",
     color: "text-orange-500",
     bgColor: "bg-orange-50 dark:bg-orange-950",
     borderColor: "border-t-orange-500",
-    status: "live",
   },
   {
-    num: "05",
     name: "Idea Sniper",
-    description: "Find real Reddit posts, HN threads, and tweets of people actively complaining about your problem before you build anything.",
+    description: "Validate your idea before building. Find real people with your problem, score market pain, map competitors.",
     icon: Target,
     href: "/tools/idea-sniper",
     badge: "Research",
     color: "text-yellow-500",
     bgColor: "bg-yellow-50 dark:bg-yellow-950",
     borderColor: "border-t-yellow-500",
-    status: "live",
   },
   {
-    num: "06",
     name: "Changelog AI",
-    description: "Connect GitHub → AI writes user-facing release notes from commits → publish to GitHub Releases, email list, and embeddable widget.",
+    description: "Paste your git log. AI writes user-facing release notes grouped by type. Publish to Markdown, email, or GitHub.",
     icon: GitBranch,
     href: "/tools/changelog-ai",
     badge: "Dev Tool",
     color: "text-blue-500",
     bgColor: "bg-blue-50 dark:bg-blue-950",
     borderColor: "border-t-blue-500",
-    status: "live",
   },
   {
-    num: "07",
     name: "DNS Desk",
-    description: "All your domains from Cloudflare, Namecheap, GoDaddy, and Vercel in one dashboard. Visual DNS editor, expiry alerts, subdomain map.",
+    description: "All your domains in one dashboard. Visual DNS editor, expiry alerts, propagation checker, health monitor.",
     icon: Globe,
     href: "/tools/dns-desk",
     badge: "Dev Tool",
     color: "text-cyan-500",
     bgColor: "bg-cyan-50 dark:bg-cyan-950",
     borderColor: "border-t-cyan-500",
-    status: "live",
   },
   {
-    num: "08",
     name: "Env Manager",
-    description: "Visual .env editor across all projects. Sync to Vercel, Railway, and Fly.io with one click. Share secrets securely. Never lose a credential.",
+    description: "Manage environment variables across projects and environments. Sync to Vercel, Railway, and Fly.io in one click.",
     icon: KeyRound,
     href: "/tools/env-manager",
     badge: "Dev Tool",
     color: "text-indigo-500",
     bgColor: "bg-indigo-50 dark:bg-indigo-950",
     borderColor: "border-t-indigo-500",
-    status: "live",
   },
 ]
 
-const heroPills = [
-  "Sub Sheriff",
-  "Invoice Zero",
-  "OG Craft",
-  "Launch Pad",
-  "Idea Sniper",
-  "Changelog AI",
-  "DNS Desk",
-  "Env Manager",
+const categories = [
+  { label: "Finance", color: "bg-green-500/10 text-green-600 dark:text-green-400" },
+  { label: "Launch", color: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  { label: "Research", color: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400" },
+  { label: "Dev Tools", color: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
 ]
 
 export default function Home() {
@@ -129,103 +110,110 @@ export default function Home() {
       <Header />
 
       <main className="flex-1">
-        {/* Hero — dark section */}
-        <section className="bg-[#0a0a0a] text-white">
-          <div className="max-w-6xl mx-auto px-4 py-20 md:py-32 text-center">
-            <p className="text-xs font-mono tracking-widest uppercase text-white/40 mb-6">
-              TOOLBOX
-            </p>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.08]">
-              8 tools you'll actually use.
+        {/* Hero */}
+        <section className="relative bg-[#0a0a0a] text-white overflow-hidden">
+          {/* Subtle grid background */}
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
+              backgroundSize: "72px 72px",
+            }}
+          />
+          {/* Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-white/[0.03] rounded-full blur-3xl" />
+
+          <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-40 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/50 mb-8">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              Tools that slot into your workflow
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.05]">
+              The developer{" "}
+              <span className="text-white/30">toolkit</span>
+              <br />
+              that actually ships.
             </h1>
-            <p className="text-lg md:text-xl text-white/50 max-w-xl mx-auto mb-10 leading-relaxed">
-              Built for developers and solo builders. Each one slots into something you already do.
+
+            <p className="text-base md:text-lg text-white/40 max-w-lg mx-auto mb-12 leading-relaxed">
+              Purpose-built tools for the things you do every week — invoicing, launching, validating, shipping.
             </p>
-            {/* Pill badges */}
-            <div className="flex flex-wrap justify-center gap-2">
-              {heroPills.map((pill) => (
+
+            {/* Category pills */}
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {categories.map((cat) => (
                 <span
-                  key={pill}
-                  className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/60 backdrop-blur-sm"
+                  key={cat.label}
+                  className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/50"
                 >
-                  {pill}
+                  {cat.label}
                 </span>
               ))}
             </div>
+
+            <p className="text-xs text-white/20 tracking-wider">
+              More tools added regularly
+            </p>
           </div>
         </section>
 
-        {/* Tool grid — light section */}
+        {/* Tool grid */}
         <section className="bg-background">
-          <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="max-w-7xl mx-auto px-4 py-16 md:py-20">
+            <div className="flex items-end justify-between mb-10">
+              <div>
+                <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-2">Tools</p>
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Built for what you already do</h2>
+              </div>
+              <p className="hidden sm:block text-sm text-muted-foreground">
+                {tools.length} tools available
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {tools.map((tool) =>
-                tool.status === "live" ? (
-                  <Link key={tool.name} href={tool.href} className="group">
-                    <Card
-                      className={`h-full transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col border-t-2 ${tool.borderColor}`}
-                    >
-                      <CardHeader className="flex-1">
-                        <div className="flex items-start justify-between mb-3">
-                          <div
-                            className={`relative w-11 h-11 rounded-lg ${tool.bgColor} flex items-center justify-center`}
-                          >
-                            <tool.icon className={`w-5 h-5 ${tool.color}`} />
-                            <span className="absolute -top-1.5 -right-1.5 text-[9px] font-mono text-muted-foreground bg-background border border-border rounded px-0.5 leading-tight">
-                              {tool.num}
-                            </span>
-                          </div>
+              {tools.map((tool) => (
+                <Link key={tool.name} href={tool.href} className="group">
+                  <Card
+                    className={`h-full transition-all duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col border-t-2 ${tool.borderColor}`}
+                  >
+                    <CardHeader className="flex-1">
+                      <div className="mb-4">
+                        <div
+                          className={`w-10 h-10 rounded-lg ${tool.bgColor} flex items-center justify-center`}
+                        >
+                          <tool.icon className={`w-5 h-5 ${tool.color}`} />
                         </div>
-                        <CardTitle className="text-base">{tool.name}</CardTitle>
-                        <CardDescription className="text-sm leading-relaxed">
-                          {tool.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <div className="px-(--card-spacing) pb-(--card-spacing)">
-                        <Badge variant="secondary">{tool.badge}</Badge>
                       </div>
-                    </Card>
-                  </Link>
-                ) : (
-                  <div key={tool.name} className="cursor-not-allowed">
-                    <Card
-                      className={`h-full flex flex-col border-t-2 ${tool.borderColor} opacity-50 grayscale`}
-                    >
-                      <CardHeader className="flex-1">
-                        <div className="flex items-start justify-between mb-3">
-                          <div
-                            className={`relative w-11 h-11 rounded-lg ${tool.bgColor} flex items-center justify-center`}
-                          >
-                            <tool.icon className={`w-5 h-5 ${tool.color}`} />
-                            <span className="absolute -top-1.5 -right-1.5 text-[9px] font-mono text-muted-foreground bg-background border border-border rounded px-0.5 leading-tight">
-                              {tool.num}
-                            </span>
-                          </div>
-                        </div>
-                        <CardTitle className="text-base">{tool.name}</CardTitle>
-                        <CardDescription className="text-sm leading-relaxed">
-                          {tool.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <div className="flex gap-2 px-(--card-spacing) pb-(--card-spacing)">
-                        <Badge variant="secondary">{tool.badge}</Badge>
-                        <Badge variant="outline" className="text-muted-foreground">
-                          Coming soon
-                        </Badge>
-                      </div>
-                    </Card>
-                  </div>
-                )
-              )}
+                      <CardTitle className="text-base font-semibold flex items-center justify-between">
+                        {tool.name}
+                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                      </CardTitle>
+                      <CardDescription className="text-sm leading-relaxed mt-1">
+                        {tool.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <div className="px-(--card-spacing) pb-(--card-spacing)">
+                      <Badge variant="secondary" className="text-xs">{tool.badge}</Badge>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t py-8">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
-          <span className="font-medium">Toolbox</span>
-          <span>8 tools for developers who ship.</span>
+      <footer className="border-t py-8 bg-background">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-foreground">Toolbox</span>
+            <span className="text-muted-foreground/40">·</span>
+            <span>Built for developers who ship</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xs">{tools.length} tools · More coming</span>
+          </div>
         </div>
       </footer>
     </div>

@@ -14,6 +14,19 @@ export interface Competitor {
   pricing: string
 }
 
+export interface TamEstimate {
+  addressableUniverse: string
+  avgWillingnessToPay: number
+  annualTam: string
+  reasoning: string
+}
+
+export interface PivotSuggestion {
+  angle: string
+  reasoning: string
+  targetAudience: string
+}
+
 export interface IdeaAnalysis {
   idea: string
   painScore: number
@@ -26,6 +39,7 @@ export interface IdeaAnalysis {
   }>
   personas: PersonaPain[]
   competitors: Competitor[]
+  competitionStrength: "weak" | "moderate" | "strong" | "very-strong"
   verdict: "go" | "no-go" | "pivot"
   verdictReasoning: string
   whereTofindCustomers: Array<{
@@ -35,6 +49,9 @@ export interface IdeaAnalysis {
   }>
   exactLanguage: string[]
   outreachMessage: string
+  tamEstimate: TamEstimate
+  pivotSuggestions: PivotSuggestion[]
+  relatedIdeas: string[]
 }
 
 export interface IdeaRecord {

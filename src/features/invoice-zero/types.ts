@@ -2,6 +2,10 @@ export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue"
 
 export type Currency = "USD" | "EUR" | "GBP" | "INR" | "CAD" | "AUD"
 
+export type InvoiceTemplate = "classic" | "modern" | "minimal"
+
+export type RecurringInterval = "weekly" | "monthly" | "quarterly" | null
+
 export interface LineItem {
   id: string
   description: string
@@ -14,6 +18,16 @@ export interface Client {
   email: string
   address?: string
   company?: string
+}
+
+export interface Expense {
+  id: string
+  description: string
+  amount: number
+  date: string       // YYYY-MM-DD
+  category: string
+  project?: string
+  createdAt: string
 }
 
 export interface Invoice {
@@ -34,6 +48,10 @@ export interface Invoice {
   notes: string
   paymentTerms: string
   paidDate?: string
+  reminderSentAt?: string
+  template?: InvoiceTemplate
+  isTemplate?: boolean
+  recurringInterval?: RecurringInterval
   createdAt: string
   updatedAt: string
 }
@@ -53,6 +71,19 @@ export const CURRENCY_SYMBOLS: Record<Currency, string> = {
   CAD: "CA$",
   AUD: "A$",
 }
+
+export const EXPENSE_CATEGORIES = [
+  "Software & Tools",
+  "Hardware",
+  "Marketing",
+  "Travel",
+  "Office",
+  "Contractors",
+  "Legal & Finance",
+  "Other",
+] as const
+
+export type ExpenseCategory = typeof EXPENSE_CATEGORIES[number]
 
 export function calculateInvoiceTotals(invoice: Pick<Invoice, "lineItems" | "discountType" | "discountValue" | "taxRate">): InvoiceTotals {
   const subtotal = invoice.lineItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
@@ -93,9 +124,31 @@ export function isOverdue(invoice: Invoice): boolean {
   return new Date(invoice.dueDate) < new Date()
 }
 
-export const STATUS_META: Record<InvoiceStatus, { label: string; color: string; bg: string }> = {
-  draft:   { label: "Draft",   color: "text-gray-600",  bg: "bg-gray-100 dark:bg-gray-800" },
-  sent:    { label: "Sent",    color: "text-blue-600",  bg: "bg-blue-100 dark:bg-blue-900/40" },
-  paid:    { label: "Paid",    color: "text-green-600", bg: "bg-green-100 dark:bg-green-900/40" },
-  overdue: { label: "Overdue", color: "text-red-600",   bg: "bg-red-100 dark:bg-red-900/40" },
+export function daysSince(dateStr: string): number {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)))
+}
+
+export function daysOverdue(invoice: Invoice): number {
+  if (invoice.status !== "overdue") return 0
+  return daysSince(invoice.dueDate)
+}
+
+export function avgDaysToPayment(invoices: Invoice[]): number | null {
+  const paid = invoices.filter((i) => i.status === "paid" && i.paidDate)
+  if (paid.length === 0) return null
+  const total = paid.reduce((sum, i) => {
+    const days = Math.floor(
+      (new Date(i.paidDate!).getTime() - new Date(i.issueDate).getTime()) / (1000 * 60 * 60 * 24)
+    )
+    return sum + days
+  }, 0)
+  return Math.round(total / paid.length)
+}
+
+export const STATUS_META: Record<InvoiceStatus, { label: string; color: string; bg: string; borderColor: string }> = {
+  draft:   { label: "Draft",   color: "text-gray-600",  bg: "bg-gray-100 dark:bg-gray-800",       borderColor: "border-l-gray-400" },
+  sent:    { label: "Sent",    color: "text-blue-600",  bg: "bg-blue-100 dark:bg-blue-900/40",     borderColor: "border-l-blue-500" },
+  paid:    { label: "Paid",    color: "text-green-600", bg: "bg-green-100 dark:bg-green-900/40",   borderColor: "border-l-green-500" },
+  overdue: { label: "Overdue", color: "text-red-600",   bg: "bg-red-100 dark:bg-red-900/40",       borderColor: "border-l-red-500" },
 }

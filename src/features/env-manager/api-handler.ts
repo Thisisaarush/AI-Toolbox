@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
+import { parseEnvFile } from "./types"
 
 const limiter = rateLimit({ max: 10, windowMs: 60000 })
 
@@ -113,12 +114,72 @@ export async function POST(req: Request) {
         })
         if (!res.ok) {
           const err = await res.json().catch(() => ({}))
-          throw new ApiError(err?.message ?? `Fly.io API error (${res.status})`, 422)
+          throw new ApiError((err as { message?: string })?.message ?? `Fly.io API error (${res.status})`, 422)
         }
         return NextResponse.json({ ok: true, summary: `${envVars.length} variables synced to Fly.io` })
       } catch (err: unknown) {
         if (err instanceof ApiError) throw err
         throw new ApiError("Fly.io sync failed: " + (err instanceof Error ? err.message : "Unknown"), 422)
+      }
+    }
+
+    if (action === "import-url") {
+      const { url } = body
+      if (!url || typeof url !== "string") throw new ApiError("url required", 400)
+
+      // Validate it's a real URL
+      let parsedUrl: URL
+      try {
+        parsedUrl = new URL(url)
+      } catch {
+        throw new ApiError("Invalid URL", 400)
+      }
+
+      // Only allow http/https
+      if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+        throw new ApiError("Only http/https URLs are supported", 400)
+      }
+
+      try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 10000)
+
+        const res = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            "Accept": "text/plain, text/x-dotenv, */*",
+            "User-Agent": "env-manager/1.0",
+          },
+        })
+        clearTimeout(timeout)
+
+        if (!res.ok) {
+          throw new ApiError(`Remote URL responded with ${res.status}`, 422)
+        }
+
+        const contentType = res.headers.get("content-type") ?? ""
+        // Sanity check: reject obvious non-text responses
+        if (contentType.includes("application/json") || contentType.includes("text/html")) {
+          throw new ApiError("URL does not appear to contain a .env file (got HTML/JSON)", 422)
+        }
+
+        const text = await res.text()
+        if (text.length > 100_000) {
+          throw new ApiError("File too large (max 100KB)", 422)
+        }
+
+        const vars = parseEnvFile(text)
+        if (vars.length === 0) {
+          throw new ApiError("No environment variables found in the remote file", 422)
+        }
+
+        return NextResponse.json({ ok: true, vars, count: vars.length })
+      } catch (err: unknown) {
+        if (err instanceof ApiError) throw err
+        throw new ApiError(
+          "Failed to fetch remote URL: " + (err instanceof Error ? err.message : "Unknown error"),
+          422
+        )
       }
     }
 

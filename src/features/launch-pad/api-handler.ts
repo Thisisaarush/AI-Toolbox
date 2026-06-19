@@ -3,7 +3,8 @@ import { auth } from "@clerk/nextjs/server"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import type { LaunchInput, LaunchOutput } from "./types"
+import type { LaunchInput, LaunchOutput, CompetitorResearch, EmailSubjectLine } from "./types"
+import { scoreSubjectLine } from "./types"
 
 const aiLimiter = rateLimit({ max: 5, windowMs: 60000 })
 
@@ -17,24 +18,138 @@ export async function POST(req: Request) {
 
     const body = await req.json()
     const { action } = body
-    if (action !== "generate" && action !== "regenerate-platform") throw new ApiError(`Unknown action: ${action}`, 400)
 
+    const KNOWN_ACTIONS = ["generate", "regenerate-platform", "competitor-research", "generate-subject-lines"]
+    if (!KNOWN_ACTIONS.includes(action)) throw new ApiError(`Unknown action: ${action}`, 400)
+
+    const key = process.env.GEMINI_API_KEY
+    if (!key) throw new ApiError("AI not configured", 503)
+    const genAI = new GoogleGenerativeAI(key)
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
+
+    // ── COMPETITOR RESEARCH ────────────────────────────────────────────────
+    if (action === "competitor-research") {
+      const { productName, category } = body as { productName: string; category: string }
+      if (!productName) throw new ApiError("productName required", 400)
+      if (!category) throw new ApiError("category required", 400)
+
+      const prompt = `You are a startup market researcher. Research competitors for this product.
+
+Product: ${productName}
+Category: ${category}
+
+Return a JSON object with this exact structure:
+{
+  "competitors": [
+    {
+      "name": "CompetitorName",
+      "url": "https://example.com",
+      "pricingModel": "Freemium / SaaS / One-time / Open Source / etc",
+      "keyDifferentiator": "One sentence on what makes them stand out",
+      "weakness": "One sentence on their main weakness"
+    }
+  ],
+  "positioningAngles": [
+    "Angle 1: one sentence positioning statement",
+    "Angle 2: one sentence positioning statement",
+    "Angle 3: one sentence positioning statement"
+  ],
+  "suggestedUVP": "One clear sentence unique value proposition for ${productName} vs these competitors"
+}
+
+List exactly 5 real or plausible competitors. Base responses on real market knowledge.
+Return only valid JSON, no markdown fences.`
+
+      try {
+        const result = await model.generateContent(prompt)
+        const text = result.response.text().replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+        const research: Omit<CompetitorResearch, "generatedAt"> = JSON.parse(text)
+        const data: CompetitorResearch = { ...research, generatedAt: new Date().toISOString() }
+        return NextResponse.json({ ok: true, data })
+      } catch {
+        const fallback: CompetitorResearch = {
+          competitors: [
+            { name: "Competitor A", url: "https://example.com", pricingModel: "Freemium", keyDifferentiator: "Market leader with broad integrations", weakness: "Complex UX, expensive at scale" },
+            { name: "Competitor B", url: "https://example.com", pricingModel: "SaaS", keyDifferentiator: "Strong analytics features", weakness: "Lacks mobile app" },
+            { name: "Competitor C", url: "https://example.com", pricingModel: "One-time", keyDifferentiator: "Simple and affordable", weakness: "Limited customization" },
+            { name: "Competitor D", url: "https://example.com", pricingModel: "Open Source", keyDifferentiator: "Self-hostable, developer-friendly", weakness: "Requires technical setup" },
+            { name: "Competitor E", url: "https://example.com", pricingModel: "Freemium", keyDifferentiator: "Strong community and templates", weakness: "Slow to ship new features" },
+          ],
+          positioningAngles: [
+            "Focus on ease of use — get started in minutes, not hours",
+            "Target a specific niche that incumbents ignore",
+            "Offer transparent, predictable pricing unlike the competition",
+          ],
+          suggestedUVP: `${productName} is the only tool in ${category} that combines simplicity with power — without the enterprise price tag.`,
+          generatedAt: new Date().toISOString(),
+        }
+        return NextResponse.json({ ok: true, data: fallback })
+      }
+    }
+
+    // ── GENERATE EMAIL SUBJECT LINES ─────────────────────────────────────
+    if (action === "generate-subject-lines") {
+      const { productName, targetAudience, currentSubject } = body as {
+        productName: string
+        targetAudience: string
+        currentSubject: string
+      }
+      if (!productName) throw new ApiError("productName required", 400)
+
+      const prompt = `You are an email marketing expert. Generate 3 alternative cold email subject lines for:
+
+Product: ${productName}
+Target audience: ${targetAudience || "professionals"}
+Current subject: ${currentSubject || "(none)"}
+
+Requirements:
+- Each under 50 characters
+- Variety: one curiosity-gap, one benefit-led, one personalization angle
+- Do NOT repeat the current subject
+
+Return JSON array:
+[
+  { "subject": "...", "reason": "why this works (one sentence)" },
+  { "subject": "...", "reason": "why this works (one sentence)" },
+  { "subject": "...", "reason": "why this works (one sentence)" }
+]
+
+Only return valid JSON, no markdown.`
+
+      try {
+        const result = await model.generateContent(prompt)
+        const text = result.response.text().replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+        const raw: Array<{ subject: string; reason: string }> = JSON.parse(text)
+        const items: EmailSubjectLine[] = raw.map((r) => ({
+          subject: r.subject,
+          reason: r.reason,
+          openRateLabel: scoreSubjectLine(r.subject),
+        }))
+        return NextResponse.json({ ok: true, items })
+      } catch {
+        const fallback: EmailSubjectLine[] = [
+          { subject: `Quick question about ${productName}`, openRateLabel: "Medium", reason: "Curiosity-gap approach feels personal" },
+          { subject: `Save hours with ${productName}`, openRateLabel: "High", reason: "Benefit-led with a power word" },
+          { subject: `[Name], have you seen this?`, openRateLabel: "High", reason: "Personalization + curiosity drives opens" },
+        ]
+        return NextResponse.json({ ok: true, items: fallback })
+      }
+    }
+
+    // ── REQUIRE input FOR REMAINING ACTIONS ───────────────────────────────
     const input: LaunchInput = body.input
     if (!input?.productName) throw new ApiError("productName required", 400)
 
-    // Handle single-platform regeneration
+    const toneGuide = {
+      professional: "Use polished, business-appropriate language. Avoid hype.",
+      casual: "Be friendly, conversational, like talking to a friend. Use 'you' and 'we'.",
+      technical: "Lead with technical details. Assume a developer audience. Be precise.",
+      excited: "High energy! Use exclamation points (sparingly). Show genuine enthusiasm.",
+    }[input.tone] ?? ""
+
+    // ── REGENERATE PLATFORM ────────────────────────────────────────────────
     if (action === "regenerate-platform") {
       const platform: string = body.platform ?? ""
-      const key = process.env.GEMINI_API_KEY
-      if (!key) throw new ApiError("AI not configured", 503)
-      const genAI = new GoogleGenerativeAI(key)
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
-      const toneGuide = {
-        professional: "Use polished, business-appropriate language. Avoid hype.",
-        casual: "Be friendly, conversational, like talking to a friend. Use 'you' and 'we'.",
-        technical: "Lead with technical details. Assume a developer audience. Be precise.",
-        excited: "High energy! Use exclamation points (sparingly). Show genuine enthusiasm.",
-      }[input.tone] ?? ""
       const platformPrompts: Record<string, string> = {
         ph: `Generate a Product Hunt listing JSON: { "productHunt": { "name": "...", "tagline": "max 60 chars", "description": "max 260 chars", "firstComment": "200-300 words" } }`,
         hn: `Generate a Hacker News Show HN JSON: { "hackerNews": { "title": "Show HN: [Name] – [one-liner]", "body": "150-250 words, honest, no marketing speak" } }`,
@@ -56,19 +171,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const key = process.env.GEMINI_API_KEY
-    if (!key) throw new ApiError("AI not configured", 503)
-
-    const genAI = new GoogleGenerativeAI(key)
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
-
-    const toneGuide = {
-      professional: "Use polished, business-appropriate language. Avoid hype.",
-      casual: "Be friendly, conversational, like talking to a friend. Use 'you' and 'we'.",
-      technical: "Lead with technical details. Assume a developer audience. Be precise.",
-      excited: "High energy! Use exclamation points (sparingly). Show genuine enthusiasm.",
-    }[input.tone] ?? ""
-
+    // ── GENERATE ALL ──────────────────────────────────────────────────────
     const prompt = `You are a startup launch copywriter. Generate launch copy for ALL 5 platforms at once.
 
 Product: ${input.productName}
@@ -124,7 +227,6 @@ IMPORTANT:
       const output: LaunchOutput = JSON.parse(text)
       return NextResponse.json({ ok: true, output })
     } catch {
-      // Fallback structure
       const fallback: LaunchOutput = {
         productHunt: {
           name: input.productName,

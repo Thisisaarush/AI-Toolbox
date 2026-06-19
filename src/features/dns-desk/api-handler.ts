@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
-import type { DNSRecord, PropagationResult, RecordType } from "./types"
+import type { DNSRecord, PropagationResult, RecordType, SSLInfo, WhoisInfo } from "./types"
 
 const limiter = rateLimit({ max: 20, windowMs: 60000 })
 
@@ -49,6 +49,17 @@ async function queryDoH(resolver: string, domain: string, type: string): Promise
     clearTimeout(timeout)
     return []
   }
+}
+
+// crt.sh certificate transparency response type
+interface CrtShEntry {
+  issuer_ca_id?: number
+  issuer_name?: string
+  common_name?: string
+  name_value?: string
+  not_before?: string
+  not_after?: string
+  entry_timestamp?: string
 }
 
 export async function POST(req: Request) {
@@ -98,7 +109,7 @@ export async function POST(req: Request) {
       const { domain } = body
       if (!domain) throw new ApiError("domain required", 400)
 
-      let cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "")
+      const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "")
 
       const [httpOk, wwwOk, aRecords, mxRecords] = await Promise.all([
         fetch(`https://${cleanDomain}`, { method: "HEAD" }).then((r) => ({ ok: r.ok, status: r.status })).catch(() => ({ ok: false, status: 0 })),
@@ -121,6 +132,155 @@ export async function POST(req: Request) {
           mxRecords,
         },
       })
+    }
+
+    if (action === "check-ssl") {
+      const { domain } = body
+      if (!domain) throw new ApiError("domain required", 400)
+
+      const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "")
+
+      try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 8000)
+
+        const res = await fetch(
+          `https://crt.sh/?q=${encodeURIComponent(cleanDomain)}&output=json`,
+          {
+            signal: controller.signal,
+            headers: { "Accept": "application/json" },
+          }
+        )
+        clearTimeout(timeout)
+
+        if (!res.ok) {
+          throw new Error(`crt.sh responded with ${res.status}`)
+        }
+
+        const certs: CrtShEntry[] = await res.json()
+
+        // Find the most recent non-wildcard/non-precert cert for this exact domain
+        const now = new Date()
+        const relevant = certs
+          .filter((c) => {
+            const cn = (c.common_name ?? "").toLowerCase()
+            const nameVal = (c.name_value ?? "").toLowerCase()
+            const domainLower = cleanDomain.toLowerCase()
+            return cn === domainLower || nameVal.includes(domainLower)
+          })
+          .filter((c) => c.not_after)
+          .sort((a, b) => {
+            const dateA = a.not_after ? new Date(a.not_after).getTime() : 0
+            const dateB = b.not_after ? new Date(b.not_after).getTime() : 0
+            return dateB - dateA
+          })
+
+        if (relevant.length === 0) {
+          return NextResponse.json({
+            ok: true,
+            ssl: null,
+            message: "No certificates found in transparency logs",
+          })
+        }
+
+        const latest = relevant[0]
+        if (!latest) {
+          return NextResponse.json({ error: true, message: "No certificates found in transparency logs" })
+        }
+        const validTo = latest.not_after ? new Date(latest.not_after) : null
+        const validFrom = latest.not_before ? new Date(latest.not_before) : null
+        const daysUntilExpiry = validTo
+          ? Math.ceil((validTo.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+          : 0
+
+        const sslInfo: SSLInfo = {
+          issuer: latest.issuer_name ?? "Unknown",
+          validFrom: validFrom ? validFrom.toISOString() : "",
+          validTo: validTo ? validTo.toISOString() : "",
+          daysUntilExpiry,
+          isValid: validTo ? validTo > now : false,
+          certName: latest.common_name ?? cleanDomain,
+        }
+
+        return NextResponse.json({ ok: true, ssl: sslInfo })
+      } catch (err: unknown) {
+        if (err instanceof ApiError) throw err
+        return NextResponse.json({
+          ok: true,
+          ssl: null,
+          message: "Could not retrieve certificate data: " + (err instanceof Error ? err.message : "Unknown error"),
+        })
+      }
+    }
+
+    if (action === "whois") {
+      const { domain } = body
+      if (!domain) throw new ApiError("domain required", 400)
+
+      const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "")
+      const whoisUrl = `https://who.is/whois/${encodeURIComponent(cleanDomain)}`
+
+      try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 6000)
+
+        const res = await fetch(
+          `https://jsonwhois.com/api/whois?domain=${encodeURIComponent(cleanDomain)}`,
+          {
+            signal: controller.signal,
+            headers: { "Accept": "application/json" },
+          }
+        )
+        clearTimeout(timeout)
+
+        if (!res.ok) {
+          // Fallback: return link to who.is
+          const info: WhoisInfo = { whoisUrl }
+          return NextResponse.json({ ok: true, whois: info })
+        }
+
+        const data = await res.json()
+
+        const nameServers: string[] = []
+        if (Array.isArray(data.nameservers)) {
+          for (const ns of data.nameservers) {
+            if (typeof ns === "string") nameServers.push(ns)
+            else if (ns?.name) nameServers.push(ns.name as string)
+          }
+        }
+
+        const info: WhoisInfo = {
+          registrar: (data.registrar?.name as string | undefined) ?? (data.registrar as string | undefined),
+          creationDate: (data.created_on as string | undefined) ?? (data.creation_date as string | undefined),
+          expiryDate: (data.expires_on as string | undefined) ?? (data.expiration_date as string | undefined),
+          nameServers: nameServers.length > 0 ? nameServers : undefined,
+          whoisUrl,
+          raw: typeof data.raw === "string" ? (data.raw as string).slice(0, 2000) : undefined,
+        }
+
+        return NextResponse.json({ ok: true, whois: info })
+      } catch {
+        // Always return at minimum a link to who.is
+        const info: WhoisInfo = { whoisUrl }
+        return NextResponse.json({ ok: true, whois: info })
+      }
+    }
+
+    if (action === "reverse-dns") {
+      const { ip: ipAddress } = body
+      if (!ipAddress) throw new ApiError("ip required", 400)
+
+      const parts = String(ipAddress).split(".")
+      if (parts.length !== 4) throw new ApiError("Invalid IPv4 address", 400)
+      const reversed = parts.reverse().join(".")
+      const ptrDomain = `${reversed}.in-addr.arpa`
+
+      try {
+        const answers = await queryDoH("8.8.8.8", ptrDomain, "PTR")
+        return NextResponse.json({ ok: true, ptr: answers[0] ?? null, ptrDomain })
+      } catch {
+        return NextResponse.json({ ok: true, ptr: null, ptrDomain })
+      }
     }
 
     if (action === "cloudflare-import") {

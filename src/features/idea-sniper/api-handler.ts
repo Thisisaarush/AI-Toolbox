@@ -65,6 +65,7 @@ Return a single JSON object with EXACTLY this structure:
       "pricing": "string"
     }
   ],
+  "competitionStrength": "weak | moderate | strong | very-strong (assess the overall competitive landscape density)",
   "verdict": "go | no-go | pivot",
   "verdictReasoning": "string (3-5 sentences with specific reasoning)",
   "whereTofindCustomers": [
@@ -77,7 +78,23 @@ Return a single JSON object with EXACTLY this structure:
   "exactLanguage": [
     "string (exact phrase people use when describing this pain, useful for landing page copy)"
   ],
-  "outreachMessage": "string (copy-paste Reddit/community DM to find potential users, 100-150 words)"
+  "outreachMessage": "string (copy-paste Reddit/community DM to find potential users, 100-150 words)",
+  "tamEstimate": {
+    "addressableUniverse": "string (e.g. '~2.5M developers in the US who regularly write backend APIs')",
+    "avgWillingnessToPay": number (monthly USD average across personas, e.g. 25),
+    "annualTam": "string (pre-formatted, e.g. '$750M' — calculated as universe count * avgWTP * 12, show your work in reasoning)",
+    "reasoning": "string (2-3 sentences explaining the TAM calculation assumptions)"
+  },
+  "pivotSuggestions": [
+    {
+      "angle": "string (the pivot idea in one sentence)",
+      "reasoning": "string (why this pivot addresses the core weakness)",
+      "targetAudience": "string (who this pivot targets)"
+    }
+  ],
+  "relatedIdeas": [
+    "string (5 adjacent idea angles — not the same idea, but related problems or variations the user could analyze next)"
+  ]
 }
 
 Rules:
@@ -86,7 +103,11 @@ Rules:
 - competitors must have 3-5 known tools (include well-known ones even if imperfect alternatives)
 - exactLanguage must have 6-8 phrases
 - whereTofindCustomers must have 5-8 communities
+- pivotSuggestions must have exactly 3 items (always include regardless of verdict — they're always useful)
+- relatedIdeas must have exactly 5 items
+- tamEstimate.annualTam = addressable universe number * avgWillingnessToPay * 12, formatted as currency string
 - Be brutally honest about go/no-go - don't sugarcoat
+- competitionStrength: "weak" means few/poor alternatives, "very-strong" means highly saturated market
 - Only return valid JSON, no markdown`
 
     try {
@@ -103,11 +124,30 @@ Rules:
         communitySignals: [{ platform: "Reddit (AI-synthesized)", simulatedQuote: `"I've been struggling with exactly this problem for months. Can't believe there's no good solution."`, sentiment: "frustrated" }],
         personas: [{ jobTitle: "Developer", context: "Regular workflow", frequency: "weekly", workaround: "Manual process", willingToPay: "$10-50/mo" }],
         competitors: [{ name: "Generic Competitor", description: "Partial solution", pros: ["Established"], cons: ["Missing key features"], pricing: "Unknown" }],
+        competitionStrength: "moderate",
         verdict: "go",
         verdictReasoning: "Could not complete full analysis. Try again with more specific idea description.",
         whereTofindCustomers: [{ type: "subreddit", name: "r/entrepreneur", link: "https://reddit.com/r/entrepreneur" }],
         exactLanguage: ["I can't find a good way to...", "Why is there no tool for..."],
         outreachMessage: `Hi! I'm building a solution for [problem]. Would love to chat for 10 minutes about your experience with [pain point]. No pitch, just research. DM me if interested!`,
+        tamEstimate: {
+          addressableUniverse: "~1M potential users",
+          avgWillingnessToPay: 20,
+          annualTam: "$240M",
+          reasoning: "Rough estimate based on typical market size for this problem space. Re-run for more accurate analysis.",
+        },
+        pivotSuggestions: [
+          { angle: "Narrow to a specific vertical", reasoning: "A focused niche has less competition and clearer buyers", targetAudience: "Enterprise teams in one industry" },
+          { angle: "Solve an adjacent problem with less competition", reasoning: "Related pain point with fewer existing solutions", targetAudience: "Same audience, different workflow" },
+          { angle: "Build a workflow integration instead", reasoning: "Embedding into existing tools reduces friction to adoption", targetAudience: "Users of popular platforms in this space" },
+        ],
+        relatedIdeas: [
+          "Automated testing tool for this domain",
+          "Analytics dashboard for this use case",
+          "AI-assisted version of a manual workflow in this space",
+          "Collaboration tool for teams dealing with this pain",
+          "API or SDK that solves the underlying technical problem",
+        ],
       }
       return NextResponse.json({ ok: true, analysis: fallback })
     }
