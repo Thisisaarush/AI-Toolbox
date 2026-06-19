@@ -76,3 +76,41 @@ model VibeCheck {
 
   @@index([userId])
 }
+
+model DBSchema {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String   @default("Untitled Schema")
+  rawSchema String
+  tables    Json?
+  notes     String?
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model KnowledgeItem {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  content     String
+  contentType String   @default("note")
+  sourceUrl   String?
+  summary     String?
+  keyConcepts String[]
+  tags        String[]
+  code        String?
+  language    String?
+  reviewCount Int      @default(0)
+  nextReview  DateTime?
+  ease        Float    @default(2.5)
+  interval    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, tags])
+  @@index([userId, nextReview])
+}
