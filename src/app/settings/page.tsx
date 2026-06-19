@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { ArrowLeft, Sun, Moon, Globe, Shield, Trash2, Code2, Activity, BookOpen, CheckCircle2, Info, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -30,6 +30,7 @@ const CURRENCIES = [
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
   const { currency, setCurrency } = useCurrency()
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [githubUser, setGithubUser] = useState<string | null>(null)
   const [stravaUser, setStravaUser] = useState<string | null>(null)
@@ -94,9 +95,13 @@ export default function SettingsPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            onClick={() => router.back()}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Go back"
+          >
             <ArrowLeft className="w-4 h-4" />
-          </Link>
+          </button>
           <span className="font-semibold text-sm">Settings</span>
         </div>
       </header>
