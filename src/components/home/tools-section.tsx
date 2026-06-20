@@ -7,7 +7,7 @@ import { ArrowRight, Star, Search, X,
   Dumbbell, CheckCircle2, TrendingUp, Shield, Users, Plane,
   BookOpen, List, MessageSquare, Briefcase, Calendar, FileSignature,
   Scroll, Palette, Layout, Eye, Hammer, Sparkles, Brain, UserCheck,
-  Braces,
+  Braces, FilePlus, MessageCircle, Dices, Flame, Printer, Database,
 } from "lucide-react"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -50,7 +50,11 @@ const categories: Category[] = [
       { name: "Stalkr", description: "Research any brand or company. Score their name, sentiment, SEO keywords, HN mentions, and get actionable improvements.", icon: Eye, href: "/tools/stalkr", badge: "Research", color: "text-teal-500", bgColor: "bg-teal-50 dark:bg-teal-950", borderColor: "border-t-teal-500" },
       { name: "Build or Skip", description: "Pitch your idea and get a brutally honest verdict. For, against, risks, prediction, and pivot suggestions.", icon: Hammer, href: "/tools/build-or-skip", badge: "Research", color: "text-rose-500", bgColor: "bg-rose-50 dark:bg-rose-950", borderColor: "border-t-rose-500" },
       { name: "User Voice", description: "Simulate fake user interviews. Get 5 personas with honest reactions, feature requests, and willingness to pay.", icon: UserCheck, href: "/tools/user-voice", badge: "Research", color: "text-violet-500", bgColor: "bg-violet-50 dark:bg-violet-950", borderColor: "border-t-violet-500" },
+      { name: "Form Builder", description: "Drag-and-drop form builder with 15+ field types, multi-step forms, themes, conditional logic, and response analytics.", icon: FilePlus, href: "/tools/form-builder", badge: "Dev Tool", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
       { name: "JSON Studio", description: "Full-featured JSON editor with tree view, diff checker, schema generator, CSV converter, and deep search.", icon: Braces, href: "/tools/json-studio", badge: "Dev Tool", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
+      { name: "Color & Design Studio", description: "Color palette generator, contrast checker, gradient builder, and CSS export. Create harmonious color schemes in seconds.", icon: Palette, href: "/tools/color-studio", badge: "Dev Tool", color: "text-fuchsia-500", bgColor: "bg-fuchsia-50 dark:bg-fuchsia-950", borderColor: "border-t-fuchsia-500" },
+      { name: "Markdown Workspace", description: "Full-featured markdown editor with live preview, file management, toolbar, and export to HTML/markdown.", icon: FileText, href: "/tools/markdown-workspace", badge: "Dev Tool", color: "text-cyan-500", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
+      { name: "Fake It", description: "Generate realistic mock data for testing. Names, emails, phones, addresses, and more. Export as JSON or CSV.", icon: Database, href: "/tools/fake-it", badge: "Dev Tool", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-950", borderColor: "border-t-amber-500" },
     ],
   },
   {
@@ -66,6 +70,10 @@ const categories: Category[] = [
       { name: "Travel Docs", description: "Organize travel documents, visa requirements, and packing lists. Never miss a document for any trip.", icon: Plane, href: "/tools/travel-docs", badge: "Personal", color: "text-cyan-600", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
       { name: "Dev Health", description: "Pomodoro timer, daily health log, streak tracker, and weekly heatmap. Monitor sleep, energy, mood, and exercise.", icon: Brain, href: "/tools/dev-health", badge: "Personal", color: "text-indigo-400", bgColor: "bg-indigo-50 dark:bg-indigo-950", borderColor: "border-t-indigo-400" },
       { name: "Ship Tracker", description: "Create challenges, track daily progress, build streaks, and hold yourself accountable. With shame cards for missed days.", icon: Rocket, href: "/tools/ship-tracker", badge: "Personal", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-950", borderColor: "border-t-amber-500" },
+      { name: "Personal CRM", description: "Track contacts, log interactions, set follow-ups, and never forget a birthday. Your personal relationship manager.", icon: Users, href: "/tools/personal-crm", badge: "Personal", color: "text-sky-500", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
+      { name: "IndiePage", description: "Build a personal landing page with bio, links, social icons, and custom themes. Export as standalone HTML.", icon: Globe, href: "/tools/indiepage", badge: "Personal", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500" },
+      { name: "Chat with Anyone", description: "Simulate conversations with 7 different personas. Practice interviews, vent to a friend, or get career advice.", icon: MessageCircle, href: "/tools/chat-anyone", badge: "Personal", color: "text-pink-500", bgColor: "bg-pink-50 dark:bg-pink-950", borderColor: "border-t-pink-500" },
+      { name: "Visualize Habit", description: "Track habits with a GitHub-style heatmap, monthly calendar, weekly view, and detailed stats with streaks.", icon: Flame, href: "/tools/visualize-habit", badge: "Personal", color: "text-orange-500", bgColor: "bg-orange-50 dark:bg-orange-950", borderColor: "border-t-orange-500" },
     ],
   },
   {
@@ -76,6 +84,8 @@ const categories: Category[] = [
       { name: "Book Notes", description: "Capture highlights, summaries, and key takeaways from books. Search by title via Open Library. Import from Readwise.", icon: BookOpen, href: "/tools/book-notes", badge: "Education", color: "text-violet-500", bgColor: "bg-violet-50 dark:bg-violet-950", borderColor: "border-t-violet-500" },
       { name: "Reading List", description: "Manage your to-read list, track reading status, and log reading time. Sync highlights from Readwise.", icon: List, href: "/tools/reading-list", badge: "Education", color: "text-indigo-400", bgColor: "bg-indigo-50 dark:bg-indigo-950", borderColor: "border-t-indigo-400" },
       { name: "Interview Prep", description: "Practice behavioral and technical interview questions. Track answers with the STAR method, score yourself.", icon: MessageSquare, href: "/tools/interview-prep", badge: "Career", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-950", borderColor: "border-t-amber-500" },
+      { name: "Decision Game", description: "Magic 8-ball, spin-the-wheel picker, and pros/cons analyzer. Make decisions fun and interactive.", icon: Dices, href: "/tools/decision-game", badge: "Education", color: "text-purple-500", bgColor: "bg-purple-50 dark:bg-purple-950", borderColor: "border-t-purple-500" },
+      { name: "WorkbookPDF", description: "Create printable worksheets, quizzes, lined paper, and checklists. Print directly or save as PDF.", icon: Printer, href: "/tools/workbook-pdf", badge: "Education", color: "text-green-500", bgColor: "bg-green-50 dark:bg-green-950", borderColor: "border-t-green-500" },
     ],
   },
   {
