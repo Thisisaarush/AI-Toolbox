@@ -112,7 +112,7 @@ export const SERVICE_DB: Record<string, {
   "expressvpn":      { cancelUrl: "https://www.expressvpn.com/subscriptions", category: "security" },
 
   // Finance
-  "stripe":          { cancelUrl: "https://dashboard.stripe.com/settings/billing", category: "finance" },
+  "razorpay":        { cancelUrl: "https://dashboard.razorpay.com/app/settings", category: "finance" },
   "mercury":         { cancelUrl: "https://mercury.com/support", category: "finance" },
   "wise":            { cancelUrl: "https://wise.com/settings", category: "finance" },
   "quickbooks":      { cancelUrl: "https://quickbooks.intuit.com/learn-support/", category: "finance" },

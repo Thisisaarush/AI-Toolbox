@@ -187,7 +187,7 @@ export const VAR_TEMPLATES: Array<{ category: string; vars: string[] }> = [
     vars: ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_REGION", "S3_BUCKET_NAME"],
   },
   {
-    category: "Stripe",
-    vars: ["STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "STRIPE_WEBHOOK_SECRET", "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"],
+    category: "Razorpay",
+    vars: ["RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "RAZORPAY_WEBHOOK_SECRET", "RAZORPAY_PLAN_ID_PRO_MONTHLY", "RAZORPAY_PLAN_ID_PRO_YEARLY"],
   },
 ]

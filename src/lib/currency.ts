@@ -1,29 +1,18 @@
-/**
- * Maps ISO 3166-1 alpha-2 country codes to their primary currency.
- * Used for auto-detecting the user's preferred currency from their IP country.
- */
 export const COUNTRY_TO_CURRENCY: Record<string, string> = {
-  // North America
   US: "USD", CA: "CAD", MX: "MXN",
-  // Europe - Euro zone
   DE: "EUR", FR: "EUR", IT: "EUR", ES: "EUR", PT: "EUR", NL: "EUR",
   BE: "EUR", AT: "EUR", IE: "EUR", FI: "EUR", GR: "EUR", LU: "EUR",
   SK: "EUR", SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", CY: "EUR",
   MT: "EUR", HR: "EUR",
-  // Europe - non-Euro
   GB: "GBP", CH: "CHF", SE: "SEK", NO: "NOK", DK: "DKK",
   PL: "PLN", CZ: "CZK", HU: "HUF", RO: "RON", BG: "BGN",
-  // Asia Pacific
   IN: "INR", JP: "JPY", CN: "CNY", AU: "AUD", NZ: "NZD",
   SG: "SGD", HK: "HKD", KR: "KRW", TW: "TWD", TH: "THB",
   MY: "MYR", ID: "IDR", PH: "PHP", VN: "VND", PK: "PKR",
   BD: "BDT", LK: "LKR", NP: "NPR",
-  // Middle East & Africa
   AE: "AED", SA: "SAR", IL: "ILS", TR: "TRY", EG: "EGP",
   ZA: "ZAR", NG: "NGN", KE: "KES", GH: "GHS",
-  // Latin America
   BR: "BRL", AR: "ARS", CL: "CLP", CO: "COP", PE: "PEN",
-  // Default fallback
   _: "USD",
 }
 
@@ -43,6 +32,8 @@ export type CurrencyInfo = {
   code: string
   symbol: string
   country: string
+  vpnLikely?: boolean
+  vpnReasons?: string[]
 }
 
 export function getCurrencyForCountry(countryCode: string): CurrencyInfo {

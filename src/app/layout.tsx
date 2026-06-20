@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ThemeProvider } from "next-themes"
 import { CurrencyProvider } from "@/lib/currency-context"
+import { SubscriptionProvider } from "@/components/shared/subscription-context"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "sonner"
 import "./globals.css"
@@ -56,10 +57,12 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <CurrencyProvider>
-              <TooltipProvider>
-                {children}
-                <Toaster position="bottom-right" richColors />
-              </TooltipProvider>
+              <SubscriptionProvider>
+                <TooltipProvider>
+                  {children}
+                  <Toaster position="bottom-right" richColors />
+                </TooltipProvider>
+              </SubscriptionProvider>
             </CurrencyProvider>
           </ThemeProvider>
         </body>

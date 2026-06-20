@@ -3,15 +3,18 @@
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
-import { ArrowLeft, Sun, Moon, Globe, Shield, Trash2, Code2, Activity, BookOpen, CheckCircle2, Info, ExternalLink, Sparkles } from "lucide-react"
+import { ArrowLeft, Sun, Moon, Globe, Shield, Trash2, Code2, Activity, BookOpen, CheckCircle2, Info, ExternalLink, Sparkles, CreditCard, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { ConnectButton, TokenConnect } from "@/components/shared/connect-button"
 import { useCurrency } from "@/lib/currency-context"
 import { CURRENCY_SYMBOLS } from "@/lib/currency"
 import { toast } from "sonner"
+import { useSubscription } from "@/components/shared/subscription-context"
+import { cancelSubscription } from "@/lib/razorpay/client"
 import {
   Dialog,
   DialogContent,
@@ -41,6 +44,8 @@ export default function SettingsPage() {
   const [geminiKey, setGeminiKey] = useState<string | null>(null)
   const [geminiDraft, setGeminiDraft] = useState("")
   const [showGeminiInput, setShowGeminiInput] = useState(false)
+  const [portalLoading, setPortalLoading] = useState(false)
+  const { subscription } = useSubscription()
 
   useEffect(() => {
     setMounted(true)
@@ -78,6 +83,19 @@ export default function SettingsPage() {
     }
     setLocalDataSize(`${(total / 1024).toFixed(1)} KB`)
   }, [])
+
+  async function handleCancelSubscription() {
+    setPortalLoading(true)
+    try {
+      await cancelSubscription()
+      toast.success("Subscription will cancel at period end")
+      setTimeout(() => window.location.reload(), 1500)
+    } catch {
+      toast.error("Failed to cancel subscription")
+    } finally {
+      setPortalLoading(false)
+    }
+  }
 
   function handleClearAll() {
     localStorage.clear()
@@ -459,7 +477,7 @@ export default function SettingsPage() {
                   <p className="text-xs text-muted-foreground mt-0.5">{localDataSize} across all tools</p>
                 </div>
                 <Dialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
-                  <DialogTrigger>
+                  <DialogTrigger render={<span />}>
                     <Button variant="destructive" size="sm">
                       <Trash2 className="w-3.5 h-3.5 mr-1" />
                       Clear all data
@@ -487,26 +505,46 @@ export default function SettingsPage() {
           </Card>
         </section>
 
-        {/* ── About ───────────────────────────────────────────────────────── */}
+        {/* ── Subscription ─────────────────────────────────────────────── */}
         <section className="space-y-4">
-          <h2 className="text-base font-semibold">About</h2>
+          <div>
+            <h2 className="text-base font-semibold mb-0.5">Subscription</h2>
+            <p className="text-xs text-muted-foreground">
+              {subscription.plan === "pro" ? "You're on the Pro plan." : "Free plan — upgrade for cloud sync, AI, and premium tools."}
+            </p>
+          </div>
           <Card>
-            <CardContent className="py-5 space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">App</span>
-                <span className="font-medium">Toolbox</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Stack</span>
-                <span className="font-medium text-xs">Next.js 16 · Tailwind v4 · Gemini 2.5 Flash</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Storage</span>
-                <span className="font-medium text-xs">Browser localStorage (client-only)</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Auth</span>
-                <span className="font-medium text-xs">Clerk · OAuth via GitHub / Strava</span>
+            <CardContent className="py-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center",
+                    subscription.plan === "pro" ? "bg-foreground text-background" : "bg-muted"
+                  )}>
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">
+                      {subscription.plan === "pro" ? "Pro Plan" : "Free Plan"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {subscription.plan === "pro"
+                        ? subscription.cancelAtPeriodEnd
+                          ? "Cancels at period end"
+                          : `Active — ${subscription.currentPeriodEnd ? `renews ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}` : ""}`
+                        : "All tools free with localStorage"}
+                    </p>
+                  </div>
+                </div>
+                {subscription.plan === "pro" ? (
+                  <Button variant="outline" size="sm" onClick={handleCancelSubscription} disabled={portalLoading}>
+                    {portalLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Cancel"}
+                  </Button>
+                ) : (
+                  <Button size="sm" onClick={() => router.push("/pricing")}>
+                    Upgrade
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
