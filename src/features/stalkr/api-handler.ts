@@ -1,23 +1,12 @@
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { getUserId } from "@/lib/auth"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
-import { getGeminiKey } from "@/lib/ai-key"
+import { geminiJSON } from "@/lib/gemini"
 import type { HNMention } from "./types"
 
 const limiter = rateLimit({ max: 20, windowMs: 60000 })
 const aiLimiter = rateLimit({ max: 10, windowMs: 60000 })
-
-async function geminiJSON(req: Request, prompt: string): Promise<unknown> {
-  const key = getGeminiKey(req)
-  const genAI = new GoogleGenerativeAI(key)
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
-  const result = await model.generateContent(prompt)
-  const text = result.response.text()
-  const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
-  return JSON.parse(cleaned)
-}
 
 async function fetchHNMentions(brandName: string): Promise<HNMention[]> {
   try {
@@ -52,7 +41,7 @@ async function fetchHNMentions(brandName: string): Promise<HNMention[]> {
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const userId = await getUserId(req)
     const ip = req.headers.get("x-forwarded-for") ?? "unknown"
     const uid = userId ?? ip
 

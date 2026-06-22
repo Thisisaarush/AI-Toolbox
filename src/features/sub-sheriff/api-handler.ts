@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { getUserId } from "@/lib/auth"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
 import { toMonthly } from "./types"
@@ -17,7 +17,7 @@ function getStore(userId: string) {
 
 export async function GET(req: Request) {
   try {
-    const { userId } = await auth()
+    const userId = await getUserId(req)
     const ip = req.headers.get("x-forwarded-for") ?? "unknown"
     const uid = userId ?? ip
     const { allowed } = limiter.check(`sub-sheriff:${ip}`)
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const userId = await getUserId(req)
     const ip = req.headers.get("x-forwarded-for") ?? "unknown"
     const uid = userId ?? ip
     const { allowed } = limiter.check(`sub-sheriff:${ip}`)

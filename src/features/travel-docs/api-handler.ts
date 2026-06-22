@@ -1,25 +1,15 @@
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { getUserId } from "@/lib/auth"
 import { handleApiError, ApiError } from "@/lib/api-error"
 import { rateLimit } from "@/lib/rate-limit"
-import { GoogleGenerativeAI } from "@google/generative-ai"
-import { getGeminiKey } from "@/lib/ai-key"
+import { geminiJSON } from "@/lib/gemini"
 
 const limiter   = rateLimit({ max: 20, windowMs: 60000 })
 const aiLimiter = rateLimit({ max: 5,  windowMs: 60000 })
 
-async function geminiJSON(req: Request, prompt: string): Promise<unknown> {
-  const key = getGeminiKey(req)
-  const genAI = new GoogleGenerativeAI(key)
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
-  const result = await model.generateContent(prompt)
-  const text = result.response.text().replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
-  return JSON.parse(text)
-}
-
 export async function GET(req: Request) {
   try {
-    const { userId } = await auth()
+    const userId = await getUserId(req)
     const ip = req.headers.get("x-forwarded-for") ?? "unknown"
     const uid = userId ?? ip
     const { allowed } = limiter.check(`travel-docs:${uid}`)
@@ -30,7 +20,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const userId = await getUserId(req)
     const ip = req.headers.get("x-forwarded-for") ?? "unknown"
     const uid = userId ?? ip
 
