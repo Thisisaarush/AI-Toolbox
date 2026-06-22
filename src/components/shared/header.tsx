@@ -19,7 +19,6 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
         <nav className="flex items-center gap-1 shrink-0">
           <ThemeToggle />
 
-          {/* Settings — always visible */}
           <Link href="/settings" className="shrink-0">
             <Button
               variant="ghost"

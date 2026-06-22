@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
+import { useAuth } from "@clerk/nextjs"
 import { ArrowLeft, Sun, Moon, Globe, Shield, Trash2, Code2, Activity, BookOpen, CheckCircle2, Info, ExternalLink, Sparkles, CreditCard, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -84,10 +85,12 @@ export default function SettingsPage() {
     setLocalDataSize(`${(total / 1024).toFixed(1)} KB`)
   }, [])
 
+  const { getToken } = useAuth()
+
   async function handleCancelSubscription() {
     setPortalLoading(true)
     try {
-      await cancelSubscription()
+      await cancelSubscription(await getToken())
       toast.success("Subscription will cancel at period end")
       setTimeout(() => window.location.reload(), 1500)
     } catch {
@@ -158,6 +161,51 @@ export default function SettingsPage() {
             Manage your connected accounts, appearance, and preferences.
           </p>
         </div>
+
+        {/* ── Subscription ─────────────────────────────────────────────── */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-base font-semibold mb-0.5">Subscription</h2>
+            <p className="text-xs text-muted-foreground">
+              {subscription.plan === "pro" ? "You're on the Pro plan." : "Free plan — upgrade for cloud sync, AI, and premium tools."}
+            </p>
+          </div>
+          <Card>
+            <CardContent className="py-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center",
+                    subscription.plan === "pro" ? "bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-md shadow-violet-500/20" : "bg-muted"
+                  )}>
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">
+                      {subscription.plan === "pro" ? "Pro Plan" : "Free Plan"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {subscription.plan === "pro"
+                        ? subscription.cancelAtPeriodEnd
+                          ? "Cancels at period end"
+                          : `Active — ${subscription.currentPeriodEnd ? `renews ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}` : ""}`
+                        : "All tools free with localStorage"}
+                    </p>
+                  </div>
+                </div>
+                {subscription.plan === "pro" ? (
+                  <Button variant="outline" size="sm" onClick={handleCancelSubscription} disabled={portalLoading}>
+                    {portalLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Cancel"}
+                  </Button>
+                ) : (
+                  <Button size="sm" disabled>
+                    Coming Soon
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
 
         {/* ── AI Provider ─────────────────────────────────────────────────── */}
         <section className="space-y-4">
@@ -500,51 +548,6 @@ export default function SettingsPage() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* ── Subscription ─────────────────────────────────────────────── */}
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-base font-semibold mb-0.5">Subscription</h2>
-            <p className="text-xs text-muted-foreground">
-              {subscription.plan === "pro" ? "You're on the Pro plan." : "Free plan — upgrade for cloud sync, AI, and premium tools."}
-            </p>
-          </div>
-          <Card>
-            <CardContent className="py-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center",
-                    subscription.plan === "pro" ? "bg-foreground text-background" : "bg-muted"
-                  )}>
-                    <CreditCard className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">
-                      {subscription.plan === "pro" ? "Pro Plan" : "Free Plan"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {subscription.plan === "pro"
-                        ? subscription.cancelAtPeriodEnd
-                          ? "Cancels at period end"
-                          : `Active — ${subscription.currentPeriodEnd ? `renews ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}` : ""}`
-                        : "All tools free with localStorage"}
-                    </p>
-                  </div>
-                </div>
-                {subscription.plan === "pro" ? (
-                  <Button variant="outline" size="sm" onClick={handleCancelSubscription} disabled={portalLoading}>
-                    {portalLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Cancel"}
-                  </Button>
-                ) : (
-                  <Button size="sm" onClick={() => router.push("/pricing")}>
-                    Upgrade
-                  </Button>
-                )}
               </div>
             </CardContent>
           </Card>

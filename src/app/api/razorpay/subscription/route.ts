@@ -1,10 +1,28 @@
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
 import { db } from "@/lib/db"
 
-export async function GET() {
+function decodeToken(token: string): Record<string, unknown> | null {
   try {
-    const { userId } = await auth()
+    const parts = token.split(".")
+    if (parts.length !== 3) return null
+    const payload = parts[1]
+    if (!payload) return null
+    return JSON.parse(Buffer.from(payload, "base64url").toString("utf8"))
+  } catch {
+    return null
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const authHeader = req.headers.get("authorization")
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null
+
+    let userId: string | null = null
+    if (token) {
+      const payload = decodeToken(token)
+      userId = (payload?.sub as string) ?? null
+    }
     if (!userId) {
       return NextResponse.json({ plan: "free", status: null, currentPeriodEnd: null, cancelAtPeriodEnd: false })
     }

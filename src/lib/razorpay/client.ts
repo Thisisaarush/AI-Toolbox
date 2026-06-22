@@ -1,8 +1,11 @@
-export async function redirectToCheckout(options: { plan?: string; interval?: string }) {
+export async function redirectToCheckout(options: { plan?: string; interval?: string; token?: string | null }) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" }
+  if (options.token) headers["Authorization"] = `Bearer ${options.token}`
+
   const res = await fetch("/api/razorpay/checkout", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(options),
+    headers,
+    body: JSON.stringify({ plan: options.plan, interval: options.interval }),
   })
 
   if (!res.ok) {
@@ -14,8 +17,11 @@ export async function redirectToCheckout(options: { plan?: string; interval?: st
   if (short_url) window.location.href = short_url
 }
 
-export async function cancelSubscription() {
-  const res = await fetch("/api/razorpay/cancel", { method: "POST" })
+export async function cancelSubscription(token?: string | null) {
+  const headers: Record<string, string> = {}
+  if (token) headers["Authorization"] = `Bearer ${token}`
+
+  const res = await fetch("/api/razorpay/cancel", { method: "POST", headers })
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))

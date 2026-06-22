@@ -1,9 +1,32 @@
 import { NextResponse } from "next/server"
 import { cancelSubscription } from "@/lib/razorpay/server"
 
-export async function POST() {
+function decodeToken(token: string): Record<string, unknown> | null {
   try {
-    const result = await cancelSubscription(true)
+    const parts = token.split(".")
+    if (parts.length !== 3) return null
+    const payload = parts[1]
+    if (!payload) return null
+    return JSON.parse(Buffer.from(payload, "base64url").toString("utf8"))
+  } catch {
+    return null
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const authHeader = req.headers.get("authorization")
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null
+    if (!token) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 400 })
+    }
+
+    const payload = decodeToken(token)
+    const userId = (payload?.sub as string) ?? null
+    if (!userId) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 400 })
+    }
+    const result = await cancelSubscription(userId, true)
     return NextResponse.json(result)
   } catch (error) {
     const message = error instanceof Error ? error.message : "Internal error"

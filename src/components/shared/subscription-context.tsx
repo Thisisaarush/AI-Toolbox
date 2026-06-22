@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react"
+import { useAuth } from "@clerk/nextjs"
 import type { Plan } from "@/lib/subscription"
 
 type SubscriptionData = {
@@ -26,10 +27,15 @@ const SubscriptionContext = createContext<{
 
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
   const [subscription, setSubscription] = useState<SubscriptionData>(defaultData)
+  const { getToken } = useAuth()
 
   const fetchSubscription = useCallback(async () => {
     try {
-      const res = await fetch("/api/razorpay/subscription")
+      const headers: Record<string, string> = {}
+      const token = await getToken()
+      if (token) headers["Authorization"] = `Bearer ${token}`
+
+      const res = await fetch("/api/razorpay/subscription", { headers })
       if (!res.ok) {
         setSubscription((p) => ({ ...p, loading: false }))
         return
@@ -45,7 +51,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     } catch {
       setSubscription((p) => ({ ...p, loading: false }))
     }
-  }, [])
+  }, [getToken])
 
   useEffect(() => {
     fetchSubscription()

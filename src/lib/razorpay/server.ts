@@ -1,7 +1,6 @@
 import "server-only"
 import { env } from "@/lib/env"
 import { db } from "@/lib/db"
-import { auth } from "@clerk/nextjs/server"
 import crypto from "crypto"
 
 let razorpayInstance: any | null = null
@@ -23,12 +22,9 @@ function resolvePlanId(plan: string, interval: string): string {
   throw new Error("Invalid plan or interval")
 }
 
-export async function createCheckoutSession(plan: string, interval: string) {
+export async function createCheckoutSession(userId: string, plan: string, interval: string) {
   const razorpay = await getRazorpay()
   if (!razorpay) throw new Error("Razorpay not configured")
-
-  const { userId } = await auth()
-  if (!userId) throw new Error("Not authenticated")
 
   const prisma = db()
   if (!prisma) throw new Error("Database not configured")
@@ -36,13 +32,8 @@ export async function createCheckoutSession(plan: string, interval: string) {
   let user = await prisma.user.findUnique({ where: { clerkId: userId } })
 
   if (!user) {
-    const session = await auth()
     user = await prisma.user.create({
-      data: {
-        clerkId: userId,
-        email: ((session?.sessionClaims as any)?.email as string) ?? "",
-        name: ((session?.sessionClaims as any)?.name as string) ?? "",
-      },
+      data: { clerkId: userId },
     })
   }
 
@@ -50,7 +41,7 @@ export async function createCheckoutSession(plan: string, interval: string) {
 
   const subscription = await razorpay.subscriptions.create({
     plan_id: planId,
-    total_count: 0,
+    total_count: 1200,
     quantity: 1,
     customer_notify: 1,
     notes: {
@@ -79,12 +70,9 @@ export async function createCheckoutSession(plan: string, interval: string) {
   return { id: subscription.id, short_url: subscription.short_url }
 }
 
-export async function cancelSubscription(cancelAtCycleEnd = true) {
+export async function cancelSubscription(userId: string, cancelAtCycleEnd = true) {
   const razorpay = await getRazorpay()
   if (!razorpay) throw new Error("Razorpay not configured")
-
-  const { userId } = await auth()
-  if (!userId) throw new Error("Not authenticated")
 
   const prisma = db()
   if (!prisma) throw new Error("Database not configured")
