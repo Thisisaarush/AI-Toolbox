@@ -3,7 +3,7 @@ import "server-only"
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url().min(1),
-  GEMINI_API_KEY: z.string().min(1),
+  GEMINI_API_KEY: z.string().optional(),
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
   CLERK_SECRET_KEY: z.string().min(1),
   RAZORPAY_KEY_ID: z.string().optional(),
