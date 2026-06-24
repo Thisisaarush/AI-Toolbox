@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
+import { useHashNav } from "@/lib/use-hash-nav"
 import {
   FileText, Plus, Trash2, Download, Copy, Check, Loader2,
   Sparkles, Search, Eye, Edit3, X, DollarSign,
@@ -138,6 +139,8 @@ export function InvoiceZeroContent() {
     }
     setExpenses(loadExpenses())
   }, [])
+
+  useHashNav(view, setView, ["list", "create", "edit", "preview"] as const)
 
   // N shortcut to create new invoice
   const handleNewInvoice = useCallback(() => {

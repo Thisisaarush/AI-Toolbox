@@ -86,7 +86,9 @@ export const SERVICE_DB: Record<string, {
   "cleanshot":       { cancelUrl: "https://cleanshot.com/", category: "design" },
 
   // Media
-  "spotify":         { cancelUrl: "https://www.spotify.com/account/subscription/", category: "media" },
+  "spotify":         { cancelUrl: "https://www.spotify.com/account/subscription/", category: "music" },
+  "tidal":           { cancelUrl: "https://tidal.com/account", category: "music" },
+  "apple music":     { cancelUrl: "https://support.apple.com/en-us/HT202039", category: "music" },
   "netflix":         { cancelUrl: "https://www.netflix.com/cancel", category: "media" },
   "youtube premium": { cancelUrl: "https://www.youtube.com/paid_memberships", category: "media" },
   "apple tv":        { cancelUrl: "https://support.apple.com/en-us/HT202039", category: "media" },
@@ -118,6 +120,70 @@ export const SERVICE_DB: Record<string, {
   "quickbooks":      { cancelUrl: "https://quickbooks.intuit.com/learn-support/", category: "finance" },
   "freshbooks":      { cancelUrl: "https://my.freshbooks.com/#/account-info/subscription", category: "finance" },
   "wave":            { cancelUrl: "https://www.waveapps.com/accounting/", category: "finance" },
+
+  // Food
+  "doordash":        { cancelUrl: "https://www.doordash.com/account/", category: "food" },
+  "ubereats":        { cancelUrl: "https://www.ubereats.com/account", category: "food" },
+  "hellofresh":      { cancelUrl: "https://www.hellofresh.com/account", category: "food" },
+  "blue apron":      { cancelUrl: "https://www.blueapron.com/account", category: "food" },
+
+  // Health & Fitness
+  "strava":          { cancelUrl: "https://www.strava.com/account/billing", category: "health-fitness" },
+  "myfitnesspal":    { cancelUrl: "https://www.myfitnesspal.com/account/billing", category: "health-fitness" },
+  "whoop":           { cancelUrl: "https://www.whoop.com/account/billing", category: "health-fitness" },
+  "calm":            { cancelUrl: "https://www.calm.com/account/billing", category: "health-fitness" },
+  "headspace":       { cancelUrl: "https://www.headspace.com/account/billing", category: "health-fitness" },
+
+  // Education
+  "udemy":           { cancelUrl: "https://www.udemy.com/account/billing/", category: "education" },
+  "coursera":        { cancelUrl: "https://www.coursera.org/account/billing", category: "education" },
+  "skillshare":      { cancelUrl: "https://www.skillshare.com/account/billing", category: "education" },
+  "masterclass":     { cancelUrl: "https://www.masterclass.com/account/billing", category: "education" },
+  "duolingo":        { cancelUrl: "https://www.duolingo.com/account/billing", category: "education" },
+
+  // Transportation
+  "uber":            { cancelUrl: "https://www.uber.com/account/", category: "transportation" },
+  "lyft":            { cancelUrl: "https://www.lyft.com/account", category: "transportation" },
+
+  // Shopping
+  "amazon prime":    { cancelUrl: "https://www.amazon.com/gp/primecentral", category: "shopping" },
+  "walmart+":        { cancelUrl: "https://www.walmart.com/account/", category: "shopping" },
+
+  // Entertainment
+  "patreon":         { cancelUrl: "https://www.patreon.com/account/billing", category: "entertainment" },
+  "twitch":          { cancelUrl: "https://www.twitch.tv/settings/billing", category: "entertainment" },
+  "onlyfans":        { cancelUrl: "https://onlyfans.com/my/account", category: "entertainment" },
+
+  // News
+  "medium":          { cancelUrl: "https://medium.com/me/settings/billing", category: "news" },
+  "substack":        { cancelUrl: "https://substack.com/account", category: "news" },
+  "nytimes":         { cancelUrl: "https://www.nytimes.com/account", category: "news" },
+  "wsj":             { cancelUrl: "https://www.wsj.com/account", category: "news" },
+  "bloomberg":       { cancelUrl: "https://www.bloomberg.com/account", category: "news" },
+
+  // Social
+  "discord":         { cancelUrl: "https://discord.com/settings/billing", category: "social" },
+  "linkedin premium":{ cancelUrl: "https://www.linkedin.com/premium/", category: "social" },
+
+  // Storage
+  "icloud":          { cancelUrl: "https://support.apple.com/en-us/HT202039", category: "storage" },
+  "google drive":    { cancelUrl: "https://one.google.com/about", category: "storage" },
+  "dropbox":         { cancelUrl: "https://www.dropbox.com/account/billing", category: "storage" },
+  "onedrive":        { cancelUrl: "https://account.microsoft.com/services/", category: "storage" },
+
+  // Utilities
+  "comcast":         { cancelUrl: "https://www.xfinity.com/account/", category: "utilities" },
+  "verizon":         { cancelUrl: "https://www.verizon.com/account/", category: "utilities" },
+  "att":             { cancelUrl: "https://www.att.com/account/", category: "utilities" },
+
+  // Gaming
+  "nintendo":        { cancelUrl: "https://www.nintendo.com/account/", category: "gaming" },
+  "xbox":            { cancelUrl: "https://account.microsoft.com/services/", category: "gaming" },
+  "playstation":     { cancelUrl: "https://www.playstation.com/account/", category: "gaming" },
+  "steam":           { cancelUrl: "https://store.steampowered.com/account/", category: "gaming" },
+
+  // Patreon is duplicated under entertainment already, add social variant
+  "linkedin":        { cancelUrl: "https://www.linkedin.com/premium/", category: "social" },
 }
 
 export function lookupService(name: string): typeof SERVICE_DB[string] | undefined {

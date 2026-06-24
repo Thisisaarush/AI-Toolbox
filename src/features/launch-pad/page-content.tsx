@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
+import { useHashNav } from "@/lib/use-hash-nav"
 import {
   Rocket, Sparkles, Copy, Check, Loader2, Plus, Trash2, X,
   RefreshCw, Clock, CheckSquare, ChevronDown, ChevronUp,
@@ -263,7 +264,11 @@ export function LaunchPadContent() {
   const [subjectLoading, setSubjectLoading] = useState(false)
   const [activeSubject, setActiveSubject] = useState<string | null>(null)
 
-  useEffect(() => { setRecords(load()) }, [])
+  useEffect(() => {
+    setRecords(load())
+  }, [])
+
+  useHashNav(view, setView, ["form", "output", "history", "waitlist", "research"] as const)
 
   function copyText(text: string, key: string) {
     navigator.clipboard.writeText(text)

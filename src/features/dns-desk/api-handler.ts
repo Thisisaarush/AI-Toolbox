@@ -283,6 +283,25 @@ export async function POST(req: Request) {
       }
     }
 
+    if (action === "cloudflare-list-zones") {
+      const { apiToken } = body
+      if (!apiToken) throw new ApiError("Cloudflare API token required", 400)
+      try {
+        const res = await fetch("https://api.cloudflare.com/client/v4/zones?per_page=100", {
+          headers: { "Authorization": `Bearer ${apiToken}`, "Content-Type": "application/json" },
+        })
+        const data = await res.json()
+        if (!data.success) throw new ApiError("Invalid Cloudflare credentials", 401)
+        const zones = (data.result ?? []).map((z: { id: string; name: string }) => ({
+          id: z.id, name: z.name,
+        }))
+        return NextResponse.json({ ok: true, zones })
+      } catch (err: unknown) {
+        if (err instanceof ApiError) throw err
+        throw new ApiError("Cloudflare API error: " + (err instanceof Error ? err.message : "Unknown"), 422)
+      }
+    }
+
     if (action === "cloudflare-import") {
       const { apiToken, zoneId } = body
       if (!apiToken) throw new ApiError("Cloudflare API token required", 400)

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   Lock, Plus, Trash2, Copy, Check, Eye, EyeOff, Search, Loader2,
@@ -266,10 +267,17 @@ export function EnvManagerContent() {
   // Validation editor
   const [validationVarId, setValidationVarId] = useState<string | null>(null)
 
+  useHashNav(view, setView, ["projects", "project", "diff", "sync"] as const)
+
   useEffect(() => {
     setProjects(load())
     setAudit(loadAudit())
+
   }, [])
+
+
+
+
 
   useEffect(() => {
     setMissingVars([])

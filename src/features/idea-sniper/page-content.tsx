@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
+import { useHashNav } from "@/lib/use-hash-nav"
 import {
   Target, Sparkles, Copy, Check, Loader2, Trash2,
   TrendingUp, TrendingDown, Minus, Users, Search,
@@ -469,7 +470,11 @@ export function IdeaSniperContent() {
   const [realSignals, setRealSignals] = useState<RealSignals | null>(null)
   const [realSignalsLoading, setRealSignalsLoading] = useState(false)
 
-  useEffect(() => { setRecords(load()) }, [])
+  useEffect(() => {
+    setRecords(load())
+  }, [])
+
+  useHashNav(view, setView, ["input", "result", "history"] as const)
 
   function copyText(text: string, key: string) {
     navigator.clipboard.writeText(text)

@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   Globe, Plus, Trash2, Copy, Check, Loader2, Search,
   AlertCircle, Shield, ChevronRight,
   Info, Zap, X, Pencil, FileCode2,
   Lock, RefreshCw, ArrowLeftRight, Activity,
-  TrendingUp, ChevronDown, ChevronUp, ExternalLink,
+  ChevronDown, ChevronUp, ExternalLink,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,7 +20,7 @@ import {
   type Domain, type DNSRecord, type RecordType, type PropagationResult,
   type SSLInfo, type WhoisInfo, type DnsDiffResult,
   RECORD_TYPE_DESCRIPTIONS, RECORD_TYPE_COLORS, DNS_TEMPLATES,
-  getDaysUntilExpiry, getExpiryColor, getExpiryBadgeColor, estimateDomainValue,
+  getDaysUntilExpiry, getExpiryColor, getExpiryBadgeColor,
 } from "./types"
 
 const STORAGE_KEY = "dns-desk-v1"
@@ -132,17 +133,29 @@ export function DNSDeskContent() {
   const [healthDashLoading, setHealthDashLoading] = useState<Record<string, boolean>>({})
 
   // Portfolio value
-  const [showPortfolio, setShowPortfolio] = useState(false)
+
 
   // Cloudflare
   const [cfToken, setCfToken] = useState("")
   const [cfZoneId, setCfZoneId] = useState("")
+  const [cfZoneOptions, setCfZoneOptions] = useState<{ id: string; name: string }[]>([])
   const [cfLoading, setCfLoading] = useState(false)
+  const [cfStep, setCfStep] = useState<"token" | "zone" | "done">("token")
 
   // Export dropdown
   const [showExportMenu, setShowExportMenu] = useState(false)
 
-  useEffect(() => { setDomains(load()) }, [])
+  useHashNav(view, setView, ["domains", "domain-detail", "propagation", "cloudflare", "health-dashboard"] as const)
+
+  useEffect(() => {
+    const stored = load()
+    setDomains(stored)
+
+  }, [])
+
+
+
+
 
   useEffect(() => {
     if (!showExportMenu) return
@@ -450,8 +463,28 @@ export function DNSDeskContent() {
     toast.success("All health checks complete")
   }
 
+  async function listCloudflareZones() {
+    if (!cfToken.trim()) { toast.error("Cloudflare API token required"); return }
+    setCfLoading(true)
+    try {
+      const res = await fetch("/api/dns-desk", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cloudflare-list-zones", apiToken: cfToken }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? "Failed to list zones")
+      if (data.zones.length === 0) { toast.error("No zones found for this token"); setCfLoading(false); return }
+      setCfZoneOptions(data.zones)
+      setCfStep("zone")
+      localStorage.setItem("dns-desk-cf-token", cfToken)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to list zones")
+    }
+    setCfLoading(false)
+  }
+
   async function importFromCloudflare() {
-    if (!cfToken.trim() || !cfZoneId.trim()) { toast.error("API token and Zone ID required"); return }
+    if (!cfToken.trim() || !cfZoneId.trim()) { toast.error("Select a zone"); return }
     setCfLoading(true)
     try {
       const res = await fetch("/api/dns-desk", {
@@ -472,7 +505,7 @@ export function DNSDeskContent() {
         save(next)
         return next
       })
-      setCfToken(""); setCfZoneId("")
+      setCfZoneId(""); setCfZoneOptions([]); setCfStep("token")
       toast.success(`Imported ${data.domain.name} with ${data.domain.records.length} records`)
       setView("domains")
     } catch (err: unknown) {
@@ -515,7 +548,11 @@ export function DNSDeskContent() {
     return Array.from(subs.entries()).sort((a, b) => a[0].localeCompare(b[0]))
   }, [selectedDomain])
 
-  const portfolioTotal = useMemo(() => domains.reduce((sum, d) => sum + estimateDomainValue(d.name), 0), [domains])
+  // Restore persisted Cloudflare token on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("dns-desk-cf-token")
+    if (saved) { setCfToken(saved); setCfStep("zone") }
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -669,42 +706,6 @@ export function DNSDeskContent() {
                     </Card>
                   )
                 })}
-              </div>
-            )}
-
-            {/* Portfolio Value Estimator */}
-            {domains.length > 0 && (
-              <div>
-                <button
-                  onClick={() => setShowPortfolio((v) => !v)}
-                  className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  Portfolio Value Estimator
-                  {showPortfolio ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
-                {showPortfolio && (
-                  <Card className="mt-2 border-dashed">
-                    <CardContent className="pt-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <p className="text-xs text-muted-foreground">Estimated total portfolio value</p>
-                        <p className="text-xl font-bold text-teal-600">${portfolioTotal.toLocaleString()}</p>
-                      </div>
-                      <div className="space-y-1">
-                        {domains.map((d) => {
-                          const val = estimateDomainValue(d.name)
-                          return (
-                            <div key={d.id} className="flex items-center justify-between text-xs">
-                              <span className="font-mono text-muted-foreground">{d.name}</span>
-                              <span className="font-medium">${val.toLocaleString()}</span>
-                            </div>
-                          )
-                        })}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-3 italic">Estimated values only — not financial advice. Based on TLD, length, and word count heuristics.</p>
-                    </CardContent>
-                  </Card>
-                )}
               </div>
             )}
           </div>
@@ -1332,28 +1333,69 @@ export function DNSDeskContent() {
         {/* ── CLOUDFLARE IMPORT ────────────────────────────────────────────── */}
         {view === "cloudflare" && (
           <div className="space-y-5 max-w-lg mx-auto">
-            <div>
-              <h1 className="text-3xl font-bold mb-1">Cloudflare Import</h1>
-              <p className="text-muted-foreground text-sm leading-relaxed">Import your zones and DNS records from Cloudflare automatically.</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-1">Cloudflare Import</h1>
+                <p className="text-muted-foreground text-sm leading-relaxed">Import your DNS zones and records from Cloudflare automatically.</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => window.open("https://dash.cloudflare.com/profile/api-tokens", "_blank")}>
+                <ExternalLink className="w-4 h-4 mr-1" /> Create API Token
+              </Button>
             </div>
             <Card>
               <CardContent className="pt-5 space-y-5">
-                <div>
-                  <label className="text-xs font-medium mb-1 block">Cloudflare API Token</label>
-                  <Input type="password" placeholder="Your API token with Zone:Read, DNS:Read permissions" value={cfToken} onChange={(e) => setCfToken(e.target.value)} />
-                  <p className="text-xs text-muted-foreground mt-1">Create at cloudflare.com/profile/api-tokens — Zone Read + DNS Read permissions</p>
-                </div>
-                <div>
-                  <label className="text-xs font-medium mb-1 block">Zone ID</label>
-                  <Input placeholder="Your zone ID from the Cloudflare dashboard" value={cfZoneId} onChange={(e) => setCfZoneId(e.target.value)} />
-                  <p className="text-xs text-muted-foreground mt-1">Found in your domain&apos;s Overview page (right sidebar)</p>
-                </div>
-                <Button className="w-full" onClick={importFromCloudflare} disabled={cfLoading}>
-                  {cfLoading
-                    ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Importing...</>
-                    : <><Zap className="w-4 h-4 mr-2" /> Import from Cloudflare</>
-                  }
-                </Button>
+                {cfStep === "token" && (
+                  <>
+                    <div>
+                      <label className="text-xs font-medium mb-1 block">Cloudflare API Token</label>
+                      <div className="flex gap-2">
+                        <Input type="password" placeholder="Paste your API token with Zone:Read, DNS:Read permissions" value={cfToken} onChange={(e) => { setCfToken(e.target.value); setCfZoneOptions([]); }} />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Need one? Click &quot;Create API Token&quot; above — select &quot;Zone:Read&quot; and &quot;DNS:Read&quot; permissions.</p>
+                    </div>
+                    <Button className="w-full" onClick={listCloudflareZones} disabled={cfLoading || !cfToken.trim()}>
+                      {cfLoading
+                        ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Fetching zones...</>
+                        : <><Search className="w-4 h-4 mr-2" /> List Zones</>
+                      }
+                    </Button>
+                  </>
+                )}
+                {cfStep === "zone" && (
+                  <>
+                    <div>
+                      <label className="text-xs font-medium mb-1 block">Select a zone to import</label>
+                      <div className="space-y-1 max-h-64 overflow-y-auto">
+                        {cfZoneOptions.map((z) => (
+                          <label
+                            key={z.id}
+                            className={`flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-colors ${cfZoneId === z.id ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
+                          >
+                            <input
+                              type="radio"
+                              name="cf-zone"
+                              checked={cfZoneId === z.id}
+                              onChange={() => setCfZoneId(z.id)}
+                            />
+                            <Globe className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">{z.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button variant="outline" className="flex-1" onClick={() => { setCfStep("token"); setCfZoneId(""); setCfZoneOptions([]); localStorage.removeItem("dns-desk-cf-token") }}>
+                        ← Change Token
+                      </Button>
+                      <Button className="flex-1" onClick={importFromCloudflare} disabled={cfLoading || !cfZoneId}>
+                        {cfLoading
+                          ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Importing...</>
+                          : <><Zap className="w-4 h-4 mr-2" /> Import</>
+                        }
+                      </Button>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   Dumbbell, Plus, Trash2, Sparkles, ChevronRight, X,
@@ -90,14 +91,21 @@ export function WorkoutLogContent() {
   const [customName, setCustomName] = useState("")
   const [showAddExercise, setShowAddExercise] = useState(false)
 
+  useHashNav(view, setView, ["log", "sessions", "programs", "progress", "add-session", "session-detail", "program-detail"] as const)
+
   useEffect(() => {
     setSessions(loadSessions()); setPrograms(loadPrograms()); setPRs(loadPRs())
     try { setCustomExercises(JSON.parse(localStorage.getItem("workout-custom-ex-v1") ?? "[]")) } catch { /* empty */ }
+
   }, [])
   useEffect(() => { saveSessions(sessions) }, [sessions])
   useEffect(() => { savePrograms(programs) }, [programs])
   useEffect(() => { savePRs(prs) }, [prs])
   useEffect(() => { localStorage.setItem("workout-custom-ex-v1", JSON.stringify(customExercises)) }, [customExercises])
+
+
+
+
 
   const allExercises = useMemo(() => [...PRESET_EXERCISES, ...customExercises], [customExercises])
 

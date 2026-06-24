@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
+import { useHashNav } from "@/lib/use-hash-nav"
 import {
   GitBranch, Sparkles, Copy, Check, Loader2, Plus, Trash2,
   Download, Eye, EyeOff, History, ChevronDown, ChevronUp, Search,
@@ -400,7 +401,11 @@ export function ChangelogAIContent() {
   const [historySearch, setHistorySearch] = useState("")
   const [expandedReleases, setExpandedReleases] = useState<Set<string>>(new Set())
 
-  useEffect(() => { setReleases(load()) }, [])
+  useEffect(() => {
+    setReleases(load())
+  }, [])
+
+  useHashNav(view, setView, ["input", "editor", "history"] as const)
 
   function copyText(text: string, key: string) {
     navigator.clipboard.writeText(text)

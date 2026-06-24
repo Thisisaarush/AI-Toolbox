@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   Briefcase, Plus, Trash2, Sparkles, Star, ChevronRight,
@@ -83,8 +84,17 @@ export function JobTrackerContent() {
   const [ivInterviewer, setIvInterviewer] = useState("")
   const [ivPrep, setIvPrep] = useState("")
 
-  useEffect(() => { setState(loadState()) }, [])
+  useHashNav(view, setView, ["pipeline", "add-app", "app-detail", "resumes", "stats", "cover-letter"] as const)
+
+  useEffect(() => {
+    setState(loadState())
+
+  }, [])
   useEffect(() => { saveState(state) }, [state])
+
+
+
+
 
   const selectedApp = useMemo(() =>
     state.applications.find((a) => a.id === selectedId) ?? null,

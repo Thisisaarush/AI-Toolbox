@@ -47,6 +47,7 @@ export default function RootLayout({
       >
         <head>
           <link rel="preconnect" href={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_test_") ? "https://clerk.accounts.dev" : "https://clerk.toolbox.app"} />
+          <script src="https://accounts.google.com/gsi/client" />
         </head>
         <body className="min-h-full flex flex-col">
           <ThemeProvider

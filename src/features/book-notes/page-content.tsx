@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   BookOpen, Plus, Trash2, Download, Sparkles, Search,
@@ -135,13 +136,20 @@ export function BookNotesContent() {
   const [reviewIdx, setReviewIdx] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
 
+  useHashNav(view, setView, ["library", "add-book", "book-detail", "review"] as const)
+
   useEffect(() => {
     setBooks(loadBooks()); setFlashcards(loadFlashcards())
     const stored = localStorage.getItem("readwise-token")
     if (stored) setRwToken(stored)
+
   }, [])
   useEffect(() => { saveBooks(books) }, [books])
   useEffect(() => { saveFlashcards(flashcards) }, [flashcards])
+
+
+
+
 
   const selectedBook = useMemo(() => books.find((b) => b.id === selectedBookId) ?? null, [books, selectedBookId])
   const stats = useMemo(() => computeStats(books, flashcards), [books, flashcards])

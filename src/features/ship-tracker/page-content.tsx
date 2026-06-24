@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
+import { useHashNav } from "@/lib/use-hash-nav"
 import {
   Rocket, Plus, Trash2, Calendar, Target, BarChart3,
   Flame, CheckCircle2, XCircle, TrendingUp,
@@ -43,7 +44,11 @@ export function ShipTrackerContent() {
   const [newCommitment, setNewCommitment] = useState("")
   const [newGoal, setNewGoal] = useState("")
 
-  useEffect(() => { setData(load()) }, [])
+  useEffect(() => {
+    setData(load())
+  }, [])
+
+  useHashNav(view, setView, ["list", "challenge", "new"] as const)
 
   const activeChallenge = data.challenges.find((c) => c.id === data.activeChallengeId) ?? null
 

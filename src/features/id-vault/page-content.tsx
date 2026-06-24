@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
+import { useHashNav } from "@/lib/use-hash-nav"
 import {
   Shield, Plus, Trash2, Eye, EyeOff, Copy, Bell, X,
   AlertTriangle, Printer, Upload, Cloud, ChevronRight, Lock,
@@ -64,8 +65,12 @@ export function IdVaultContent() {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { setVaultState(loadState()) }, [])
+  useEffect(() => {
+    setVaultState(loadState())
+  }, [])
   useEffect(() => { saveState(vaultState) }, [vaultState])
+
+  useHashNav(view, setView, ["vault", "add-doc", "doc-detail", "emergency-card", "setup-pin"] as const)
 
   const selectedDoc = useMemo(() => vaultState.documents.find((d) => d.id === selectedDocId) ?? null, [vaultState.documents, selectedDocId])
 

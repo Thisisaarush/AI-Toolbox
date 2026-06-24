@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -497,9 +498,16 @@ export function PersonalCRMContent() {
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [showInteractionForm, setShowInteractionForm] = useState(false)
 
+  useHashNav(view, setView, ["list", "detail", "dashboard"] as const)
+
   useEffect(() => {
     setContacts(loadContacts())
+
   }, [])
+
+
+
+
 
   function updateContacts(fn: (prev: Contact[]) => Contact[]) {
     setContacts((prev) => {

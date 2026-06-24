@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useMemo, useEffect, useCallback } from "react"
+import { useState, useMemo, useEffect, useCallback, useRef } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   CreditCard, Plus, Trash2, ExternalLink, AlertTriangle,
@@ -34,7 +35,7 @@ function save(subs: Subscription[]) {
 }
 
 type View = "dashboard" | "import" | "add" | "detail" | "edit-sub"
-type DashTab = "all" | "cancel-queue" | "groups"
+type DashTab = "all" | "active" | "unused" | "cancel-queue" | "groups"
 type SortKey = "name" | "amount" | "renewal" | "added"
 type QuickFilter = "all" | "active" | "unused" | "rarely" | "due-soon"
 
@@ -44,7 +45,7 @@ const USAGE_OPTIONS: { value: UsageStatus; label: string; color: string }[] = [
   { value: "unused",  label: "Not using",    color: "text-red-600" },
 ]
 
-// ── Monthly spend forecast helpers ──────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function getMonthForecast(subs: Subscription[]): { forecast: number; lastMonth: number } {
   const now = new Date()
@@ -53,7 +54,6 @@ function getMonthForecast(subs: Subscription[]): { forecast: number; lastMonth: 
   const daysInMonth = endOfMonth.getDate()
   const dayOfMonth = now.getDate()
 
-  // Start of last month
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
   const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
 
@@ -64,28 +64,22 @@ function getMonthForecast(subs: Subscription[]): { forecast: number; lastMonth: 
     if (s.billingCycle === "one-time") continue
     const monthly = s.amount
 
-    // Forecast: prorate annual subs by remaining days in month
     if (s.billingCycle === "annual" && s.renewalDate) {
       const renewal = new Date(s.renewalDate)
-      // If annual renewal falls this month, count full annual amount
       if (renewal >= startOfMonth && renewal <= endOfMonth) {
         forecast += s.rawAmount
       } else {
-        // Otherwise count monthly prorated
         forecast += monthly
       }
     } else {
-      // Monthly/quarterly/weekly: scale by days remaining vs full month
       const remaining = daysInMonth - dayOfMonth + 1
       forecast += monthly * (remaining / daysInMonth)
     }
 
-    // Last month: was this sub active last month?
     const createdAt = new Date(s.createdAt)
     if (createdAt <= endOfLastMonth) {
       lastMonth += monthly
     } else if (createdAt >= startOfLastMonth && createdAt <= endOfLastMonth) {
-      // Partial: pro-rate by day of month created
       const dayCreated = createdAt.getDate()
       const daysLastMonth = endOfLastMonth.getDate()
       lastMonth += monthly * ((daysLastMonth - dayCreated + 1) / daysLastMonth)
@@ -94,8 +88,6 @@ function getMonthForecast(subs: Subscription[]): { forecast: number; lastMonth: 
 
   return { forecast, lastMonth }
 }
-
-// ── Spending by month (last 6 months) ───────────────────────────────────────
 
 interface MonthData {
   label: string
@@ -115,7 +107,6 @@ function getSpendingByMonth(subs: Subscription[]): MonthData[] {
     for (const s of subs) {
       if (s.billingCycle === "one-time") continue
       const created = new Date(s.createdAt)
-      // Sub was active before end of this month
       if (created <= monthEnd) {
         amount += s.amount
       }
@@ -126,8 +117,6 @@ function getSpendingByMonth(subs: Subscription[]): MonthData[] {
   return months
 }
 
-// ── Cancel queue helpers ─────────────────────────────────────────────────────
-
 function getCancelQueue(subs: Subscription[]): Subscription[] {
   return subs.filter((s) => {
     if (s.usageStatus === "unused") return true
@@ -136,8 +125,6 @@ function getCancelQueue(subs: Subscription[]): Subscription[] {
     return false
   })
 }
-
-// ── Groups (by tag) ──────────────────────────────────────────────────────────
 
 interface GroupData {
   name: string
@@ -169,6 +156,8 @@ function getGroups(subs: Subscription[]): GroupData[] {
     .sort((a, b) => b.total - a.total)
 }
 
+// ── Main component ───────────────────────────────────────────────────────────
+
 export function SubSheriffContent() {
   const [subs, setSubs] = useState<Subscription[]>([])
   const [view, setView] = useState<View>("dashboard")
@@ -186,6 +175,52 @@ export function SubSheriffContent() {
   const [emailText, setEmailText] = useState("")
   const [isParsing, setIsParsing] = useState(false)
   const [parsedResults, setParsedResults] = useState<(ParsedSubscription & { selected: boolean })[]>([])
+  const [gmailConnecting, setGmailConnecting] = useState(false)
+  const [gmailConnected, setGmailConnected] = useState(false)
+  const [gmailAccessToken, setGmailAccessToken] = useState("")
+  const [gmailEmails, setGmailEmails] = useState<{ id: string; subject: string; from: string; date: string; selected: boolean }[]>([])
+  const [gmailNextPageToken, setGmailNextPageToken] = useState<string | undefined>(undefined)
+  const [gmailLoadingMore, setGmailLoadingMore] = useState(false)
+  const [importingEmails, setImportingEmails] = useState(false)
+
+  async function fetchGmailEmails(token: string, pageToken?: string, replace?: boolean) {
+    try {
+      let query = "https://gmail.googleapis.com/gmail/v1/users/me/messages?q=subject:(receipt OR invoice OR \"payment received\" OR \"your order\" OR \"your subscription\" OR \"billing statement\" OR \"thank you for your purchase\" OR \"payment confirmation\")&maxResults=10"
+      if (pageToken) query += `&pageToken=${pageToken}`
+      const searchRes = await fetch(query, { headers: { Authorization: `Bearer ${token}` } })
+      if (!searchRes.ok) throw new Error("Failed to search Gmail")
+      const searchData = await searchRes.json()
+      const messages: { id: string }[] = searchData.messages ?? []
+
+      setGmailNextPageToken(searchData.nextPageToken)
+
+      const emailList: { id: string; subject: string; from: string; date: string; selected: boolean }[] = []
+      for (const msg of messages) {
+        try {
+          const metaRes = await fetch(
+            `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=Date`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+          if (!metaRes.ok) continue
+          const metaData = await metaRes.json()
+          const headers = metaData.payload?.headers ?? []
+          const subject = headers.find((h: any) => h.name === "Subject")?.value ?? "(no subject)"
+          const from = headers.find((h: any) => h.name === "From")?.value ?? "(unknown)"
+          const date = headers.find((h: any) => h.name === "Date")?.value ?? ""
+          emailList.push({ id: msg.id, subject, from, date, selected: true })
+        } catch { /* skip */ }
+      }
+
+      if (replace) {
+        setGmailEmails(emailList)
+      } else {
+        setGmailEmails((prev) => [...prev, ...emailList])
+      }
+      if (emailList.length === 0) toast.info("No more emails found")
+    } catch {
+      toast.error("Failed to search Gmail")
+    }
+  }
 
   // Add / edit form state
   const [editingSubId, setEditingSubId] = useState<string | null>(null)
@@ -199,13 +234,37 @@ export function SubSheriffContent() {
   const [addRoiNote, setAddRoiNote] = useState("")
   const [addTagsInput, setAddTagsInput] = useState("")
 
-  useEffect(() => { setSubs(load()) }, [])
-  useEffect(() => { save(subs) }, [subs])
+  const mounted = useRef(false)
+  useHashNav(view, setView, ["dashboard", "import", "add", "detail", "edit-sub"] as const)
+
+  useEffect(() => {
+    const stored = load()
+    setSubs(stored)
+    if (stored.length > 0) {
+      const savedToken = localStorage.getItem("sub-sheriff-gmail-token")
+      if (savedToken) { setGmailAccessToken(savedToken); setGmailConnected(true) }
+    }
+    mounted.current = true
+  }, [])
+
+  useEffect(() => {
+    if (!mounted.current) return
+    save(subs)
+  }, [subs])
+
+  useEffect(() => {
+    if (subs.length > 0 && view === "dashboard") {
+      const emptyStateEl = document.querySelector('[class*="mx-auto mt-16"]')
+      if (emptyStateEl) {
+        console.warn("[Sub Sheriff] Warning: subs are loaded but empty state is still visible. subs.length:", subs.length)
+      }
+    }
+  }, [subs, view])
 
   // ── Computed ──────────────────────────────────────────────────────────────
   const summary = useMemo(() => {
     const totalMonthly = subs.reduce((acc, s) => acc + s.amount, 0)
-    const byCategory: Partial<Record<Category, number>> = {}
+    const byCategory: Record<string, number> = {}
     subs.forEach((s) => {
       byCategory[s.category] = (byCategory[s.category] ?? 0) + s.amount
     })
@@ -221,7 +280,7 @@ export function SubSheriffContent() {
         const catSubs = subs.filter((s) => s.category === cat)
         return catSubs.length >= 2
       })
-      .map(([cat]) => cat as Category)
+      .map(([cat]) => cat)
 
     const upcomingRenewals = subs
       .filter((s) => s.renewalDate && daysUntilRenewal(s.renewalDate) <= 30)
@@ -234,7 +293,6 @@ export function SubSheriffContent() {
     const cancelQueue = getCancelQueue(subs)
     const groups = getGroups(subs)
 
-    // All unique tags
     const allTags = Array.from(
       new Set(subs.flatMap((s) => s.tags ?? []))
     ).sort()
@@ -242,7 +300,7 @@ export function SubSheriffContent() {
     return {
       totalMonthly,
       totalAnnual: totalMonthly * 12,
-      byCategory: byCategory as Record<Category, number>,
+      byCategory,
       unusedMonthly,
       rarelyMonthly,
       savingsIfCancelled: unusedMonthly,
@@ -272,7 +330,6 @@ export function SubSheriffContent() {
     if (filterUsage !== "all") result = result.filter((s) => s.usageStatus === filterUsage)
     if (filterTag !== "all") result = result.filter((s) => (s.tags ?? []).includes(filterTag))
 
-    // Quick filter
     if (quickFilter === "active") result = result.filter((s) => s.usageStatus === "active")
     if (quickFilter === "unused") result = result.filter((s) => s.usageStatus === "unused")
     if (quickFilter === "rarely") result = result.filter((s) => s.usageStatus === "rarely")
@@ -324,11 +381,9 @@ export function SubSheriffContent() {
     const raw = parseFloat(addAmount)
     if (isNaN(raw)) { toast.error("Invalid amount"); return }
 
-    // Find existing sub to check if amount changed
     const existingSub = subs.find((s) => s.id === editingSubId)
     const newTags = addTagsInput.split(",").map((t) => t.trim()).filter(Boolean)
 
-    // Build price history entry if amount changed
     let priceHistory: PriceHistoryEntry[] | undefined = existingSub?.priceHistory
     if (existingSub && existingSub.rawAmount !== raw) {
       const entry: PriceHistoryEntry = {
@@ -399,12 +454,12 @@ export function SubSheriffContent() {
     setView("dashboard")
   }
 
-  async function handleParse() {
-    if (!emailText.trim()) { toast.error("Paste email content first"); return }
+  async function parseContent(content: string) {
+    if (!content.trim()) { toast.error("No content to parse"); return }
     setIsParsing(true)
     setParsedResults([])
     try {
-      const res = await aiFetch("/api/sub-sheriff/parse", { emailText })
+      const res = await aiFetch("/api/sub-sheriff/parse", { emailText: content })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Parse failed")
       const results = (data.subscriptions ?? []).map((s: ParsedSubscription) => ({
@@ -412,7 +467,7 @@ export function SubSheriffContent() {
         selected: true,
       }))
       setParsedResults(results)
-      if (results.length === 0) toast.info("No subscriptions detected in this email")
+      if (results.length === 0) toast.info("No subscriptions detected")
       else toast.success(`Found ${results.length} subscription${results.length !== 1 ? "s" : ""}`)
     } catch (err: unknown) {
       if (err instanceof AiKeyError) {
@@ -423,6 +478,69 @@ export function SubSheriffContent() {
       toast.error(err instanceof Error ? err.message : "Parse failed")
     }
     setIsParsing(false)
+  }
+
+  async function handleParse() {
+    if (!emailText.trim()) { toast.error("Paste email content first"); return }
+    await parseContent(emailText)
+  }
+
+  function handleGmailConnect() {
+    const startOAuth = () => {
+      const GIS = (window as any).google?.accounts?.oauth2
+      if (!GIS) {
+        toast.error("Google Identity Services not loaded. Try refreshing the page.")
+        return
+      }
+
+      setGmailConnecting(true)
+      try {
+        const client = GIS.initTokenClient({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "",
+          scope: "https://www.googleapis.com/auth/gmail.readonly",
+          callback: async (tokenResponse: { access_token?: string; error?: string }) => {
+          if (tokenResponse.error) {
+            toast.error("Gmail authorization failed: " + tokenResponse.error)
+            setGmailConnecting(false)
+            return
+          }
+          if (!tokenResponse.access_token) {
+            toast.error("No access token received")
+            setGmailConnecting(false)
+            return
+          }
+
+          setGmailConnected(true)
+          setGmailAccessToken(tokenResponse.access_token)
+          localStorage.setItem("sub-sheriff-gmail-token", tokenResponse.access_token)
+          setGmailNextPageToken(undefined)
+          await fetchGmailEmails(tokenResponse.access_token, undefined, true)
+          setGmailConnecting(false)
+        },
+      })
+        client.requestAccessToken()
+      } catch (err) {
+        setGmailConnecting(false)
+        toast.error("Failed to connect to Gmail")
+      }
+    }
+
+    if ((window as any).google?.accounts?.oauth2) {
+      startOAuth()
+      return
+    }
+
+    const script = document.createElement("script")
+    script.src = "https://accounts.google.com/gsi/client"
+    script.onload = () => {
+      if ((window as any).google?.accounts?.oauth2) {
+        startOAuth()
+      } else {
+        toast.error("Failed to load Google Identity Services")
+      }
+    }
+    script.onerror = () => toast.error("Failed to load Google Identity Services")
+    document.head.appendChild(script)
   }
 
   function importSelected() {
@@ -454,6 +572,70 @@ export function SubSheriffContent() {
     setView("dashboard")
   }
 
+  async function fetchEmailContents(emails: { id: string }[], token: string) {
+    const contents: string[] = []
+    for (const email of emails) {
+      try {
+        const msgRes = await fetch(
+          `https://gmail.googleapis.com/gmail/v1/users/me/messages/${email.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        if (!msgRes.ok) continue
+        const msgData = await msgRes.json()
+        const parts = msgData.payload?.parts ?? (msgData.payload ? [msgData.payload] : [])
+        for (const part of parts) {
+          if (part.mimeType === "text/plain" && part.body?.data) {
+            const raw = atob(part.body.data.replace(/-/g, "+").replace(/_/g, "/"))
+            const bytes = new Uint8Array(raw.length)
+            for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i)
+            const decoded = new TextDecoder("utf-8").decode(bytes)
+            contents.push(decoded)
+          }
+        }
+      } catch { /* skip */ }
+    }
+    return contents
+  }
+
+  function cleanEmailContent(text: string): string {
+    return text
+      .replace(/https?:\/\/\S+/g, "")
+      .replace(/\s{3,}/g, "\n\n")
+      .replace(/\n{4,}/g, "\n\n")
+      .replace(/[^\x20-\x7E\s]/g, "")
+      .trim()
+  }
+
+  async function handleImportSelectedEmails() {
+    const selected = gmailEmails.filter((e) => e.selected)
+    if (selected.length === 0) { toast.error("Select at least one email"); return }
+
+    if (!gmailAccessToken) {
+      toast.error("Gmail not connected. Click Connect Gmail first.")
+      return
+    }
+
+    setImportingEmails(true)
+    const contents = await fetchEmailContents(selected, gmailAccessToken)
+
+    if (contents.length > 0) {
+      const cleaned = contents.map(cleanEmailContent).filter(Boolean).join("\n\n---\n\n")
+      setEmailText(cleaned)
+      setGmailEmails([])
+      await parseContent(cleaned)
+    } else {
+      toast.error("Failed to load email content. Try reconnecting.")
+    }
+    setImportingEmails(false)
+  }
+
+  async function loadMoreGmailEmails() {
+    if (!gmailAccessToken || !gmailNextPageToken) return
+    setGmailLoadingMore(true)
+    await fetchGmailEmails(gmailAccessToken, gmailNextPageToken, false)
+    setGmailLoadingMore(false)
+  }
+
   function exportCsv() {
     const rows = [
       ["Name", "Monthly ($)", "Billed Amount", "Cycle", "Category", "Usage", "Next Renewal", "Cancel URL", "Tags", "ROI Note"],
@@ -462,7 +644,7 @@ export function SubSheriffContent() {
         s.amount.toFixed(2),
         s.rawAmount.toFixed(2),
         s.billingCycle,
-        CATEGORY_META[s.category].label,
+        CATEGORY_META[s.category]?.label ?? s.category,
         s.usageStatus,
         s.renewalDate ?? "",
         s.cancelUrl ?? "",
@@ -638,7 +820,7 @@ export function SubSheriffContent() {
                     {summary.duplicates.length > 0 && (
                       <Alert
                         icon={<AlertTriangle className="w-4 h-4 text-amber-500" />}
-                        message={`Possible duplicates in: ${summary.duplicates.map((c) => CATEGORY_META[c].label).join(", ")}. You have 2+ subscriptions in the same category.`}
+                        message={`Possible duplicates in: ${summary.duplicates.map((c) => CATEGORY_META[c]?.label ?? c).join(", ")}. You have 2+ subscriptions in the same category.`}
                         action="Review"
                         onAction={() => setFilterCategory(summary.duplicates[0]!)}
                       />
@@ -695,10 +877,10 @@ export function SubSheriffContent() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {(Object.entries(summary.byCategory) as [Category, number][])
+                      {(Object.entries(summary.byCategory) as [string, number][])
                         .sort((a, b) => b[1] - a[1])
                         .map(([cat, amount]) => {
-                          const meta = CATEGORY_META[cat]
+                          const meta = CATEGORY_META[cat] ?? { label: cat, color: "text-gray-600", bg: "bg-gray-100 dark:bg-gray-800", barColor: "bg-gray-500" }
                           const pct = summary.totalMonthly > 0 ? (amount / summary.totalMonthly) * 100 : 0
                           return (
                             <button
@@ -726,9 +908,11 @@ export function SubSheriffContent() {
                 </Card>
 
                 {/* Tab bar */}
-                <div className="flex gap-1.5 p-1 bg-muted/50 rounded-lg w-fit">
+                <div className="flex gap-1.5 p-1 bg-muted/50 rounded-lg w-fit flex-wrap">
                   {([
                     { key: "all" as DashTab, label: "All Subscriptions" },
+                    { key: "active" as DashTab, label: `Active (${subs.filter(s => s.usageStatus === "active").length})` },
+                    { key: "unused" as DashTab, label: `Unused (${subs.filter(s => s.usageStatus === "unused").length})` },
                     { key: "cancel-queue" as DashTab, label: `Cancel Queue${summary.cancelQueue.length > 0 ? ` (${summary.cancelQueue.length})` : ""}` },
                     { key: "groups" as DashTab, label: "Groups" },
                   ] satisfies { key: DashTab; label: string }[]).map((tab) => (
@@ -796,16 +980,19 @@ export function SubSheriffContent() {
                           className="pl-9"
                         />
                       </div>
-                      <select
-                        value={filterCategory}
-                        onChange={(e) => setFilterCategory(e.target.value as Category | "all")}
-                        className="h-11 rounded-md border border-input bg-background px-4 text-sm"
-                      >
-                        <option value="all">All categories</option>
-                        {Object.entries(CATEGORY_META).map(([k, v]) => (
-                          <option key={k} value={k}>{v.label}</option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <select
+                          value={filterCategory}
+                          onChange={(e) => setFilterCategory(e.target.value as Category | "all")}
+                          className="h-11 rounded-md border border-input bg-background px-4 text-sm appearance-none mr-2 pr-10"
+                        >
+                          <option value="all">All categories</option>
+                          {Object.entries(CATEGORY_META).map(([k, v]) => (
+                            <option key={k} value={k}>{v.label}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-muted-foreground" />
+                      </div>
                       {hasActiveFilters && (
                         <Button variant="ghost" size="sm" onClick={clearFilters}>
                           <X className="w-4 h-4 mr-1" /> Clear
@@ -853,6 +1040,56 @@ export function SubSheriffContent() {
                   </>
                 )}
 
+                {/* ── Active tab ── */}
+                {dashTab === "active" && (
+                  <Card>
+                    <CardContent className="pt-6">
+                      {(() => {
+                        const activeSubs = subs.filter(s => s.usageStatus === "active").sort((a, b) => b.amount - a.amount)
+                        if (activeSubs.length === 0) return <p className="text-sm text-muted-foreground text-center py-8">No active subscriptions</p>
+                        return (
+                          <div className="divide-y">
+                            {activeSubs.map((s) => (
+                              <SubscriptionRow
+                                key={s.id}
+                                sub={s}
+                                onSelect={() => { setSelectedSub(s); setView("detail") }}
+                                onUsageChange={(status) => updateUsage(s.id, status)}
+                                onDelete={() => deleteSub(s.id)}
+                              />
+                            ))}
+                          </div>
+                        )
+                      })()}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* ── Unused tab ── */}
+                {dashTab === "unused" && (
+                  <Card>
+                    <CardContent className="pt-6">
+                      {(() => {
+                        const unusedSubs = subs.filter(s => s.usageStatus === "unused").sort((a, b) => b.amount - a.amount)
+                        if (unusedSubs.length === 0) return <p className="text-sm text-muted-foreground text-center py-8">No unused subscriptions</p>
+                        return (
+                          <div className="divide-y">
+                            {unusedSubs.map((s) => (
+                              <SubscriptionRow
+                                key={s.id}
+                                sub={s}
+                                onSelect={() => { setSelectedSub(s); setView("detail") }}
+                                onUsageChange={(status) => updateUsage(s.id, status)}
+                                onDelete={() => deleteSub(s.id)}
+                              />
+                            ))}
+                          </div>
+                        )
+                      })()}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* ── Cancel queue tab ── */}
                 {dashTab === "cancel-queue" && (
                   <div className="space-y-5">
@@ -878,7 +1115,7 @@ export function SubSheriffContent() {
                           Potential annual savings: <span className="font-bold text-green-600">{formatCurrency(summary.cancelQueue.reduce((acc, s) => acc + s.amount * 12, 0))}</span>
                         </p>
                         {summary.cancelQueue.map((s) => {
-                          const meta = CATEGORY_META[s.category]
+                          const meta = CATEGORY_META[s.category] ?? { label: s.category, color: "text-gray-600", bg: "bg-gray-100 dark:bg-gray-800" }
                           const reason =
                             s.usageStatus === "unused"
                               ? "Marked unused"
@@ -985,40 +1222,173 @@ export function SubSheriffContent() {
             <div>
               <h1 className="text-3xl font-bold mb-1">Scan Email</h1>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Paste the text of a billing receipt, renewal email, or subscription confirmation.
+                Connect Gmail to find subscription emails, or paste billing receipts / renewal emails manually.
                 AI will extract the subscription details automatically.
               </p>
             </div>
 
             {parsedResults.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 space-y-5">
-                  <div>
-                    <label className="text-xs font-medium mb-1.5 block">
-                      Email content <span className="text-muted-foreground">(paste the full email text)</span>
-                    </label>
-                    <Textarea
-                      placeholder={`Your GitHub Copilot subscription\n\nAmount: $10.00/month\nNext billing date: July 15, 2026\n\nThank you for your subscription to GitHub Copilot...`}
-                      value={emailText}
-                      onChange={(e) => setEmailText(e.target.value)}
-                      rows={14}
-                      className="font-mono text-sm"
-                    />
+              <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    {gmailEmails.length > 0
+                      ? `${gmailEmails.length} subscription email${gmailEmails.length !== 1 ? "s" : ""} found`
+                      : "Search your inbox for subscription emails"}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    {gmailConnected ? (
+                      <>
+                        <span className="text-xs text-green-600 flex items-center gap-1">
+                          <Check className="w-3 h-3" /> Gmail connected
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            setGmailConnecting(true)
+                            setGmailNextPageToken(undefined)
+                            await fetchGmailEmails(gmailAccessToken, undefined, true)
+                            setGmailConnecting(false)
+                          }}
+                          disabled={gmailConnecting}
+                        >
+                          {gmailConnecting ? (
+                            <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Loading...</>
+                          ) : (
+                            <><Mail className="w-4 h-4 mr-1" /> Fetch Emails</>
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setGmailConnected(false)
+                            setGmailAccessToken("")
+                            setGmailEmails([])
+                            setGmailNextPageToken(undefined)
+                            localStorage.removeItem("sub-sheriff-gmail-token")
+                          }}
+                        >
+                          Disconnect
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGmailConnect}
+                        disabled={gmailConnecting}
+                      >
+                        {gmailConnecting ? (
+                          <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Connecting...</>
+                        ) : (
+                          <><Mail className="w-4 h-4 mr-1" /> Connect Gmail</>
+                        )}
+                      </Button>
+                    )}
                   </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-xs text-muted-foreground">
-                      You can paste multiple emails at once for batch import
-                    </p>
-                    <Button onClick={handleParse} disabled={isParsing || !emailText.trim()}>
-                      {isParsing ? (
-                        <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Scanning...</>
-                      ) : (
-                        <><Sparkles className="w-4 h-4 mr-1" /> Scan with AI</>
+                </div>
+
+                {gmailEmails.length > 0 && (
+                  <Card>
+                    <CardContent className="pt-5 space-y-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-medium">Select emails to import</label>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setGmailEmails((prev) => prev.map((e) => ({ ...e, selected: !e.selected })))}
+                            className="text-xs text-muted-foreground hover:text-foreground"
+                          >
+                            Toggle all
+                          </button>
+                          <Button
+                            size="sm"
+                            onClick={handleImportSelectedEmails}
+                            disabled={importingEmails || !gmailEmails.some((e) => e.selected)}
+                          >
+                            {importingEmails ? (
+                              <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Loading...</>
+                            ) : (
+                              <><Check className="w-4 h-4 mr-1" /> Import Selected ({gmailEmails.filter((e) => e.selected).length})</>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="max-h-64 overflow-y-auto space-y-1">
+                        {gmailEmails.map((email) => (
+                          <label
+                            key={email.id}
+                            className="flex items-start gap-3 p-2 rounded-md hover:bg-muted/50 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={email.selected}
+                              onChange={() =>
+                                setGmailEmails((prev) =>
+                                  prev.map((e) => e.id === email.id ? { ...e, selected: !e.selected } : e)
+                                )
+                              }
+                              className="mt-1"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium truncate">{email.subject}</p>
+                              <p className="text-xs text-muted-foreground truncate">{email.from}</p>
+                            </div>
+                            {email.date && (
+                              <span className="text-xs text-muted-foreground shrink-0">
+                                {new Date(email.date).toLocaleDateString()}
+                              </span>
+                            )}
+                          </label>
+                        ))}
+                      </div>
+                      {gmailNextPageToken && (
+                        <div className="pt-2 text-center">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={loadMoreGmailEmails}
+                            disabled={gmailLoadingMore}
+                          >
+                            {gmailLoadingMore ? (
+                              <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Loading...</>
+                            ) : (
+                              <>Load more</>
+                            )}
+                          </Button>
+                        </div>
                       )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                )}
+
+                <Card>
+                  <CardContent className="pt-6 space-y-5">
+                    <div>
+                      <label className="text-xs font-medium mb-2 block">Email content <span className="text-muted-foreground">(paste the full email text)</span></label>
+                      <Textarea
+                        placeholder={`Your GitHub Copilot subscription\n\nAmount: $10.00/month\nNext billing date: July 15, 2026\n\nThank you for your subscription to GitHub Copilot...`}
+                        value={emailText}
+                        onChange={(e) => setEmailText(e.target.value)}
+                        rows={14}
+                        className="font-mono text-sm"
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="text-xs text-muted-foreground">
+                        You can paste multiple emails at once for batch import
+                      </p>
+                      <Button onClick={handleParse} disabled={isParsing || !emailText.trim()}>
+                        {isParsing ? (
+                          <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Scanning...</>
+                        ) : (
+                          <><Sparkles className="w-4 h-4 mr-1" /> Scan with AI</>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             ) : (
               <div className="space-y-5">
                 <div className="flex items-center justify-between">
@@ -1026,7 +1396,7 @@ export function SubSheriffContent() {
                     Found {parsedResults.length} subscription{parsedResults.length !== 1 ? "s" : ""}
                   </p>
                   <div className="flex gap-3">
-                    <Button variant="outline" size="sm" onClick={() => setParsedResults([])}>
+                    <Button variant="outline" size="sm" onClick={() => { setParsedResults([]); setGmailEmails([]); setGmailNextPageToken(undefined); }}>
                       ← Rescan
                     </Button>
                     <Button size="sm" onClick={importSelected}>
@@ -1037,7 +1407,7 @@ export function SubSheriffContent() {
                 </div>
 
                 {parsedResults.map((r, i) => {
-                  const meta = CATEGORY_META[r.category]
+                  const meta = CATEGORY_META[r.category] ?? { label: r.category, color: "text-gray-600", bg: "bg-gray-100 dark:bg-gray-800" }
                   return (
                     <Card
                       key={i}
@@ -1119,29 +1489,35 @@ export function SubSheriffContent() {
                   </div>
                   <div>
                     <label className="text-xs font-medium mb-1 block">Billing cycle</label>
-                    <select
-                      value={addCycle}
-                      onChange={(e) => setAddCycle(e.target.value as BillingCycle)}
-                      className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
-                    >
-                      {Object.entries(BILLING_CYCLE_LABELS).map(([k, v]) => (
-                        <option key={k} value={k}>{v}</option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={addCycle}
+                        onChange={(e) => setAddCycle(e.target.value as BillingCycle)}
+                        className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm appearance-none mr-2 pr-10"
+                      >
+                        {Object.entries(BILLING_CYCLE_LABELS).map(([k, v]) => (
+                          <option key={k} value={k}>{v}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-muted-foreground" />
+                    </div>
                   </div>
                 </div>
 
                 <div>
                   <label className="text-xs font-medium mb-1 block">Category</label>
-                  <select
-                    value={addCategory}
-                    onChange={(e) => setAddCategory(e.target.value as Category)}
-                    className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
-                  >
-                    {Object.entries(CATEGORY_META).map(([k, v]) => (
-                      <option key={k} value={k}>{v.label}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={addCategory}
+                      onChange={(e) => setAddCategory(e.target.value as Category)}
+                      className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm appearance-none mr-2 pr-10"
+                    >
+                      {Object.entries(CATEGORY_META).map(([k, v]) => (
+                        <option key={k} value={k}>{v.label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-muted-foreground" />
+                  </div>
                 </div>
 
                 <div>
@@ -1231,29 +1607,35 @@ export function SubSheriffContent() {
                   </div>
                   <div>
                     <label className="text-xs font-medium mb-1 block">Billing cycle</label>
-                    <select
-                      value={addCycle}
-                      onChange={(e) => setAddCycle(e.target.value as BillingCycle)}
-                      className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
-                    >
-                      {Object.entries(BILLING_CYCLE_LABELS).map(([k, v]) => (
-                        <option key={k} value={k}>{v}</option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={addCycle}
+                        onChange={(e) => setAddCycle(e.target.value as BillingCycle)}
+                        className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm appearance-none mr-2 pr-10"
+                      >
+                        {Object.entries(BILLING_CYCLE_LABELS).map(([k, v]) => (
+                          <option key={k} value={k}>{v}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-muted-foreground" />
+                    </div>
                   </div>
                 </div>
 
                 <div>
                   <label className="text-xs font-medium mb-1 block">Category</label>
-                  <select
-                    value={addCategory}
-                    onChange={(e) => setAddCategory(e.target.value as Category)}
-                    className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm"
-                  >
-                    {Object.entries(CATEGORY_META).map(([k, v]) => (
-                      <option key={k} value={k}>{v.label}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={addCategory}
+                      onChange={(e) => setAddCategory(e.target.value as Category)}
+                      className="w-full h-11 rounded-md border border-input bg-background px-4 text-sm appearance-none mr-2 pr-10"
+                    >
+                      {Object.entries(CATEGORY_META).map(([k, v]) => (
+                        <option key={k} value={k}>{v.label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-muted-foreground" />
+                  </div>
                 </div>
 
                 <div>
@@ -1362,8 +1744,8 @@ export function SubSheriffContent() {
             <Card>
               <CardContent className="pt-5 space-y-5">
                 <Row label="Category" value={
-                  <span className={`text-xs font-medium px-3 py-0.5 rounded-full ${CATEGORY_META[selectedSub.category].bg} ${CATEGORY_META[selectedSub.category].color}`}>
-                    {CATEGORY_META[selectedSub.category].label}
+                  <span className={`text-xs font-medium px-3 py-0.5 rounded-full ${CATEGORY_META[selectedSub.category]?.bg ?? "bg-gray-100"} ${CATEGORY_META[selectedSub.category]?.color ?? "text-gray-600"}`}>
+                    {CATEGORY_META[selectedSub.category]?.label ?? selectedSub.category}
                   </span>
                 } />
                 <Row label="Billing" value={`${formatCurrency(selectedSub.rawAmount)} ${BILLING_CYCLE_LABELS[selectedSub.billingCycle].toLowerCase()}`} />
@@ -1550,7 +1932,7 @@ function SubscriptionRow({
   onUsageChange: (status: UsageStatus) => void
   onDelete: () => void
 }) {
-  const meta = CATEGORY_META[sub.category]
+  const meta = CATEGORY_META[sub.category] ?? { label: sub.category, color: "text-gray-600", bg: "bg-gray-100 dark:bg-gray-800" }
   const usageOption = USAGE_OPTIONS.find((o) => o.value === sub.usageStatus)!
 
   return (
@@ -1594,16 +1976,19 @@ function SubscriptionRow({
       </div>
 
       <div className="col-span-2">
-        <select
-          value={sub.usageStatus}
-          onChange={(e) => onUsageChange(e.target.value as UsageStatus)}
-          onClick={(e) => e.stopPropagation()}
-          className={`text-xs font-medium bg-transparent border-none outline-none cursor-pointer ${usageOption.color}`}
-        >
-          {USAGE_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
+        <div className="relative inline-block">
+          <select
+            value={sub.usageStatus}
+            onChange={(e) => onUsageChange(e.target.value as UsageStatus)}
+            onClick={(e) => e.stopPropagation()}
+            className={`text-xs font-medium bg-transparent border-none outline-none cursor-pointer appearance-none mr-2 pr-5 ${usageOption.color}`}
+          >
+            {USAGE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-muted-foreground" />
+        </div>
       </div>
 
       <div className="col-span-2 flex items-center justify-between">

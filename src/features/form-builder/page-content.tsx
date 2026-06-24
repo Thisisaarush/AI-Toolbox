@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
@@ -684,6 +685,8 @@ export function FormBuilderContent() {
     setForms(loadForms())
     setResponses(loadResponses())
   }, [])
+
+  useHashNav(view, setView, ["edit", "preview", "responses", "share"] as const)
 
   // Persist forms
   useEffect(() => {

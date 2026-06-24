@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   FileSignature, Plus, Trash2, Download, Sparkles, Search,
@@ -41,8 +42,17 @@ export function ContractGenContent() {
   const [editedContent, setEditedContent] = useState("")
   const [activeVersionId, setActiveVersionId] = useState<string | null>(null)
 
-  useEffect(() => { setContracts(loadContracts()) }, [])
+  useHashNav(view, setView, ["library", "new-contract", "contract-detail"] as const)
+
+  useEffect(() => {
+    setContracts(loadContracts())
+
+  }, [])
   useEffect(() => { saveContracts(contracts) }, [contracts])
+
+
+
+
 
   const selectedContract = useMemo(() =>
     contracts.find((c) => c.id === selectedId) ?? null,

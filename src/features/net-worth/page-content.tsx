@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useHashNav } from "@/lib/use-hash-nav"
 import { ToolHeader } from "@/components/shared/tool-header"
 import {
   TrendingUp, Plus, Trash2, Sparkles, RefreshCw, Target,
@@ -65,8 +66,17 @@ export function NetWorthContent() {
   const [goalTarget, setGoalTarget] = useState("")
   const [goalDate, setGoalDate] = useState("")
 
-  useEffect(() => { setState(load()) }, [])
+  useHashNav(view, setView, ["dashboard", "add-account", "goals"] as const)
+
+  useEffect(() => {
+    setState(load())
+
+  }, [])
   useEffect(() => { save(state) }, [state])
+
+
+
+
 
   // FX rates
   async function fetchRates() {
