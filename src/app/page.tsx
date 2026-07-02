@@ -9,9 +9,9 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Header sticky={false} />
 
-      <main className="flex-1 h-screen overflow-y-auto snap-y snap-mandatory">
-        {/* Hero — full viewport, snaps to top */}
-        <section className="relative h-screen snap-start shrink-0 bg-white dark:bg-[#0a0a0a] overflow-hidden border-b border-border">
+      <main className="flex-1 h-[calc(100vh-3.5rem-1px)] overflow-y-auto snap-y snap-mandatory">
+        {/* Hero — fills remaining viewport below header, snaps to top */}
+        <section className="relative h-full snap-start shrink-0 bg-white dark:bg-[#0a0a0a] overflow-hidden border-b border-border">
           {/* Grid — light mode */}
           <div
             className="absolute inset-0 opacity-[0.04] dark:hidden"

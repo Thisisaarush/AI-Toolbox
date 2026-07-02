@@ -437,10 +437,9 @@ function ToolCard({
       href={tool.href}
       className="group"
     >
-      <Card className={`relative h-full flex flex-col border-t-2 ${tool.borderColor}`}>
+      <Card className={`relative h-full flex flex-col border-t-2 ${tool.borderColor} overflow-visible`}>
         {tool.isNew && (
-          <span className="absolute -top-2 left-3 inline-flex items-center gap-1 rounded-full bg-violet-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
-            <Sparkles className="w-2.5 h-2.5" />
+          <span className="absolute -top-2 left-3 inline-flex items-center rounded-full bg-violet-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
             New
           </span>
         )}
