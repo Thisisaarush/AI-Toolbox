@@ -7,7 +7,7 @@ export const CATEGORY_META = [
   { id: "launch-marketing",  label: "Launch & Marketing",  legendColor: "bg-orange-500", count: 7  },
   { id: "content-creative",  label: "Content & Creative",  legendColor: "bg-purple-500", count: 3  },
   { id: "career-learning",   label: "Career & Learning",   legendColor: "bg-indigo-500", count: 7  },
-  { id: "personal",          label: "Personal",            legendColor: "bg-amber-500",  count: 10  },
+  { id: "personal",          label: "Personal",            legendColor: "bg-amber-500",  count: 9  },
   { id: "social",            label: "Social",              legendColor: "bg-pink-500",   count: 1  },
   { id: "legal",             label: "Legal",               legendColor: "bg-rose-500",   count: 1  },
 ] as const

@@ -7,7 +7,7 @@ import { ArrowRight, Star, Search, X,
   Dumbbell, CheckCircle2, TrendingUp, Shield, Users, Plane,
   BookOpen, List, MessageSquare, Briefcase, Calendar, FileSignature,
   Scroll, Palette, Layout, Eye, Hammer, Sparkles, Brain, UserCheck,
-  Braces, FilePlus, MessageCircle, Dices, Flame, Printer, Database, Car,
+  Braces, FilePlus, MessageCircle, Dices, Flame, Printer, Database,
 } from "lucide-react"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -113,7 +113,6 @@ const categories: Category[] = [
       { name: "Travel Docs", description: "Organize travel documents, visa requirements, and packing lists. Never miss a document for any trip.", icon: Plane, href: "/tools/travel-docs", badge: "Personal", color: "text-cyan-600", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
       { name: "Visualize Habit", description: "Track habits with a GitHub-style heatmap, monthly calendar, weekly view, and detailed stats with streaks.", icon: Flame, href: "/tools/visualize-habit", badge: "Personal", color: "text-orange-500", bgColor: "bg-orange-50 dark:bg-orange-950", borderColor: "border-t-orange-500" },
       { name: "IndiePage", description: "Build a personal landing page with bio, links, social icons, and custom themes. Export as standalone HTML.", icon: Globe, href: "/tools/indiepage", badge: "Personal", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500" },
-      { name: "Vehicle Desk", description: "Track your vehicles, manage PUC/insurance/RC expiry, check challans, and keep your vehicle portfolio in one place.", icon: Car, href: "/tools/vehicle-desk", badge: "Personal", color: "text-blue-600", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
     ],
   },
   {
