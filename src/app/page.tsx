@@ -1,7 +1,6 @@
 import { Header } from "@/components/shared/header"
 import { ToolsSection } from "@/components/home/tools-section"
 import { HeroCategories } from "@/components/home/hero-categories"
-import { HeroFloatingIcons } from "@/components/home/hero-floating-icons"
 import { CATEGORY_META, ALL_TOOL_COUNT } from "@/lib/tools-meta"
 
 export default function Home() {
@@ -9,7 +8,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Header sticky={false} />
 
-      <main className="flex-1 h-[calc(100vh-3.5rem-1px)] overflow-y-auto snap-y snap-mandatory">
+      <main className="h-[calc(100vh-3.5rem-1px)] overflow-y-auto snap-y snap-mandatory">
         {/* Hero — fills remaining viewport below header, snaps to top */}
         <section className="relative h-full snap-start shrink-0 bg-white dark:bg-[#0a0a0a] overflow-hidden border-b border-border">
           {/* Grid — light mode */}
@@ -28,9 +27,6 @@ export default function Home() {
               backgroundSize: "72px 72px",
             }}
           />
-
-          {/* Floating tool icons — decorative, clickable shortcuts */}
-          <HeroFloatingIcons />
 
           <div className="relative z-10 h-full max-w-6xl mx-auto px-4 flex flex-col items-center justify-center text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-3 py-1 text-xs font-medium text-black/50 dark:text-white/50 mb-8">
