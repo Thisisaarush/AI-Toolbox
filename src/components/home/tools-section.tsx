@@ -22,6 +22,8 @@ type Tool = {
   color: string
   bgColor: string
   borderColor: string
+  popular?: boolean
+  isNew?: boolean
 }
 
 type Category = {
@@ -39,15 +41,15 @@ const categories: Category[] = [
     label: "Development",
     legendColor: "bg-blue-500",
     tools: [
-      { name: "DependGuard", description: "Scan package.json for outdated, vulnerable, or typosquatted dependencies. AI-powered analysis and health scoring.", icon: Shield, href: "/tools/dependguard", badge: "Dev Tool", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500" },
+      { name: "DependGuard", description: "Scan package.json for outdated, vulnerable, or typosquatted dependencies. AI-powered analysis and health scoring.", icon: Shield, href: "/tools/dependguard", badge: "Dev Tool", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500", popular: true, isNew: true },
       { name: "DNS Desk", description: "All your domains in one dashboard. Visual DNS editor, expiry alerts, propagation checker, health monitor.", icon: Globe, href: "/tools/dns-desk", badge: "Dev Tool", color: "text-sky-500", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
       { name: "Env Manager", description: "Manage environment variables across projects and environments. Sync to Vercel, Railway, and Fly.io in one click.", icon: KeyRound, href: "/tools/env-manager", badge: "Dev Tool", color: "text-indigo-500", bgColor: "bg-indigo-50 dark:bg-indigo-950", borderColor: "border-t-indigo-500" },
       { name: "Changelog AI", description: "Paste your git log or fetch from GitHub. AI writes user-facing release notes grouped by type.", icon: GitBranch, href: "/tools/changelog-ai", badge: "Dev Tool", color: "text-cyan-500", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
-      { name: "JSON Studio", description: "Full-featured JSON editor with tree view, diff checker, schema generator, CSV converter, and deep search.", icon: Braces, href: "/tools/json-studio", badge: "Dev Tool", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
-      { name: "Color & Design Studio", description: "Color palette generator, contrast checker, gradient builder, and CSS export. Create harmonious color schemes in seconds.", icon: Palette, href: "/tools/color-studio", badge: "Dev Tool", color: "text-fuchsia-500", bgColor: "bg-fuchsia-50 dark:bg-fuchsia-950", borderColor: "border-t-fuchsia-500" },
-      { name: "Markdown Workspace", description: "Full-featured markdown editor with live preview, file management, toolbar, and export to HTML/markdown.", icon: FileText, href: "/tools/markdown-workspace", badge: "Dev Tool", color: "text-cyan-500", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
+      { name: "JSON Studio", description: "Full-featured JSON editor with tree view, diff checker, schema generator, CSV converter, and deep search.", icon: Braces, href: "/tools/json-studio", badge: "Dev Tool", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500", popular: true, isNew: true },
+      { name: "Color & Design Studio", description: "Color palette generator, contrast checker, gradient builder, and CSS export. Create harmonious color schemes in seconds.", icon: Palette, href: "/tools/color-studio", badge: "Dev Tool", color: "text-fuchsia-500", bgColor: "bg-fuchsia-50 dark:bg-fuchsia-950", borderColor: "border-t-fuchsia-500", isNew: true },
+      { name: "Markdown Workspace", description: "Full-featured markdown editor with live preview, file management, toolbar, and export to HTML/markdown.", icon: FileText, href: "/tools/markdown-workspace", badge: "Dev Tool", color: "text-cyan-500", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500", isNew: true },
       { name: "Fake It", description: "Generate realistic mock data for testing. Names, emails, phones, addresses, and more. Export as JSON or CSV.", icon: Database, href: "/tools/fake-it", badge: "Dev Tool", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-950", borderColor: "border-t-amber-500" },
-      { name: "Form Builder", description: "Drag-and-drop form builder with 15+ field types, multi-step forms, themes, conditional logic, and response analytics.", icon: FilePlus, href: "/tools/form-builder", badge: "Dev Tool", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
+      { name: "Form Builder", description: "Drag-and-drop form builder with 15+ field types, multi-step forms, themes, conditional logic, and response analytics.", icon: FilePlus, href: "/tools/form-builder", badge: "Dev Tool", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500", popular: true, isNew: true },
     ],
   },
   {
@@ -55,9 +57,9 @@ const categories: Category[] = [
     label: "Finance",
     legendColor: "bg-green-500",
     tools: [
-      { name: "Sub Sheriff", description: "Scan your email for every subscription you're paying for. Find forgotten charges, duplicates, and what to cancel.", icon: CreditCard, href: "/tools/sub-sheriff", badge: "Finance", color: "text-red-500", bgColor: "bg-red-50 dark:bg-red-950", borderColor: "border-t-red-500" },
-      { name: "Invoice Zero", description: "Create and send professional invoices in under 60 seconds. Track payments, manage clients, download PDFs.", icon: FileText, href: "/tools/invoice-zero", badge: "Finance", color: "text-green-500", bgColor: "bg-green-50 dark:bg-green-950", borderColor: "border-t-green-500" },
-      { name: "Net Worth", description: "Track assets, liabilities, and net worth over time. Multi-currency support via live exchange rates.", icon: TrendingUp, href: "/tools/net-worth", badge: "Finance", color: "text-emerald-600", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500" },
+      { name: "Sub Sheriff", description: "Scan your email for every subscription you're paying for. Find forgotten charges, duplicates, and what to cancel.", icon: CreditCard, href: "/tools/sub-sheriff", badge: "Finance", color: "text-red-500", bgColor: "bg-red-50 dark:bg-red-950", borderColor: "border-t-red-500", popular: true },
+      { name: "Invoice Zero", description: "Create and send professional invoices in under 60 seconds. Track payments, manage clients, download PDFs.", icon: FileText, href: "/tools/invoice-zero", badge: "Finance", color: "text-green-500", bgColor: "bg-green-50 dark:bg-green-950", borderColor: "border-t-green-500", popular: true },
+      { name: "Net Worth", description: "Track assets, liabilities, and net worth over time. Multi-currency support via live exchange rates.", icon: TrendingUp, href: "/tools/net-worth", badge: "Finance", color: "text-emerald-600", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500", popular: true },
       { name: "Expense Splitter", description: "Split bills between friends and groups. Multi-currency, tracks who owes what, and generates settlement summaries.", icon: Users, href: "/tools/expense-splitter", badge: "Finance", color: "text-lime-600", bgColor: "bg-lime-50 dark:bg-lime-950", borderColor: "border-t-lime-500" },
     ],
   },
@@ -91,8 +93,8 @@ const categories: Category[] = [
     legendColor: "bg-indigo-500",
     tools: [
       { name: "Interview Prep", description: "Practice behavioral and technical interview questions. Track answers with the STAR method, score yourself.", icon: MessageSquare, href: "/tools/interview-prep", badge: "Career", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-950", borderColor: "border-t-amber-500" },
-      { name: "Resume Builder", description: "Build, preview, and score resumes. ATS analysis, job tailoring, cover letter generation, and bullet rewriting powered by AI.", icon: Scroll, href: "/tools/resume-builder", badge: "Career", color: "text-sky-600", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
-      { name: "Job Tracker", description: "Track job applications through every stage. Notes, contacts, follow-up reminders, and a Kanban-style pipeline.", icon: Briefcase, href: "/tools/job-tracker", badge: "Career", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
+      { name: "Resume Builder", description: "Build, preview, and score resumes. ATS analysis, job tailoring, cover letter generation, and bullet rewriting powered by AI.", icon: Scroll, href: "/tools/resume-builder", badge: "Career", color: "text-sky-600", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500", popular: true },
+      { name: "Job Tracker", description: "Track job applications through every stage. Notes, contacts, follow-up reminders, and a Kanban-style pipeline.", icon: Briefcase, href: "/tools/job-tracker", badge: "Career", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500", popular: true },
       { name: "Book Notes", description: "Capture highlights, summaries, and key takeaways from books. Search by title via Open Library. Import from Readwise.", icon: BookOpen, href: "/tools/book-notes", badge: "Education", color: "text-violet-500", bgColor: "bg-violet-50 dark:bg-violet-950", borderColor: "border-t-violet-500" },
       { name: "Reading List", description: "Manage your to-read list, track reading status, and log reading time. Sync highlights from Readwise.", icon: List, href: "/tools/reading-list", badge: "Education", color: "text-indigo-400", bgColor: "bg-indigo-50 dark:bg-indigo-950", borderColor: "border-t-indigo-400" },
       { name: "Decision Game", description: "Magic 8-ball, spin-the-wheel picker, and pros/cons analyzer. Make decisions fun and interactive.", icon: Dices, href: "/tools/decision-game", badge: "Education", color: "text-purple-500", bgColor: "bg-purple-50 dark:bg-purple-950", borderColor: "border-t-purple-500" },
@@ -105,14 +107,14 @@ const categories: Category[] = [
     legendColor: "bg-amber-500",
     tools: [
       { name: "Workout Log", description: "Log workouts, track PRs, and visualize progress. Import activities from Strava or add manually.", icon: Dumbbell, href: "/tools/workout-log", badge: "Personal", color: "text-orange-500", bgColor: "bg-orange-50 dark:bg-orange-950", borderColor: "border-t-orange-500" },
-      { name: "Habit Tracker", description: "Build streaks, track daily habits, and visualize consistency with a clean heatmap calendar.", icon: CheckCircle2, href: "/tools/habit-tracker", badge: "Personal", color: "text-teal-500", bgColor: "bg-teal-50 dark:bg-teal-950", borderColor: "border-t-teal-500" },
+      { name: "Habit Tracker", description: "Build streaks, track daily habits, and visualize consistency with a clean heatmap calendar.", icon: CheckCircle2, href: "/tools/habit-tracker", badge: "Personal", color: "text-teal-500", bgColor: "bg-teal-50 dark:bg-teal-950", borderColor: "border-t-teal-500", popular: true },
       { name: "ID Vault", description: "Store passport numbers, license IDs, and document expiry dates. Encrypted client-side, never leaves your device.", icon: Shield, href: "/tools/id-vault", badge: "Personal", color: "text-sky-500", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
       { name: "Dev Health", description: "Pomodoro timer, daily health log, streak tracker, and weekly heatmap. Monitor sleep, energy, mood, and exercise.", icon: Brain, href: "/tools/dev-health", badge: "Personal", color: "text-indigo-400", bgColor: "bg-indigo-50 dark:bg-indigo-950", borderColor: "border-t-indigo-400" },
       { name: "Ship Tracker", description: "Create challenges, track daily progress, build streaks, and hold yourself accountable. With shame cards for missed days.", icon: Rocket, href: "/tools/ship-tracker", badge: "Personal", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-950", borderColor: "border-t-amber-500" },
       { name: "Personal CRM", description: "Track contacts, log interactions, set follow-ups, and never forget a birthday. Your personal relationship manager.", icon: Users, href: "/tools/personal-crm", badge: "Personal", color: "text-sky-500", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
       { name: "Travel Docs", description: "Organize travel documents, visa requirements, and packing lists. Never miss a document for any trip.", icon: Plane, href: "/tools/travel-docs", badge: "Personal", color: "text-cyan-600", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
       { name: "Visualize Habit", description: "Track habits with a GitHub-style heatmap, monthly calendar, weekly view, and detailed stats with streaks.", icon: Flame, href: "/tools/visualize-habit", badge: "Personal", color: "text-orange-500", bgColor: "bg-orange-50 dark:bg-orange-950", borderColor: "border-t-orange-500" },
-      { name: "IndiePage", description: "Build a personal landing page with bio, links, social icons, and custom themes. Export as standalone HTML.", icon: Globe, href: "/tools/indiepage", badge: "Personal", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500" },
+      { name: "IndiePage", description: "Build a personal landing page with bio, links, social icons, and custom themes. Export as standalone HTML.", icon: Globe, href: "/tools/indiepage", badge: "Personal", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500", isNew: true },
     ],
   },
   {
@@ -186,9 +188,11 @@ export function ToolsSection() {
 
   // Build a reverse-lookup from href → Tool
   const toolByHref = new Map<string, Tool>()
+  const allTools: Tool[] = []
   for (const cat of categories) {
     for (const t of cat.tools) {
       toolByHref.set(t.href, t)
+      allTools.push(t)
     }
   }
 
@@ -196,6 +200,10 @@ export function ToolsSection() {
   const favoriteTools = favorites
     .map((href) => toolByHref.get(href))
     .filter((t): t is Tool => t !== undefined && matchesSearch(t))
+
+  // Curated rows — only shown on the unfiltered "All" view
+  const popularTools = allTools.filter((t) => t.popular && matchesSearch(t))
+  const newTools = allTools.filter((t) => t.isNew && matchesSearch(t))
 
   // Categories with tools filtered by search
   const baseCategories = activeFilter === "all"
@@ -210,7 +218,9 @@ export function ToolsSection() {
     .filter((c) => c.tools.length > 0)
 
   const showFavorites = activeFilter === "all" && favoriteTools.length > 0
-  const hasAnyResults = showFavorites || visibleCategories.length > 0
+  const showPopular = activeFilter === "all" && popularTools.length > 0
+  const showNew = activeFilter === "all" && newTools.length > 0
+  const hasAnyResults = showFavorites || showPopular || showNew || visibleCategories.length > 0
 
   function clearSearch() {
     setSearchQuery("")
@@ -334,6 +344,54 @@ export function ToolsSection() {
               </div>
             )}
 
+            {/* 🔥 Most Popular Section */}
+            {showPopular && (
+              <div>
+                <div className="flex items-center gap-2.5 mb-7">
+                  <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+                  <h2 className="text-xl font-bold tracking-tight">Most Popular</h2>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {popularTools.length} tool{popularTools.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {popularTools.map((tool) => (
+                    <ToolCard
+                      key={tool.name}
+                      tool={tool}
+                      isFavorited={favorites.includes(tool.href)}
+                      onToggleFavorite={toggleFavorite}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ✨ Newly Added Section */}
+            {showNew && (
+              <div>
+                <div className="flex items-center gap-2.5 mb-7">
+                  <Sparkles className="w-4 h-4 text-violet-500" />
+                  <h2 className="text-xl font-bold tracking-tight">Newly Added</h2>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {newTools.length} tool{newTools.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {newTools.map((tool) => (
+                    <ToolCard
+                      key={tool.name}
+                      tool={tool}
+                      isFavorited={favorites.includes(tool.href)}
+                      onToggleFavorite={toggleFavorite}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Regular categories */}
             {visibleCategories.map((cat) => (
               <div key={cat.id}>
@@ -379,7 +437,13 @@ function ToolCard({
       href={tool.href}
       className="group"
     >
-      <Card className={`h-full flex flex-col border-t-2 ${tool.borderColor}`}>
+      <Card className={`relative h-full flex flex-col border-t-2 ${tool.borderColor}`}>
+        {tool.isNew && (
+          <span className="absolute -top-2 left-3 inline-flex items-center gap-1 rounded-full bg-violet-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+            <Sparkles className="w-2.5 h-2.5" />
+            New
+          </span>
+        )}
         <CardHeader className="flex-1">
           <div className="mb-4 flex items-start justify-between">
             <div className={`w-10 h-10 rounded-lg ${tool.bgColor} flex items-center justify-center`}>
