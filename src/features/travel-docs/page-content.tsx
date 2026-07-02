@@ -278,6 +278,16 @@ export function TravelDocsContent() {
           }
         />
         <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p>Organize travel documents, packing lists, and expenses for every trip.</p>
+            <p className="text-xs text-muted-foreground/70">
+              {tripTab === "overview" && "Overview of all your trips."}
+              {tripTab === "docs" && "Manage packing lists for travel."}
+              {tripTab === "bookings" && "Track travel expenses."}
+              {tripTab === "packing" && "Store emergency contacts and documents."}
+              {tripTab === "expenses" && "Track travel expenses."}
+            </p>
+          </div>
           {/* Trip header */}
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
@@ -666,6 +676,13 @@ export function TravelDocsContent() {
         }
       />
       <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Organize travel documents, packing lists, and expenses for every trip.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {mainTab === "trips" && "Overview of all your trips."}
+            {mainTab === "packing" && "Manage packing lists for travel."}
+          </p>
+        </div>
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-bold">Travel Docs</h1>

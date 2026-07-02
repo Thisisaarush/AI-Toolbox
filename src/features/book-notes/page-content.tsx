@@ -516,6 +516,15 @@ export function BookNotesContent() {
       />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Capture highlights, summaries, and key takeaways from books.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "library" && "Browse all your books and notes."}
+            {view === "add-book" && "Search and add a new book to your library."}
+            {view === "book-detail" && "View book highlights and summaries."}
+            {view !== "library" && view !== "add-book" && view !== "book-detail" && "Write and edit book reviews."}
+          </p>
+        </div>
 
         {/* ── Add book ── */}
         {view === "add-book" && (

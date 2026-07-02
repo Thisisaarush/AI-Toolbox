@@ -473,6 +473,14 @@ export function ColorStudioContent() {
       <ToolHeader title="Color & Design Studio" icon={Palette} color="text-fuchsia-500" badge="Design" />
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Design harmonious color schemes for your projects.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "generator" && "Create palettes from a base color."}
+            {tab === "contrast" && "Check WCAG contrast ratios."}
+            {tab === "gradient" && "Build and preview gradients."}
+          </p>
+        </div>
 
         {/* ── Tab bar ───────────────────────────────────────── */}
         <div className="flex items-center gap-2 flex-wrap">

@@ -88,6 +88,9 @@ export function ViralPostContent() {
     <>
       <ToolHeader title="Viral Post Studio" icon={Sparkles} color="text-yellow-500" badge="Creator" />
       <div className="max-w-3xl mx-auto px-5 py-6 space-y-5">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Generate platform-optimized posts with engagement scoring and hook alternatives.</p>
+        </div>
 
         {/* Format picker */}
         <div className="flex flex-wrap gap-2">

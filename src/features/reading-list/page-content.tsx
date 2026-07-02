@@ -369,6 +369,9 @@ export function ReadingListContent() {
         }
       />
       <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Manage your to-read list and track reading progress.</p>
+        </div>
         {/* Stats */}
         {store.items.length > 0 && (
           <div className="grid grid-cols-4 gap-4">

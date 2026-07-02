@@ -206,6 +206,9 @@ export function LogoMakerContent() {
     <>
       <ToolHeader title="Logo Maker" icon={Palette} color="text-pink-500" badge="Creative" />
       <div className="max-w-6xl mx-auto px-5 py-6">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Design simple logos with icon picker, color presets, and SVG/PNG export.</p>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
           {/* ── Controls ──────────────────────────────────────────────────── */}

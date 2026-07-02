@@ -209,6 +209,14 @@ ${o.faq.map((q) => `<div class="faq-item"><h4>${q.question}</h4><p>${q.answer}</
     <>
       <ToolHeader title="Landing Page Builder" icon={Layout} color="text-purple-500" badge="Launch" />
       <div className="max-w-5xl mx-auto px-5 py-6">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Generate complete landing page copy with hero, features, pricing, and FAQ.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {mainTab === "form" && "Describe your product for landing page generation."}
+            {mainTab === "output" && "View and customize generated landing page sections."}
+            {mainTab === "history" && "Revisit past landing pages."}
+          </p>
+        </div>
         {/* Tab bar */}
         <div className="flex gap-1.5 border-b border-border mb-8">
           {(["form", "output", "history"] as const).map((t) => (

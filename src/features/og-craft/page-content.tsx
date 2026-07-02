@@ -424,6 +424,16 @@ export const metadata: Metadata = {
     <div className="min-h-screen flex flex-col">
       <ToolHeader title="OG Craft" icon={Image} color="text-violet-500" badge="SEO" />
       <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Design OG images and preview how URLs render on social platforms.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "checker" && "Preview how any URL renders on social platforms."}
+            {tab === "designer" && "Design custom OG images with text and branding."}
+            {tab === "generator" && "Generate OG images from templates."}
+            {tab === "batch" && "Process multiple URLs at once."}
+            {tab === "bulk" && "Generate OG images in bulk for your site."}
+          </p>
+        </div>
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-1">OG Craft</h1>
           <p className="text-muted-foreground leading-relaxed">Preview, design, and generate Open Graph meta tags.</p>

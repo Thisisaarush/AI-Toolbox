@@ -91,6 +91,9 @@ export function BuildOrSkipContent() {
     <>
       <ToolHeader title="Build or Skip" icon={Hammer} color="text-rose-500" badge="Research" />
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Get a brutally honest verdict on your idea with pros, cons, risks, and pivot suggestions.</p>
+        </div>
 
         {/* Input form */}
         <div className="space-y-4">

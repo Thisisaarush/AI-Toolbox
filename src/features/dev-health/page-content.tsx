@@ -171,6 +171,14 @@ export function DevHealthContent() {
     <>
       <ToolHeader title="Dev Health" icon={Brain} color="text-indigo-400" badge="Personal" />
       <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Stay healthy while coding with pomodoro timer, health log, and streak tracking.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {activeTab === "pomodoro" && "Focus timer with work/break intervals."}
+            {activeTab === "log" && "Log daily health metrics like sleep, energy, and mood."}
+            {activeTab === "stats" && "View weekly heatmaps and health trends."}
+          </p>
+        </div>
 
         {/* Tab bar */}
         <div className="flex gap-1.5 border-b border-border mb-8">

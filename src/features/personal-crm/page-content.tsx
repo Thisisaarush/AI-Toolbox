@@ -648,6 +648,14 @@ export function PersonalCRMContent() {
       />
 
       <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full space-y-6">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Track contacts, log interactions, and never forget a follow-up.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "list" && "Browse all your contacts."}
+            {view === "detail" && "View contact details and interaction history."}
+            {view === "dashboard" && "See relationship health and follow-up reminders."}
+          </p>
+        </div>
         {/* View Tabs */}
         <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl w-fit">
           {([

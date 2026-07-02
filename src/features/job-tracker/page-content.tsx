@@ -314,6 +314,17 @@ export function JobTrackerContent() {
       </div>
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Track your job applications through every stage with a Kanban pipeline.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "pipeline" && "Kanban view of your job applications by stage."}
+            {view === "add-app" && "Add a new job application."}
+            {view === "app-detail" && "View application details, notes, and contacts."}
+            {view === "resumes" && "Manage resumes and versions for different roles."}
+            {view === "stats" && "Track application metrics and success rates."}
+            {view === "cover-letter" && "Write and store cover letters for applications."}
+          </p>
+        </div>
 
         {/* ── Add Application ── */}
         {view === "add-app" && (

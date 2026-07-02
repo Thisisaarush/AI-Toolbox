@@ -352,6 +352,9 @@ export function FakeItContent() {
       <ToolHeader title="Fake Data Generator" icon={Database} color="text-blue-500" badge="Data" />
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-7">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Generate realistic mock data for testing with JSON or CSV export.</p>
+        </div>
 
         {/* ── Fields ─────────────────────────────────────────── */}
         <section className="space-y-3">

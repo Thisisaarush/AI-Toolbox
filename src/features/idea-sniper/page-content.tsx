@@ -560,6 +560,14 @@ export function IdeaSniperContent() {
         }
       />
       <main className="flex-1 max-w-4xl mx-auto px-5 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Validate your product idea with market research and competitor analysis.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "input" && "Describe your product idea for validation."}
+            {view === "result" && "Review market analysis and competitive landscape."}
+            {view === "history" && "Revisit past validation results."}
+          </p>
+        </div>
 
         {/* ── INPUT ──────────────────────────────────────────────────────────── */}
         {view === "input" && (

@@ -7,7 +7,7 @@ import { ArrowRight, Star, Search, X,
   Dumbbell, CheckCircle2, TrendingUp, Shield, Users, Plane,
   BookOpen, List, MessageSquare, Briefcase, Calendar, FileSignature,
   Scroll, Palette, Layout, Eye, Hammer, Sparkles, Brain, UserCheck,
-  Braces, FilePlus, MessageCircle, Dices, Flame, Printer, Database,
+  Braces, FilePlus, MessageCircle, Dices, Flame, Printer, Database, Car,
 } from "lucide-react"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -39,6 +39,7 @@ const categories: Category[] = [
     label: "Development",
     legendColor: "bg-blue-500",
     tools: [
+      { name: "DependGuard", description: "Scan package.json for outdated, vulnerable, or typosquatted dependencies. AI-powered analysis and health scoring.", icon: Shield, href: "/tools/dependguard", badge: "Dev Tool", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500" },
       { name: "DNS Desk", description: "All your domains in one dashboard. Visual DNS editor, expiry alerts, propagation checker, health monitor.", icon: Globe, href: "/tools/dns-desk", badge: "Dev Tool", color: "text-sky-500", bgColor: "bg-sky-50 dark:bg-sky-950", borderColor: "border-t-sky-500" },
       { name: "Env Manager", description: "Manage environment variables across projects and environments. Sync to Vercel, Railway, and Fly.io in one click.", icon: KeyRound, href: "/tools/env-manager", badge: "Dev Tool", color: "text-indigo-500", bgColor: "bg-indigo-50 dark:bg-indigo-950", borderColor: "border-t-indigo-500" },
       { name: "Changelog AI", description: "Paste your git log or fetch from GitHub. AI writes user-facing release notes grouped by type.", icon: GitBranch, href: "/tools/changelog-ai", badge: "Dev Tool", color: "text-cyan-500", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
@@ -112,6 +113,7 @@ const categories: Category[] = [
       { name: "Travel Docs", description: "Organize travel documents, visa requirements, and packing lists. Never miss a document for any trip.", icon: Plane, href: "/tools/travel-docs", badge: "Personal", color: "text-cyan-600", bgColor: "bg-cyan-50 dark:bg-cyan-950", borderColor: "border-t-cyan-500" },
       { name: "Visualize Habit", description: "Track habits with a GitHub-style heatmap, monthly calendar, weekly view, and detailed stats with streaks.", icon: Flame, href: "/tools/visualize-habit", badge: "Personal", color: "text-orange-500", bgColor: "bg-orange-50 dark:bg-orange-950", borderColor: "border-t-orange-500" },
       { name: "IndiePage", description: "Build a personal landing page with bio, links, social icons, and custom themes. Export as standalone HTML.", icon: Globe, href: "/tools/indiepage", badge: "Personal", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950", borderColor: "border-t-emerald-500" },
+      { name: "Vehicle Desk", description: "Track your vehicles, manage PUC/insurance/RC expiry, check challans, and keep your vehicle portfolio in one place.", icon: Car, href: "/tools/vehicle-desk", badge: "Personal", color: "text-blue-600", bgColor: "bg-blue-50 dark:bg-blue-950", borderColor: "border-t-blue-500" },
     ],
   },
   {

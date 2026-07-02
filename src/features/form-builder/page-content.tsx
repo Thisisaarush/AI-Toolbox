@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { ToolHeader } from "@/components/shared/tool-header"
 import { useHashNav } from "@/lib/use-hash-nav"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import {
@@ -12,7 +13,7 @@ import {
   FilePlus, GripVertical, Plus, Trash2, Copy, Eye, Share2, BarChart3,
   Settings, Palette, ArrowLeft, ArrowRight, Check, X, ChevronRight,
   ChevronUp, AlertCircle, ExternalLink, Download, Save, Undo2,
-  Sparkles, Bold, Link2, Code,
+  Sparkles, Bold, Link2, Code, Loader2, Globe,
 } from "lucide-react"
 import type {
   Form, FormField, FormResponse, FieldType, FieldOption, Condition,
@@ -698,6 +699,19 @@ export function FormBuilderContent() {
     if (responses.length > 0) saveResponses(responses)
   }, [responses])
 
+  // Track views when preview tab is opened (single increment per form per session)
+  const viewedFormsRef = useRef<Set<string>>(new Set())
+  useEffect(() => {
+    if (view === "preview" && currentFormId && !viewedFormsRef.current.has(currentFormId)) {
+      viewedFormsRef.current.add(currentFormId)
+      setForms((prev) =>
+        prev.map((f) =>
+          f.id === currentFormId ? { ...f, views: f.views + 1, updatedAt: f.updatedAt } : f,
+        ),
+      )
+    }
+  }, [view, currentFormId])
+
   const currentForm = forms.find((f) => f.id === currentFormId) ?? null
 
   // ── Form list actions ────────────────────────────────────────────────
@@ -753,6 +767,11 @@ export function FormBuilderContent() {
           : f,
       ),
     )
+  }
+
+  function updateTheme(updates: Partial<FormTheme>) {
+    if (!currentForm) return
+    updateForm({ theme: { ...currentForm.theme, ...updates } })
   }
 
   function addField(type: FieldType) {
@@ -904,7 +923,6 @@ export function FormBuilderContent() {
       timeSpent: 0,
     }
     setResponses((prev) => [response, ...prev])
-    updateForm({ views: currentForm.views + 1 })
     setSubmitted(true)
     toast.success("Form submitted!")
   }
@@ -927,6 +945,23 @@ export function FormBuilderContent() {
   }
 
   // ── Responses ────────────────────────────────────────────────────────
+
+  const [serverResponses, setServerResponses] = useState<FormResponse[]>([])
+
+  useEffect(() => {
+    if (!currentForm) return
+    fetch(`/api/form/${currentForm.id}/responses`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.responses) setServerResponses(data.responses)
+      })
+      .catch(() => {})
+  }, [currentForm])
+
+  function handleDeleteResponse(id: string) {
+    setResponses((prev) => prev.filter((r) => r.id !== id))
+    toast.success("Response deleted")
+  }
 
   function exportCSV() {
     if (!currentForm) return
@@ -955,6 +990,35 @@ export function FormBuilderContent() {
 
   // ── Share ────────────────────────────────────────────────────────────
 
+  const [published, setPublished] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+
+  useEffect(() => {
+    if (!currentForm) return
+    fetch(`/api/form/${currentForm.id}`)
+      .then((r) => setPublished(r.ok))
+      .catch(() => setPublished(false))
+  }, [currentForm])
+
+  async function handlePublish() {
+    if (!currentForm) return
+    setPublishing(true)
+    try {
+      const res = await fetch("/api/form/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formId: currentForm.id,
+          title: currentForm.title,
+          formData: JSON.parse(JSON.stringify(currentForm)),
+        }),
+      })
+      if (res.ok) { setPublished(true); toast.success("Form published!") }
+      else toast.error("Failed to publish")
+    } catch { toast.error("Failed to publish") }
+    finally { setPublishing(false) }
+  }
+
   const shareUrl = currentForm
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/form/${currentForm.id}`
     : ""
@@ -965,7 +1029,9 @@ export function FormBuilderContent() {
   // ── Derived data ─────────────────────────────────────────────────────
 
   const formResponses = currentForm
-    ? responses.filter((r) => r.formId === currentForm.id)
+    ? [...responses.filter((r) => r.formId === currentForm.id), ...serverResponses].filter(
+        (r, i, arr) => arr.findIndex((x) => x.id === r.id) === i,
+      )
     : []
   const completionRate = currentForm && currentForm.views > 0
     ? Math.round((formResponses.length / currentForm.views) * 100)
@@ -1029,6 +1095,16 @@ export function FormBuilderContent() {
       />
 
       <div className="px-6 py-8">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6 max-w-5xl mx-auto">
+          <p>Build forms with drag-and-drop and collect responses.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "edit" && "Design your form with 15+ field types."}
+            {view === "preview" && "See the live form."}
+            {view === "responses" && "View collected submissions."}
+            {view === "share" && "Copy the form link."}
+          </p>
+        </div>
+
         {/* ── Form List ─────────────────────────────────────────────── */}
         {showFormList && (
           <div className="max-w-5xl mx-auto space-y-6">
@@ -1288,8 +1364,8 @@ export function FormBuilderContent() {
             </div>
 
             {/* Right: Field Settings */}
-            <div className="w-80 shrink-0 overflow-y-auto">
-              <div className="sticky top-0">
+            <div className="w-80 shrink-0 overflow-y-auto space-y-4">
+              <div className="sticky top-0 space-y-4">
                 {selectedField ? (
                   <div className="border border-border/60 rounded-xl p-5 bg-card">
                     <FieldSettingsPanel
@@ -1305,6 +1381,73 @@ export function FormBuilderContent() {
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Select a field to edit its settings
                     </p>
+                  </div>
+                )}
+
+                {/* Theme Settings */}
+                {currentForm && (
+                  <div className="border border-border/60 rounded-xl p-5 bg-card">
+                    <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                      <Palette className="w-4 h-4" /> Theme
+                    </h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs text-muted-foreground block mb-1">Primary Color</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={currentForm.theme.primaryColor}
+                            onChange={(e) => updateTheme({ primaryColor: e.target.value })}
+                            className="w-10 h-10 rounded-lg border border-input cursor-pointer"
+                          />
+                          <Input
+                            value={currentForm.theme.primaryColor}
+                            onChange={(e) => updateTheme({ primaryColor: e.target.value })}
+                            className="h-10 font-mono text-xs"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground block mb-1">Background Color</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={currentForm.theme.backgroundColor}
+                            onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
+                            className="w-10 h-10 rounded-lg border border-input cursor-pointer"
+                          />
+                          <Input
+                            value={currentForm.theme.backgroundColor}
+                            onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
+                            className="h-10 font-mono text-xs"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground block mb-1">Border Radius</label>
+                        <select
+                          value={currentForm.theme.borderRadius}
+                          onChange={(e) => updateTheme({ borderRadius: e.target.value })}
+                          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-xs"
+                        >
+                          <option value="0px">None</option>
+                          <option value="4px">Small</option>
+                          <option value="8px">Medium</option>
+                          <option value="12px">Large</option>
+                          <option value="16px">Extra Large</option>
+                          <option value="9999px">Full</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs text-muted-foreground">Show Progress Bar</label>
+                        <input
+                          type="checkbox"
+                          checked={currentForm.theme.showProgressBar}
+                          onChange={(e) => updateTheme({ showProgressBar: e.target.checked })}
+                          className="rounded border-gray-300 dark:border-gray-600 text-primary"
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -1423,6 +1566,11 @@ export function FormBuilderContent() {
                 <h2 className="text-lg font-bold">Responses</h2>
                 <p className="text-sm text-muted-foreground">
                   {formResponses.length} submission{formResponses.length !== 1 ? "s" : ""}
+                  {serverResponses.length > 0 && (
+                    <span className="text-muted-foreground/50 ml-2">
+                      ({serverResponses.length} from published form)
+                    </span>
+                  )}
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={exportCSV}>
@@ -1431,7 +1579,7 @@ export function FormBuilderContent() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div className="border border-border/60 rounded-xl p-4 bg-muted/20">
                 <div className="text-xs text-muted-foreground mb-1">Total Views</div>
                 <div className="text-2xl font-bold">{currentForm.views}</div>
@@ -1444,7 +1592,53 @@ export function FormBuilderContent() {
                 <div className="text-xs text-muted-foreground mb-1">Completion Rate</div>
                 <div className="text-2xl font-bold">{completionRate}%</div>
               </div>
+              <div className="border border-border/60 rounded-xl p-4 bg-muted/20">
+                <div className="text-xs text-muted-foreground mb-1">Server Responses</div>
+                <div className="text-2xl font-bold">{serverResponses.length}</div>
+              </div>
             </div>
+
+            {/* Response Analytics */}
+            {formResponses.length > 0 && (
+              <div className="border border-border/60 rounded-xl p-5 bg-muted/20">
+                <h3 className="text-sm font-semibold mb-4">Response Breakdown</h3>
+                <div className="grid grid-cols-2 gap-6">
+                  {currentForm.fields.filter((f) =>
+                    ["single_choice", "multiple_choice", "rating"].includes(f.type)
+                  ).slice(0, 4).map((field) => {
+                    const counts: Record<string, number> = {}
+                    let total = 0
+                    for (const r of formResponses) {
+                      const val = r.answers[field.id]
+                      if (val == null) continue
+                      if (Array.isArray(val)) {
+                        for (const v of val) { counts[v] = (counts[v] ?? 0) + 1; total++ }
+                      } else {
+                        counts[String(val)] = (counts[String(val)] ?? 0) + 1; total++
+                      }
+                    }
+                    const maxCount = Math.max(...Object.values(counts), 1)
+                    return (
+                      <div key={field.id} className="space-y-2">
+                        <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                        {Object.entries(counts).sort(([, a], [, b]) => b - a).map(([label, count]) => (
+                          <div key={label} className="flex items-center gap-2">
+                            <span className="text-xs w-24 truncate shrink-0">{label}</span>
+                            <div className="flex-1 h-5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary/60 rounded-full transition-all"
+                                style={{ width: `${(count / maxCount) * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-muted-foreground w-8 text-right">{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Response List */}
             {formResponses.length === 0 ? (
@@ -1458,7 +1652,7 @@ export function FormBuilderContent() {
             ) : (
               <div className="space-y-3">
                 {formResponses.map((r) => (
-                  <ResponseCard key={r.id} response={r} form={currentForm} />
+                  <ResponseCard key={r.id} response={r} form={currentForm} onDelete={() => handleDeleteResponse(r.id)} />
                 ))}
               </div>
             )}
@@ -1472,6 +1666,17 @@ export function FormBuilderContent() {
             <div>
               <h2 className="text-lg font-bold">Share Form</h2>
               <p className="text-sm text-muted-foreground">Share your form with others to start collecting responses</p>
+              <div className="flex items-center gap-3 pt-2">
+                <Button onClick={handlePublish} disabled={publishing} size="sm">
+                  {publishing ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : <Globe className="w-4 h-4 mr-1.5" />}
+                  {published ? "Republish" : "Publish Form"}
+                </Button>
+                {published && (
+                  <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-800">
+                    <Check className="w-3 h-3 mr-1" /> Published
+                  </Badge>
+                )}
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -1549,7 +1754,7 @@ export function FormBuilderContent() {
 
 // ── Response Card ─────────────────────────────────────────────────────────
 
-function ResponseCard({ response, form }: { response: FormResponse; form: Form }) {
+function ResponseCard({ response, form, onDelete }: { response: FormResponse; form: Form; onDelete?: () => void }) {
   const [expanded, setExpanded] = useState(false)
 
   const answerFields = form.fields.filter(
@@ -1585,6 +1790,14 @@ function ResponseCard({ response, form }: { response: FormResponse; form: Form }
 
       {expanded && (
         <div className="border-t border-border/60 px-4 py-3 space-y-3">
+          <div className="flex justify-end">
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete?.() }}
+              className="text-xs text-red-500 hover:text-red-600 flex items-center gap-1 transition-colors"
+            >
+              <Trash2 className="w-3 h-3" /> Delete
+            </button>
+          </div>
           {answerFields.map((field) => (
             <div key={field.id}>
               <div className="text-xs font-medium text-muted-foreground mb-0.5">

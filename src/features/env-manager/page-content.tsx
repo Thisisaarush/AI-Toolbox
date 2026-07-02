@@ -816,6 +816,15 @@ export function EnvManagerContent() {
         )}
 
         <main className={`flex-1 px-4 py-6 ${view === "project" && selectedProject ? "lg:max-w-4xl" : "max-w-5xl mx-auto w-full"}`}>
+          <div className="text-sm text-muted-foreground space-y-1 mb-6 max-w-5xl mx-auto">
+            <p>Organize and sync environment variables across projects.</p>
+            <p className="text-xs text-muted-foreground/70">
+              {view === "projects" && "Browse your environment variable projects."}
+              {view === "project" && "View and edit variables for a project."}
+              {view === "diff" && "Compare variables between projects."}
+              {view === "sync" && "Push variables to Vercel, Railway, or Fly.io."}
+            </p>
+          </div>
 
           {/* ── PROJECTS LIST ──────────────────────────────────────────────── */}
           {view === "projects" && (

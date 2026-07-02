@@ -719,6 +719,15 @@ export function SubSheriffContent() {
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Find and track all your subscriptions in one place.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "dashboard" && "Overview of all subscriptions and monthly spending."}
+            {view === "import" && "Scan your email for forgotten subscriptions."}
+            {view === "add" && "Manually add a subscription."}
+            {view === "detail" && "View and edit subscription details."}
+          </p>
+        </div>
 
         {/* ── Dashboard ──────────────────────────────────────────────────── */}
         {view === "dashboard" && (

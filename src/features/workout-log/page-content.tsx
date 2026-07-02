@@ -352,6 +352,18 @@ export function WorkoutLogContent() {
       </div>
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Track your workouts, log exercises, and visualize progress over time.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "sessions" && "Browse all your workout sessions."}
+            {view === "log" && "Log a new workout with exercises."}
+            {view === "programs" && "Follow structured workout programs."}
+            {view === "progress" && "Visualize your progress and PRs over time."}
+            {view === "add-session" && "Add a new workout session."}
+            {view === "session-detail" && "View details of a specific workout."}
+            {view === "program-detail" && "View and manage a workout program."}
+          </p>
+        </div>
 
         {/* ── Add Session ── */}
         {view === "add-session" && (

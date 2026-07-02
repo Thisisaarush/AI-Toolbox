@@ -557,6 +557,15 @@ export function InvoiceZeroContent() {
       />
 
       <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Create and send professional invoices in under a minute.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {mainTab === "invoices" && "Browse all your invoices."}
+            {view === "create" && "Build a new invoice from scratch."}
+            {view === "edit" && "Modify an existing invoice draft."}
+            {view === "preview" && "Review an invoice before sending."}
+          </p>
+        </div>
 
         {/* ── LIST ───────────────────────────────────────────────────────── */}
         {view === "list" && (

@@ -138,6 +138,12 @@ export function ShipTrackerContent() {
       <>
         <ToolHeader title="Ship Tracker" icon={Rocket} color="text-amber-500" badge="Personal" />
         <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p>Build streaks and ship projects with accountability and shame cards.</p>
+            <p className="text-xs text-muted-foreground/70">
+              {view === "list" && "Browse all your challenges."}
+            </p>
+          </div>
           <Button onClick={() => setView("new")}><Plus className="w-4 h-4" /> New Challenge</Button>
 
           {active && (
@@ -193,6 +199,12 @@ export function ShipTrackerContent() {
       <>
         <ToolHeader title="New Challenge" icon={Rocket} color="text-amber-500" badge="Personal" actions={<Button variant="ghost" size="sm" onClick={() => setView("list")}>Back</Button>} />
         <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p>Build streaks and ship projects with accountability and shame cards.</p>
+            <p className="text-xs text-muted-foreground/70">
+              {view === "new" && "Create a new challenge."}
+            </p>
+          </div>
           <Input placeholder="Challenge name (e.g. Ship 30 in 30)" value={newName} onChange={(e) => setNewName(e.target.value)} />
           <Textarea placeholder="Description or goal" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} rows={3} />
           <Input type="date" placeholder="Deadline" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} />
@@ -235,6 +247,12 @@ export function ShipTrackerContent() {
         </div>
       } />
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Build streaks and ship projects with accountability and shame cards.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "challenge" && "Track daily progress on a challenge with streaks."}
+          </p>
+        </div>
 
         {/* Progress */}
         <Card>

@@ -190,6 +190,15 @@ export function VisualizeHabitContent() {
       />
 
       <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-6">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Track habits with a GitHub-style heatmap, weekly view, and detailed stats.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "calendar" && "GitHub-style heatmap of your habit activity."}
+            {tab === "habits" && "Manage your habits."}
+            {tab === "weekly" && "Weekly breakdown of habit completion."}
+            {tab === "stats" && "Detailed statistics and streaks."}
+          </p>
+        </div>
         <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl w-fit">
           {(["calendar","habits","weekly","stats"] as Tab[]).map(t => (
             <button

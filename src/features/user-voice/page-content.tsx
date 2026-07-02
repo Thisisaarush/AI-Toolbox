@@ -119,6 +119,9 @@ export function UserVoiceContent() {
     <>
       <ToolHeader title="User Voice" icon={Users} color="text-violet-500" badge="Research" />
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Simulate user interviews with AI personas — get honest reactions and feature requests.</p>
+        </div>
 
         {/* Input form */}
         <Card>

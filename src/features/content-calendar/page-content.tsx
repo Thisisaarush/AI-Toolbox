@@ -296,6 +296,18 @@ export function ContentCalendarContent() {
         }
       />
       <main className="flex-1 max-w-6xl mx-auto px-5 py-6 w-full space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Plan and schedule content across channels with calendar, ideas, and Ghost publishing.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "calendar" && "Visual month and week view of your content schedule."}
+            {tab === "list" && "Browse all content as a list."}
+            {tab === "ideas" && "Brainstorm and save content ideas."}
+            {tab === "repurpose" && "Repurpose existing content for other channels."}
+            {tab === "analytics" && "Track content performance."}
+            {tab === "pillars" && "Manage content pillar topics."}
+            {tab === "settings" && "Configure content calendar preferences."}
+          </p>
+        </div>
         {/* Today banner */}
         {todayPieces.length > 0 && (
           <div className="flex items-center gap-4 p-4 rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/10">

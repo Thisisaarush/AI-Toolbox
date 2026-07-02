@@ -343,6 +343,17 @@ export function JsonStudioContent() {
       <ToolHeader title="JSON Studio" icon={Braces} color="text-blue-500" badge="Dev Tool" />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Edit, transform, and analyze JSON data.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "edit" && "Write and format JSON."}
+            {tab === "tree" && "Navigate JSON with a tree view."}
+            {tab === "diff" && "Compare two JSON documents."}
+            {tab === "schema" && "Generate a schema from sample JSON."}
+            {tab === "csv" && "Convert between JSON and CSV."}
+            {tab === "search" && "Deep search within JSON documents."}
+          </p>
+        </div>
 
         {/* ── Feature highlights ─────────────────────────────────────── */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">

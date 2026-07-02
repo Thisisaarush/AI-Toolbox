@@ -599,6 +599,14 @@ export function ChangelogAIContent() {
         }
       />
       <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Turn git commits into polished release notes.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "input" && "Paste your git log or fetch from GitHub."}
+            {view === "editor" && "Refine the AI-drafted changelog."}
+            {view === "history" && "Revisit past changelogs."}
+          </p>
+        </div>
 
         {/* ── INPUT ──────────────────────────────────────────────────────────── */}
         {view === "input" && (

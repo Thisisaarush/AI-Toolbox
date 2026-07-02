@@ -476,6 +476,14 @@ export function DecisionGameContent() {
     <div className="min-h-screen flex flex-col">
       <ToolHeader title="Decision Game" icon={HelpCircle} color="text-indigo-500" badge="Fun" />
       <main className="flex-1 max-w-3xl mx-auto px-4 py-6 w-full space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Make decisions fun with a magic 8-ball, spin wheel, and pros/cons analyzer.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "8ball" && "Ask the magic 8-ball a yes/no question."}
+            {tab === "wheel" && "Spin the wheel to pick from options."}
+            {tab === "proscons" && "Analyze pros and cons of a decision."}
+          </p>
+        </div>
         <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl w-fit">
           {tabs.map((t) => (
             <button

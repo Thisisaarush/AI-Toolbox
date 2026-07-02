@@ -234,6 +234,14 @@ export function ContractGenContent() {
       </div>
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Generate freelance contracts, NDAs, and service agreements from templates.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "library" && "Browse all your contracts and templates."}
+            {view === "new-contract" && "Create a new contract or NDA from a template."}
+            {view === "contract-detail" && "View and manage a specific contract."}
+          </p>
+        </div>
 
         {/* ── New Contract ── */}
         {view === "new-contract" && (

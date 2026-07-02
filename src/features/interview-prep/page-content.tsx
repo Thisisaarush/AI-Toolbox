@@ -364,6 +364,18 @@ export function InterviewPrepContent() {
         }
       />
       <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Practice behavioral and technical interviews with structured questions and feedback.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "bank" && "Browse a library of behavioral and technical questions."}
+            {tab === "practice" && "Practice answering questions with STAR method guidance."}
+            {tab === "mock" && "Run a timed mock interview session."}
+            {tab === "flashcards" && "Review key concepts with flashcards."}
+            {tab === "company" && "Research and prepare for a specific company."}
+            {tab === "progress" && "Track your interview prep progress and scores."}
+            {tab === "resources" && "Access interview preparation resources and tips."}
+          </p>
+        </div>
         {/* Tab bar */}
         <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl flex-wrap">
           {([

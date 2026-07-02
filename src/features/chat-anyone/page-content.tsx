@@ -336,6 +336,9 @@ export function ChatAnyoneContent() {
       <ToolHeader title="Chat with Anyone" icon={MessageCircle} color="text-pink-500" badge="Simulation" />
 
       <div className="max-w-4xl mx-auto px-6 pb-8">
+        <div className="text-sm text-muted-foreground space-y-1 mb-4">
+          <p>Practice conversations with AI personas — interviewers, friends, mentors, and more.</p>
+        </div>
         {/* Persona selector */}
         <div className="mb-4 relative">
           <button

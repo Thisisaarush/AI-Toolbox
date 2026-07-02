@@ -188,6 +188,9 @@ export function WorkbookPDFContent() {
       </div>
 
       <main className="workbook-print-area flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-6">
+        <div className="text-sm text-muted-foreground space-y-1 no-print">
+          <p>Create printable worksheets, quizzes, and checklists. Print or save as PDF.</p>
+        </div>
         {/* Templates */}
         <div className="no-print flex flex-wrap gap-2 items-center">
           <span className="text-xs font-medium text-muted-foreground">Templates:</span>

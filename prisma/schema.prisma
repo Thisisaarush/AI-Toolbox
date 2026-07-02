@@ -110,6 +110,28 @@ model Subscription {
   @@index([razorpaySubscriptionId])
 }
 
+model PublishedForm {
+  id        String   @id @default(cuid())
+  formId    String   @unique
+  title     String
+  formData  Json
+  publishedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  responses FormResponse[]
+}
+
+model FormResponse {
+  id          String   @id @default(cuid())
+  formId      String
+  form        PublishedForm @relation(fields: [formId], references: [formId], onDelete: Cascade)
+  answers     Json
+  submittedAt DateTime @default(now())
+  timeSpent   Int      @default(0)
+
+  @@index([formId])
+}
+
 model KnowledgeItem {
   id          String   @id @default(cuid())
   userId      String

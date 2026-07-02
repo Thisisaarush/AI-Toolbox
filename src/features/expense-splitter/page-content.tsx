@@ -218,6 +218,14 @@ export function ExpenseSplitterContent() {
           }
         />
         <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p>Split bills with friends and track who owes what.</p>
+            <p className="text-xs text-muted-foreground/70">
+              {tab === "expenses" && "Log shared expenses between friends."}
+              {tab === "settlements" && "See who owes whom and settle up."}
+              {tab === "summary" && "Overview of all balances and totals."}
+            </p>
+          </div>
           {/* Group info */}
           <div className="flex items-start justify-between gap-5 flex-wrap">
             <div>
@@ -499,6 +507,9 @@ export function ExpenseSplitterContent() {
         }
       />
       <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Split bills with friends and track who owes what.</p>
+        </div>
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-bold">Expense Splitter</h1>

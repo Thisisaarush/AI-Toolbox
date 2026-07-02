@@ -606,6 +606,17 @@ export function ResumeBuilderContent() {
       <input ref={fileInputRef} type="file" accept=".pdf,application/pdf" className="hidden" onChange={handleUpload} />
 
       <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Build, optimize, and tailor your resume with ATS analysis and AI help.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "builder" && "Edit and build your resume sections."}
+            {tab === "preview" && "Preview your resume as it will appear."}
+            {tab === "ats" && "Analyze resume for ATS compatibility."}
+            {tab === "tailor" && "Tailor your resume to a specific job description."}
+            {tab === "cover" && "Write and manage cover letters."}
+            {tab === "bullets" && "Polish bullet points with AI suggestions."}
+          </p>
+        </div>
         {/* Resume list */}
         <div className="flex gap-5 mb-5 overflow-x-auto pb-2">
           {resumes.map((r) => (

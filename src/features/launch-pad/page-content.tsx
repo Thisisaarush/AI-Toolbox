@@ -476,6 +476,16 @@ export function LaunchPadContent() {
         }
       />
       <main className="flex-1 max-w-4xl mx-auto px-5 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Generate launch content for Product Hunt, HN, Twitter, and more from one product description.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "form" && "Describe your product and configure your launch."}
+            {view === "output" && "View generated posts for Product Hunt, HN, Twitter, and more."}
+            {view === "history" && "Revisit past launch content."}
+            {view === "waitlist" && "Join or manage launch day waitlist."}
+            {view === "research" && "Research competitors and market positioning."}
+          </p>
+        </div>
 
         {/* ── FORM ─────────────────────────────────────────────────────────── */}
         {view === "form" && (

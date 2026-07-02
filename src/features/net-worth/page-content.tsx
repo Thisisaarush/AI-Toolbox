@@ -236,6 +236,14 @@ export function NetWorthContent() {
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Track your assets, liabilities, and net worth over time.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "dashboard" && "View your assets, liabilities, and net worth snapshot."}
+            {view === "add-account" && "Add new assets and liabilities."}
+            {view === "goals" && "Set and track savings targets."}
+          </p>
+        </div>
 
         {/* ── Add Account ── */}
         {view === "add-account" && (

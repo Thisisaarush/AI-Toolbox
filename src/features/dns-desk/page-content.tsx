@@ -597,6 +597,15 @@ export function DNSDeskContent() {
       />
 
       <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Manage all your domains and DNS records from one dashboard.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "domains" && "Browse your portfolio and manage DNS records."}
+            {view === "health-dashboard" && "Batch HTTPS, SSL, and expiry checks across all domains."}
+            {view === "propagation" && "Query DNS records across 4 global resolvers."}
+            {view === "cloudflare" && "Import zones from your Cloudflare account."}
+          </p>
+        </div>
 
         {/* ── DOMAINS LIST ─────────────────────────────────────────────────── */}
         {view === "domains" && (

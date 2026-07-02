@@ -242,6 +242,16 @@ export function IdVaultContent() {
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Store passport numbers, license IDs, and document expiry dates safely.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {view === "vault" && "Browse all stored documents."}
+            {view === "add-doc" && "Add a new document to your vault."}
+            {view === "doc-detail" && "View document details and expiry info."}
+            {view === "emergency-card" && "Set up emergency access information."}
+            {view === "setup-pin" && "Configure vault PIN for extra security."}
+          </p>
+        </div>
 
         {/* ── Setup PIN ── */}
         {view === "setup-pin" && (

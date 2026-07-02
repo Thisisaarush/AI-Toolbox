@@ -58,6 +58,9 @@ export function StalkrContent() {
     <>
       <ToolHeader title="Stalkr" icon={Eye} color="text-teal-500" badge="Research" />
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Research any brand or company — sentiment, SEO keywords, and actionable insights.</p>
+        </div>
 
         {/* Input */}
         <Card>

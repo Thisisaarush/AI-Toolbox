@@ -867,6 +867,9 @@ export function IndiePageContent() {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="text-sm text-muted-foreground space-y-1 mb-6">
+          <p>Build a personal landing page with bio, links, and social icons.</p>
+        </div>
         <div className="flex gap-8 items-start justify-center">
           {/* ── Editor ───────────────────────────────────────── */}
           <div className="w-[480px] shrink-0 space-y-4">

@@ -460,6 +460,15 @@ export function HabitTrackerContent() {
       />
 
       <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full space-y-8">
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>Build streaks and track daily habits with a clean heatmap calendar.</p>
+          <p className="text-xs text-muted-foreground/70">
+            {tab === "today" && "Check off today's habits and track your daily progress."}
+            {tab === "habits" && "Manage your habit list and create new ones."}
+            {tab === "heatmap" && "GitHub-style heatmap of your habit history."}
+            {tab === "weekly" && "Review your weekly habit completion stats."}
+          </p>
+        </div>
         {/* Daily banner */}
         {pendingCount > 0 && (
           <div className="flex items-center gap-4 p-4 rounded-xl border border-teal-500/30 bg-teal-500/10">
