@@ -1,6 +1,5 @@
 import { Header } from "@/components/shared/header"
 import { ToolsSection } from "@/components/home/tools-section"
-import { HeroCategories } from "@/components/home/hero-categories"
 import { CATEGORY_META, ALL_TOOL_COUNT } from "@/lib/tools-meta"
 
 export default function Home() {
@@ -46,8 +45,6 @@ export default function Home() {
             <p className="text-sm font-medium text-black/30 dark:text-white/30 mb-8 tracking-wider">
               {ALL_TOOL_COUNT}+ tools across {CATEGORY_META.length} categories
             </p>
-
-            <HeroCategories />
 
             {/* Scroll-down indicator */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-muted-foreground/40 animate-bounce">

@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes"
 import { CurrencyProvider } from "@/lib/currency-context"
 import { SubscriptionProvider } from "@/components/shared/subscription-context"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { CommandPalette } from "@/components/shared/command-palette"
 import { Toaster } from "sonner"
 import "./globals.css"
 
@@ -61,6 +62,7 @@ export default function RootLayout({
               <SubscriptionProvider>
                 <TooltipProvider>
                   {children}
+                  <CommandPalette />
                   <Toaster position="bottom-right" richColors />
                 </TooltipProvider>
               </SubscriptionProvider>
