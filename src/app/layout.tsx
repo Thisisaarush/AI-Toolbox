@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ThemeProvider } from "next-themes"
@@ -7,6 +8,7 @@ import { SubscriptionProvider } from "@/components/shared/subscription-context"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { CommandPalette } from "@/components/shared/command-palette"
 import { Toaster } from "sonner"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -25,11 +27,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Toolbox — Tools for developers who ship",
-  description: "A growing collection of focused tools for developers and solo builders. Subscriptions, invoices, OG images, launch copy, idea validation, changelogs, DNS, env secrets, fitness, documents, and more.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  description:
+    "A growing collection of focused tools for developers and solo builders. Subscriptions, invoices, OG images, launch copy, idea validation, changelogs, DNS, env secrets, fitness, documents, and more.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  ),
   openGraph: {
     title: "Toolbox — Tools for developers who ship",
-    description: "Focused tools for developers and solo builders. Each one slots into something you already do.",
+    description:
+      "Focused tools for developers and solo builders. Each one slots into something you already do.",
     type: "website",
   },
 }
@@ -40,15 +46,29 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+    >
       <html
         lang="en"
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         suppressHydrationWarning
       >
         <head>
-          <link rel="preconnect" href={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_test_") ? "https://clerk.accounts.dev" : "https://clerk.toolbox.app"} />
-          <script src="https://accounts.google.com/gsi/client" />
+          <link
+            rel="preconnect"
+            href={
+              process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith(
+                "pk_test_",
+              )
+                ? "https://clerk.accounts.dev"
+                : "https://clerk.toolbox.app"
+            }
+          />
+          <Script
+            src="https://accounts.google.com/gsi/client"
+            strategy="afterInteractive"
+          />
         </head>
         <body className="min-h-full flex flex-col">
           <ThemeProvider
@@ -68,6 +88,7 @@ export default function RootLayout({
               </SubscriptionProvider>
             </CurrencyProvider>
           </ThemeProvider>
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
