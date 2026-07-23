@@ -791,7 +791,7 @@ export function TravelDocsContent() {
 }
 
 // ── Collapsible (small inline helper) ────────────────────────────────────────
-function _CollapsibleSection({ title, children }: { title: string; children: React.ReactNode }) {
+function CollapsibleSection({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(true)
   return (
     <div>
@@ -804,4 +804,4 @@ function _CollapsibleSection({ title, children }: { title: string; children: Rea
   )
 }
 // suppress unused warning
-void _CollapsibleSection
+void CollapsibleSection
