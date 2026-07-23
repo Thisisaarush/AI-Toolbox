@@ -801,6 +801,11 @@ export function IndiePageContent() {
     )
   }
 
+  // ── Frame type & preview state ──────────────────────────────
+
+  const [frameType, setFrameType] = useState<FrameType>("iphone")
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   // ── Not loaded yet ──────────────────────────────────────────
 
   if (!loaded) {
@@ -813,11 +818,6 @@ export function IndiePageContent() {
       </>
     )
   }
-
-  // ── Frame type & preview state ──────────────────────────────
-
-  const [frameType, setFrameType] = useState<FrameType>("iphone")
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]

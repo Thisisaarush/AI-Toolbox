@@ -5,7 +5,7 @@ import { ToolHeader } from "@/components/shared/tool-header"
 import {
   Plane, Plus, Trash2, Loader2, Check, X, MapPin,
   FileText, Package, DollarSign, AlertTriangle, Clock,
-  ExternalLink, ChevronDown, ChevronUp, Sparkles,
+  ExternalLink, Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -789,19 +789,3 @@ export function TravelDocsContent() {
     </div>
   )
 }
-
-// ── Collapsible (small inline helper) ────────────────────────────────────────
-function _CollapsibleSection({ title, children }: { title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(true)
-  return (
-    <div>
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-3 text-sm font-semibold w-full text-left py-1.5">
-        {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        {title}
-      </button>
-      {open && children}
-    </div>
-  )
-}
-// suppress unused warning
-void _CollapsibleSection
