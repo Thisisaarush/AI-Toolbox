@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import { withSentryConfig } from "@sentry/nextjs"
 
 const csp = [
   "default-src 'self'",
@@ -6,7 +7,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' blob: data: https://oaidalleapiprodscus.blob.core.windows.net https://img.clerk.com",
   "font-src 'self'",
-  "connect-src 'self' https://api.openai.com https://api.clerk.com https://*.clerk.accounts.dev https://api.razorpay.com https://accounts.google.com https://gmail.googleapis.com",
+  "connect-src 'self' https://api.openai.com https://api.clerk.com https://*.clerk.accounts.dev https://api.razorpay.com https://accounts.google.com https://gmail.googleapis.com https://*.sentry.io https://*.ingest.sentry.io",
   "frame-src 'self' https://clerk.toolbox.app https://*.clerk.accounts.dev https://accounts.google.com",
   "frame-ancestors 'none'",
 ].join("; ")
@@ -40,4 +41,13 @@ const nextConfig: NextConfig = {
   ],
 }
 
-export default nextConfig
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // Pass the auth token for source map uploads (optional — no-op without it)
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+})

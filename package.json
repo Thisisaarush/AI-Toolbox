@@ -2,11 +2,15 @@
   "name": "toolbox",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0 <24.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
@@ -15,6 +19,7 @@
     "@google/generative-ai": "^0.24.1",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@sentry/nextjs": "^10.67.0",
     "@vercel/analytics": "^2.0.1",
     "@xyflow/react": "^12.11.0",
     "class-variance-authority": "^0.7.1",
