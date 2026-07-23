@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getUserId } from "@/lib/auth"
 import { handleApiError, ApiError } from "@/lib/api-error"
-import { rateLimit } from "@/lib/rate-limit"
+import { rateLimit, getClientIp } from "@/lib/rate-limit"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { getGeminiKey } from "@/lib/ai-key"
 
@@ -11,7 +11,7 @@ const aiLimiter = rateLimit({ max: 5, windowMs: 60000 })
 export async function POST(req: Request) {
   try {
     const userId = await getUserId(req)
-    const ip = req.headers.get("x-forwarded-for") ?? "unknown"
+    const ip = getClientIp(req)
     const uid = userId ?? ip
     const body = await req.json()
     const { action } = body

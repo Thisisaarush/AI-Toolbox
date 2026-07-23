@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getUserId } from "@/lib/auth"
 import { handleApiError, ApiError } from "@/lib/api-error"
-import { rateLimit } from "@/lib/rate-limit"
+import { rateLimit, getClientIp } from "@/lib/rate-limit"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { getGeminiKey } from "@/lib/ai-key"
 
@@ -44,7 +44,7 @@ function extractMeta(html: string): { title?: string; description?: string; ogIm
 export async function GET(req: Request) {
   try {
     const userId = await getUserId(req)
-    const ip = req.headers.get("x-forwarded-for") ?? "unknown"
+    const ip = getClientIp(req)
     const uid = userId ?? ip
     const { allowed } = limiter.check(`reading-list:${uid}`)
     if (!allowed) throw new ApiError("Too many requests", 429)
@@ -55,7 +55,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const userId = await getUserId(req)
-    const ip = req.headers.get("x-forwarded-for") ?? "unknown"
+    const ip = getClientIp(req)
     const uid = userId ?? ip
 
     const body = await req.json()

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getUserId } from "@/lib/auth"
 import { handleApiError, ApiError } from "@/lib/api-error"
-import { rateLimit } from "@/lib/rate-limit"
+import { rateLimit, getClientIp } from "@/lib/rate-limit"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import type { DepInfo, ScanResult } from "./types"
 
@@ -385,7 +385,7 @@ async function handleAIAnalysis(body: { geminiKey: string; deps: DepInfo[] }) {
 export async function POST(req: Request) {
   try {
     const userId = await getUserId(req)
-    const ip = req.headers.get("x-forwarded-for") ?? "unknown"
+    const ip = getClientIp(req)
     const { allowed } = limiter.check(`dependguard:${ip}`)
     if (!allowed) throw new ApiError("Too many requests", 429)
 

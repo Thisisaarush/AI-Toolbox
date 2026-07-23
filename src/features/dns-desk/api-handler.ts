@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getUserId } from "@/lib/auth"
 import { handleApiError, ApiError } from "@/lib/api-error"
-import { rateLimit } from "@/lib/rate-limit"
+import { rateLimit, getClientIp } from "@/lib/rate-limit"
 import type { DNSRecord, PropagationResult, RecordType, SSLInfo, WhoisInfo } from "./types"
 
 const limiter = rateLimit({ max: 20, windowMs: 60000 })
@@ -65,7 +65,7 @@ interface CrtShEntry {
 export async function POST(req: Request) {
   try {
     const userId = await getUserId(req)
-    const ip = req.headers.get("x-forwarded-for") ?? "unknown"
+    const ip = getClientIp(req)
     const uid = userId ?? ip
     const { allowed } = limiter.check(`dns-desk:${uid}:${ip}`)
     if (!allowed) throw new ApiError("Too many requests", 429)

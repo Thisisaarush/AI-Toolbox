@@ -4,6 +4,9 @@ import { getUserId } from "@/lib/auth"
 
 export async function POST(req: Request) {
   try {
+    const userId = await getUserId(req)
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
     const prisma = db()
     if (!prisma) return NextResponse.json({ error: "Database unavailable" }, { status: 503 })
 
@@ -12,6 +15,9 @@ export async function POST(req: Request) {
 
     const existing = await prisma.publishedForm.findUnique({ where: { formId } })
     if (existing) {
+      if (existing.userId !== userId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      }
       const updated = await prisma.publishedForm.update({
         where: { formId },
         data: { title: title ?? "Untitled Form", formData, updatedAt: new Date() },
@@ -20,7 +26,7 @@ export async function POST(req: Request) {
     }
 
     const published = await prisma.publishedForm.create({
-      data: { formId, title: title ?? "Untitled Form", formData },
+      data: { formId, userId, title: title ?? "Untitled Form", formData },
     })
     return NextResponse.json({ published: true, form: published })
   } catch (err) {
